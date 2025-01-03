@@ -5,8 +5,10 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Admin;
 use App\Models\Manager;
+use App\Models\Attendance;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -55,4 +57,8 @@ class User extends Authenticatable
     public function manager():HasOne{
         return $this->hasOne(Manager::class);
     }
+    public function attendances():HasMany{
+        return $this->hasMany(Attendance::class);
+    }
+    
 }

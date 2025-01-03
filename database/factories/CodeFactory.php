@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\bonuses>
  */
-class BonusesFactory extends Factory
+class CodeFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +17,8 @@ class BonusesFactory extends Factory
     public function definition(): array
     {
         return [
-            'total_amount' => $this->faker->randomFloat(2, 100, 10000), 
-            'used_amount' => $this->faker->randomFloat(2, 0, 10000)
+            'code' => $this->faker->unique->word(),
+            'bonus' => $this->faker->randomFloat(2, 100, 10000), 
         ];
     }
 }

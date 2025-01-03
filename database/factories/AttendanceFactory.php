@@ -15,10 +15,12 @@ class AttendanceFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
+    
+     public function definition(): array
     {
+        $user = User::inRandomOrder()->first(); 
         return [
-            'user_id' => User::factory(),
+            'user_id' => $user->id,
             'image_url' => $this->faker->imageUrl(200, 200, 'people'),
             'location' => $this->faker->address
         ];

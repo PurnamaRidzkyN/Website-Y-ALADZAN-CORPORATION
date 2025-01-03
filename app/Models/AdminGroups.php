@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AdminGroups extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'admin_id',
+        'group_id'       
+    ];
 
     public function groups(): BelongsTo
     {

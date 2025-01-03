@@ -13,9 +13,11 @@ class AdminGroupsFactory extends Factory
 
     public function definition()
     {
+        $group = Groups::inRandomOrder()->first(); 
+        $admin = Admin::inRandomOrder()->first(); 
         return [
-            'group_id' => Groups::factory(),
-            'admin_id' => Admin::factory(),
+            'group_id' => $group->id,
+            'admin_id' => $admin->id,
         ];
     }
 }

@@ -13,8 +13,11 @@ class LoanFactory extends Factory
 
     public function definition()
     {
+        $admin = Admin::inRandomOrder()->first(); 
+        $code = Code::inRandomOrder()->first(); 
+
         return [
-            'id_admin' => Admin::factory(),  // Assuming Admin factory is defined
+            'id_admin' => $admin->id,  // Assuming Admin factory is defined
             'name' => $this->faker->word,
             'description' => $this->faker->text,
             'loan_date' => $this->faker->date,
@@ -22,7 +25,7 @@ class LoanFactory extends Factory
             'total_payment' => 0,
             'outstanding_amount' => $this->faker->randomFloat(2, 1000, 10000),
             'phone' => $this->faker->phoneNumber,
-            'codes_id' => Code::factory(),  // Assuming Code factory is defined
+            'codes_id' => $code->id,  // Assuming Code factory is defined
         ];
     }
 }
