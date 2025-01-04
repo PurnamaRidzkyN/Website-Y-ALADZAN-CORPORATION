@@ -20,7 +20,7 @@ class ManagerFactory extends Factory
         return [
             'user_id' => User::factory(), // Relasi ke User
             'name' => $this->faker->name,
-            'foto' => $this->faker->imageUrl(200, 200, 'people'),
+            'foto' => 'https://randomuser.me/api/portraits/men/' . $this->faker->numberBetween(1, 100) . '.jpg',
             'phone' => $this->faker->phoneNumber,
         ];
     }

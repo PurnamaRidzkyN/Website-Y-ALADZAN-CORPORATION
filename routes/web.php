@@ -1,25 +1,31 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/home', function () {
-    return view('home',["title"=>"Home Page"]);
-});
-Route::get('/pembayaran', function () {
-    return view('pembayaran',["title"=>"Pembayaran"]);
-});
-Route::get('/admin', function () {
-    return view('admin',["title"=>"Admin"]);
-});
-Route::get('/peminjaman', function () {
-    return view('peminjaman',["title"=>"Peminjaman"]);
-});
-Route::get('/detail-peminjaman', function () {
-    return view('detailPeminjaman',["title"=>"Detail Peminjaman"]);
-});
+
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Middleware\CheckRole;
+
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+
+Route::post('/', [LoginController::class, 'authenticate']);
+
+Route::get('/home', [HomeController::class, 'showHome'])->middleware('auth')->name('home');
+
+Route::get('/transaksi-pembayaran', [PaymentController::class,'showPaymentGroups'])->middleware('auth')->name('Transaksi Pembayaran');
+
+Route::get('/transaksi-pembayaran/{group:name}', [PaymentController::class, 'showListAdminLoans'])
+    ->middleware(['auth', CheckRole::class.':'. 1])
+    ->name('List Admin');
+
+Route::get('/transaksi-pembayaran/{group:name}/{admin:name}', [PaymentController::class, 'showListLoans'])
+    ->middleware(['auth'])
+    ->name('Daftar Pembayaran');
+
+Route::get('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}', [PaymentController::class, 'showLoanDetail'])->middleware('auth')->name('Loan Detail');
 Route::get('/manajemen-data', function () {
     return view('manajemenData',["title"=>"Manajemen Data"]);
 });

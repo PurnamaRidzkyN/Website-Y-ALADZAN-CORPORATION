@@ -16,6 +16,7 @@ use App\Models\Payment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,11 +25,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $gwh =User::create([
+            'name' => 'Purnama',
+            'username' => 'PurnamaManajer',
+            'email' => 'purnamaA@gmail.com',
+            'password' => Hash::make('purnama'),
+            'role' => 1 
+        ]);
         Manager::factory(2)->recycle([
+            $gwh,
             User::factory(2)->create()
         ])->create();
 
+        $gwh =User::create([
+            'name' => 'Purnama',
+            'username' => 'PurnamaAdmin',
+            'email' => 'purnamaM@gmail.com',
+            'password' => Hash::make('purnama'),
+            'role' => 1 
+        ]);
         Admin::factory(10)->recycle([
+            $gwh,
             User::factory(10)->create(),
             Bonuses::factory(10)->create()
         ])->create();
@@ -39,8 +56,8 @@ class DatabaseSeeder extends Seeder
         Expense::factory(6)->recycle([
             CategoryExpense::factory(3)->create()
         ]);
-        Loan::factory(10)->create();
-        Payment::factory(20);
+        Loan::factory(30)->create();
+        Payment::factory(50)->create();
 
 
     }

@@ -16,6 +16,6 @@ class CategoryExpense extends Model
 
     public function expenses()
     {
-        return $this->hasMany(Expense::class, 'id_category');
+        return $this->hasMany(Expense::class, 'category_id');
     }
 }

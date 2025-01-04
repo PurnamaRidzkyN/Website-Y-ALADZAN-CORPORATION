@@ -8,11 +8,15 @@
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-              <x-nav-links href="home">Home</x-nav-links>
-        <x-nav-links href="pembayaran">Transaksi Pembayaran</x-nav-links>
-        <x-nav-links href="pengeluaran">Pencatatan Pengeluaran</x-nav-links>
-        <x-nav-links href="absensi">Absensi</x-nav-links>
-        <x-nav-links href="manajemen-data">Manajemen Data</x-nav-links>
+        <x-nav-links href="/home">Home</x-nav-links>
+        <x-nav-links href="/transaksi-pembayaran">Transaksi Pembayaran</x-nav-links>
+        <x-nav-links href="/pengeluaran">Pencatatan Pengeluaran</x-nav-links>
+        <x-nav-links href="/absensi">Absensi</x-nav-links>
+
+        @if(Auth::check() && Auth::user()->role == 1)
+        <!-- Menampilkan Manajemen Data Hanya untuk Role 1 -->
+        <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
+    @endif
               </div>
           </div>
         </div>
@@ -77,11 +81,11 @@
     <div x-show="isOpen" class="md:hidden" id="mobile-menu">
       <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-        <x-nav-links href="home">Home</x-nav-links>
-        <x-nav-links href="pembayaran">Pembayaran</x-nav-links>
-        <x-nav-links href="pengeluaran">Pengeluaran</x-nav-links>
-        <x-nav-links href="absensi">Absensi</x-nav-links>
-        <x-nav-links href="manajemen-data">Manajemen Data</x-nav-links>
+        <x-nav-links href="/home">Home</x-nav-links>
+        <x-nav-links href="/transaksi-pembayaran">Pembayaran</x-nav-links>
+        <x-nav-links href="/pengeluaran">Pengeluaran</x-nav-links>
+        <x-nav-links href="/absensi">Absensi</x-nav-links>
+        <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
 
     </div>
       <div class="border-t border-gray-700 pb-3 pt-4">

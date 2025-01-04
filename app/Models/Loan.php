@@ -28,7 +28,7 @@ class Loan extends Model
      */
     public function admin(): BelongsTo
     {
-        return $this->belongsTo(Admin::class, 'id_admin');
+        return $this->belongsTo(Admin::class, 'admin_id');
     }
 
     /**
@@ -36,7 +36,7 @@ class Loan extends Model
      */
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class, 'id_loan');
+        return $this->hasMany(Payment::class, 'loan_id');
     }
 
     /**

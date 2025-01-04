@@ -19,11 +19,20 @@ class Payment extends Model
         'image_url',
     ];
 
-    /**
-     * Relationship: Payment belongs to a Loan.
-     */
+    protected static function booted()
+    {
+        static::created(function ($payment) {
+            // Update total_payment dan outstanding_amount pada Loan setelah Payment ditambahkan
+            $loan = $payment->loan;
+            $totalPayment = $loan->payments->sum('amount');
+            $loan->update([
+                'total_payment' => $totalPayment,
+                'outstanding_amount' => $loan->total_amount - $totalPayment,
+            ]);
+        });
+    }
     public function loan(): BelongsTo
     {
-        return $this->belongsTo(Loan::class, 'id_loan');
+        return $this->belongsTo(Loan::class, 'loan_id');
     }
 }

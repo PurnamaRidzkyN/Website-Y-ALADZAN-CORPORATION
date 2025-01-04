@@ -14,7 +14,7 @@ return new class extends Migration
         // Tabel Loans
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_admin')->constrained('admins'); // Menggunakan foreignId untuk relasi
+            $table->foreignId('admin_id')->constrained('admins'); // Menggunakan foreignId untuk relasi
             $table->string('name');
             $table->text('description')->nullable();
             $table->date('loan_date');
@@ -29,7 +29,7 @@ return new class extends Migration
         // Tabel Payments
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_loan')->constrained('loans'); // Menggunakan foreignId untuk relasi ke tabel loans
+            $table->foreignId('loan_id')->constrained('loans'); // Menggunakan foreignId untuk relasi ke tabel loans
             $table->decimal('amount', 15, 2);
             $table->date('payment_date');
             $table->string('method');

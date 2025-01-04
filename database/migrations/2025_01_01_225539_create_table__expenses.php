@@ -21,10 +21,10 @@ return new class extends Migration
         // Tabel Expense
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->constrained('admins'); // Menggunakan foreignId untuk relasi ke admins
+            $table->foreignId('user_id')->constrained('users'); // Menggunakan foreignId untuk relasi ke admins
             $table->date('date');
             $table->decimal('amount', 15, 2);
-            $table->foreignId('id_category')->constrained('category_expenses'); // Menggunakan foreignId untuk relasi ke category_expenses
+            $table->foreignId('category_category')->constrained('category_expenses'); // Menggunakan foreignId untuk relasi ke category_expenses
             $table->text('description')->nullable();
             $table->string('method');
             $table->string('image_url')->nullable();

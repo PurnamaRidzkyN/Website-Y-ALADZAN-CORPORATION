@@ -26,7 +26,7 @@ class AdminFactory extends Factory
         return [
             'user_id' => User::factory(), // Relasi ke User
             'name' => $this->faker->name,
-            'foto' => $this->faker->imageUrl(200, 200, 'people'),
+            'foto' => 'https://randomuser.me/api/portraits/men/' . $this->faker->numberBetween(1, 100) . '.jpg',
             'salary' => $this->faker->numberBetween(5000000, 10000000),
             'bonus_id' => Bonuses::factory(),
             'phone' => $this->faker->phoneNumber,

@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 
 return new class extends Migration
@@ -50,25 +49,7 @@ return new class extends Migration
         });
     
         
-            // Create the trigger function to calculate remaining_amount
-            DB::unprepared('
-                CREATE OR REPLACE FUNCTION calculate_remaining_amount()
-                RETURNS TRIGGER AS $$
-                BEGIN
-                    NEW.remaining_amount := NEW.total_amount - NEW.used_amount;
-                    RETURN NEW;
-                END;
-                $$ LANGUAGE plpgsql;
-            ');
-        
-            // Attach the trigger to bonuses table
-            DB::unprepared('
-                CREATE TRIGGER trigger_calculate_remaining_amount
-                BEFORE INSERT OR UPDATE ON bonuses
-                FOR EACH ROW
-                EXECUTE FUNCTION calculate_remaining_amount();
-            ');
-        
+            
 
         // Tabel Admins
         Schema::create('admins', function (Blueprint $table) {
@@ -124,8 +105,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('bonuses');
-        DB::unprepared('DROP TRIGGER IF EXISTS trigger_calculate_remaining_amount ON bonuses');
-        DB::unprepared('DROP FUNCTION IF EXISTS calculate_remaining_amount');
+      
         Schema::dropIfExists('admin_groups');
         Schema::dropIfExists('groups');
         Schema::dropIfExists('attendances');
