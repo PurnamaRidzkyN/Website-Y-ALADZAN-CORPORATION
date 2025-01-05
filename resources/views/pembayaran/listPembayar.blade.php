@@ -2,38 +2,50 @@
     <x-slot:title>{{ $title }}</x-slot:title>
 
     <div class="bg-[#2D3748] py-16 sm:py-20">
+       
         <div class="container mx-auto px-6 lg:px-8">
-            <div class="mb-8 d-flex justify-content-between">
-                <!-- Tombol Kembali dengan Logo -->
-                <a href="{{ url()->previous() }}" class="px-6 py-3 bg-[#3182CE] text-white rounded-lg transition-all hover:bg-[#003366] d-flex items-center">
-                    <!-- Ikon SVG untuk Kembali -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                        <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                    </svg>
-                </a>
-            
-                <!-- Tombol Tambah Pembayar -->
-                <a href="#tambahPembayar" class="px-6 py-3 bg-[#48BB78] text-white rounded-lg transition-all hover:bg-[#2F855A] d-flex items-center">
-                    <!-- Ikon SVG untuk Tambah Pembayar -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                        <path fill-rule="evenodd" d="M12 2a1 1 0 0 1 1 1v7h7a1 1 0 1 1 0 2h-7v7a1 1 0 1 1-2 0v-7h-7a1 1 0 1 1 0-2h7V3a1 1 0 0 1 1-1Z" clip-rule="evenodd" />
-                    </svg>
-                    Tambah Pembayar
-                </a>
-            
-                <!-- Tombol Search di Samping -->
-                <div class="d-flex">
-                    <input type="text" class="form-control mr-3" id="searchInput" placeholder="Cari..." aria-label="Search" onkeyup="searchFunction()">
-                    <button class="px-6 py-3 bg-green-500 text-white rounded-lg transition-all hover:bg-green-700">
-                        <!-- Ikon SVG untuk Search -->
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                            <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
+            <div class="mb-8 flex justify-between items-center">
+                <!-- Tombol Kembali dan Tambah Data -->
+                <div class="flex space-x-4">
+                    <!-- Tombol Kembali -->
+                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-3.5 h-3.5 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 21">
+                            <path d="M15 12a1 1 0 0 0 .962-.726l2-7A1 1 0 0 0 17 3H3.77L3.175.745A1 1 0 0 0 2.208 0H1a1 1 0 0 0 0 2h.438l.6 2.255v.019l2 7 .746 2.986A3 3 0 1 0 9 17a2.966 2.966 0 0 0-.184-1h2.368c-.118.32-.18.659-.184 1a3 3 0 1 0 3-3H6.78l-.5-2H15Z"/>
+                        </svg>
+                        Kembali
+                    </button>
+        
+                    <!-- Tombol Tambah Data -->
+                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Tambah Data
+                        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                         </svg>
                     </button>
                 </div>
+        
+                <!-- Form Pencarian -->
+                <form class="flex items-center max-w-sm mx-auto">
+                    <label for="simple-search" class="sr-only">Search</label>
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search branch name..." required />
+                    </div>
+                    <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>
+                        <span class="sr-only">Search</span>
+                    </button>
+                </form>
             </div>
-            
-
+        </div>
+        
+        
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs" id="loanTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -54,8 +66,8 @@
             <!-- Tabs Content -->
             <div class="tab-content" id="loanTabsContent">
                 <!-- Sudah Lunas -->
-                <div class="tab-pane fade show active" id="fully-paid" role="tabpanel" aria-labelledby="fully-paid-tab">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                    <div class="tab-pane fade show active px-4 sm:px-6 lg:px-8" id="fully-paid" role="tabpanel" aria-labelledby="fully-paid-tab">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                         @foreach ($loans as $loan)
                             @if ($loan->total_payment >= $loan->total_amount)
                                 <div
@@ -71,7 +83,7 @@
                                         <!-- Total Payment -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Dibayar</h4>
-                                            <div class="bg-[#FF6347] p-1 rounded-lg text-center">
+                                            <div class="bg-[#FF6347] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->total_payment, 0, ',', '.') }}</p>
 
@@ -81,7 +93,7 @@
                                         <!-- Total Amount -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Total</h4>
-                                            <div class="bg-[#00B5D8] p-1 rounded-lg text-center">
+                                            <div class="bg-[#00B5D8] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->total_amount, 0, ',', '.') }}</p>
                                             </div>
@@ -90,7 +102,7 @@
                                         <!-- Outstanding Amount -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Sisa</h4>
-                                            <div class="bg-[#38A169] p-1 rounded-lg text-center">
+                                            <div class="bg-[#38A169] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->outstanding_amount, 0, ',', '.') }}</p>
                                             </div>
@@ -127,7 +139,7 @@
                 </div>
 
                 <!-- Belum Lunas -->
-                <div class="tab-pane fade" id="not-fully-paid" role="tabpanel" aria-labelledby="not-fully-paid-tab">
+                <div class="tab-pane fade show active px-4 sm:px-6 lg:px-8" id="fully-paid" role="tabpanel" aria-labelledby="fully-paid-tab">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                         @foreach ($loans as $loan)
                             @if ($loan->total_payment < $loan->total_amount)
@@ -145,7 +157,7 @@
                                         <!-- Total Payment -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Dibayar</h4>
-                                            <div class="bg-[#FF6347] p-1 rounded-lg text-center">
+                                            <div class="bg-[#FF6347] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->total_payment, 0, ',', '.') }}</p>
 
@@ -155,7 +167,7 @@
                                         <!-- Total Amount -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Total</h4>
-                                            <div class="bg-[#00B5D8] p-1 rounded-lg text-center">
+                                            <div class="bg-[#00B5D8] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->total_amount, 0, ',', '.') }}</p>
                                             </div>
@@ -164,7 +176,7 @@
                                         <!-- Outstanding Amount -->
                                         <div>
                                             <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Sisa</h4>
-                                            <div class="bg-[#38A169] p-1 rounded-lg text-center">
+                                            <div class="bg-[#38A169] p-0 rounded-lg text-center">
                                                 <p class="text-xl">Rp
                                                     {{ number_format($loan->outstanding_amount, 0, ',', '.') }}</p>
                                             </div>
