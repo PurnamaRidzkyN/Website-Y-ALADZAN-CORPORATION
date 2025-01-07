@@ -187,6 +187,7 @@
                                 <div class="p-6 text-[#F7FAFC]">
                                     <h3 class="text-xl font-semibold">{{ $loan->name }}</h3>
                                     <p class="text-sm mb-2">No HP: {{ $loan->phone }}</p>
+                                    <p class="text-sm mb-2">Kode: {{ $loan->code->code }}</p>
                                     <p class="text-sm">Tanggal Pembayaran: {{ $loan->loan_date }}</p>
                                     <p class="text-sm">Terakhir Diperbarui: {{ $loan->updated_at }}</p>
                                 </div>
@@ -254,6 +255,7 @@
                                 <div class="p-6 text-[#F7FAFC]">
                                     <h3 class="text-xl font-semibold">{{ $loan->name }}</h3>
                                     <p class="text-sm mb-2">No HP: {{ $loan->phone }}</p>
+                                    <p class="text-sm mb-2">Kode: {{ $loan->code->code }}</p>
                                     <p class="text-sm">Tanggal Pembayaran: {{ $loan->loan_date }}</p>
                                     <p class="text-sm">Terakhir Diperbarui: {{ $loan->updated_at }}</p>
                                 </div>

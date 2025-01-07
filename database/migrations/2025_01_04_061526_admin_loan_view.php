@@ -15,6 +15,7 @@ return new class extends Migration
             SELECT 
                 ag.group_id,
                 ag.admin_id,
+                l.codes_id,
                 a.name,
                 a.phone,
                 a.foto,
@@ -28,7 +29,7 @@ return new class extends Migration
             JOIN 
                 loans l ON a.id = l.admin_id
             GROUP BY 
-                ag.group_id, ag.admin_id, a.name, a.phone,a.foto;
+                ag.group_id, ag.admin_id, a.name, a.phone,a.foto,l.codes_id;
         ");
     }
 

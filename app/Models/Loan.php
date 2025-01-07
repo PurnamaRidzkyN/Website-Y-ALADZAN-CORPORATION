@@ -46,4 +46,5 @@ class Loan extends Model
     {
         return $this->belongsTo(Code::class, 'codes_id');
     }
+    protected $with = ['code'];
 }

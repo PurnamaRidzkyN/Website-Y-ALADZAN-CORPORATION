@@ -40,7 +40,10 @@
                 <h5 class="text-2xl font-bold text-[#F7FAFC] mb-4">Informasi Pembayaran</h5>
                 <ul class="list-none text-[#E2E8F0]">
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Nama:</strong> {{ $loans->name }}</li>
-                    <li class="detail-item text-[#F7FAFC] mb-4"><strong>Total Pembayaran:</strong>
+                    <li class="detail-item text-[#F7FAFC] mb-4"><strong>Kode:</strong>
+                        {{ $loans->code ? $loans->code->code : 'Kode tidak tersedia' }}
+                    </li>
+                                        <li class="detail-item text-[#F7FAFC] mb-4"><strong>Total Pembayaran:</strong>
                         Rp{{ number_format($loans->total_amount, 0, ',', '.') }}</li>
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Dibayar:</strong>
                         Rp{{ number_format($loans->total_payment, 0, ',', '.') }}</li>

@@ -1,10 +1,9 @@
 <?php
-
+// app/Models/Code.php
 namespace App\Models;
 
-use App\Models\Loan;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Code extends Model
@@ -15,9 +14,10 @@ class Code extends Model
         'bonus',
         'code'
     ];
-    
-    public function loan():BelongsTo{
-        return $this->belongsTo(Loan::class);
+
+    // Relasi satu code memiliki banyak loan
+    public function loans(): HasMany
+    {
+        return $this->hasMany(Loan::class);
     }
-    
 }
