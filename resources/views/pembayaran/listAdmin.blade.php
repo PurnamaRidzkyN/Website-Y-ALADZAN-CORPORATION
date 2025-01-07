@@ -1,34 +1,157 @@
 <x-layouts>
     <x-slot:title>{{ $title }}</x-slot:title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS Bundle (termasuk Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <div class="bg-[#2D3748] py-16 sm:py-20">
         <div class="container mx-auto px-6 lg:px-8">
-            <div class="mb-8 d-flex justify-content-between">
-                <!-- Tombol Kembali dengan Logo -->
-                <a href="{{ url()->previous() }}"
-                    class="px-6 py-3 bg-[#3182CE] text-white rounded-lg transition-all hover:bg-[#003366] d-flex items-center">
-                    <!-- Ikon SVG untuk Kembali -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                        <path fill-rule="evenodd"
-                            d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </a>
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="mb-8">
+                    <!-- Tombol Kembali dan Tambah Data -->
+                    <div class="flex justify-between items-center mb-4">
+                        <!-- Tombol Kembali -->
+                        <a href="{{ route('Transaksi Pembayaran') }}"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-6 mr-2 w-5 h-5">
+                                <path fill-rule="evenodd"
+                                    d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Kembali
+                        </a>
 
-                <!-- Tombol Search di Samping -->
-                <div class="d-flex">
-                    <input type="text" class="form-control mr-3" id="searchInput" placeholder="Cari..."
-                        aria-label="Search" onkeyup="searchFunction()">
-                    <button class="px-6 py-3 bg-green-500 text-white rounded-lg transition-all hover:bg-green-700">
-                        <!-- Ikon SVG untuk Search -->
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                            <path fill-rule="evenodd"
-                                d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
+                        <!-- Tombol Tambah Data -->
+                        <!-- Tombol untuk menampilkan modal pertama -->
+                        <button type="button"
+                            class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                            data-bs-toggle="modal" data-bs-target="#adminModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="size-6 mr-2 w-5 h-5">
+                                <path
+                                    d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                            </svg>
+                            Tambah Data
+                        </button>
+
+
+                        <!-- Modal Daftar Admin (Modal Pertama) -->
+                        <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                                    <div class="modal-header" style="background-color: #3182CE;">
+                                        <h5 class="modal-title" id="adminModalLabel">Daftar Admin</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-bordered" style="background-color: #1A2634;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-white">Nama</th>
+                                                    <th class="text-white">Foto Profil</th>
+                                                    <th class="text-white">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($admins as $admin)
+                                                    <tr>
+                                                        <td>
+                                                            <img src="{{ $admin->foto }}" alt="foto"
+                                                                class="rounded-circle" width="50" height="50">
+                                                        </td>
+                                                        <td class="text-white">{{ $admin->name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-danger"
+                                                                onclick="deleteAdmin({{ $admin->id }})">
+                                                                Hapus
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <!-- Tombol untuk membuka modal tambah admin baru -->
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#addAdminModal">
+                                            Tambah Admin Baru
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Modal Menambah Admin Baru (Modal Kedua) -->
+                    <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                                <div class="modal-header" style="background-color: #3182CE;">
+                                    <h5 class="modal-title" id="addAdminModalLabel">Tambah Admin Baru</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Pilih admin yang mau ditambahkan</p>
+                                    <form action="" method="POST">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label for="admin_id" class="form-label">Pilih Admin</label>
+                                            <select class="form-select" name="admin_id" id="admin_id">
+                                                @foreach ($adminAll as $admin)
+                                                    <option value="{{ $admin->id }}"
+                                                        data-profile="{{ $admin->profile_picture }}">
+                                                        {{ $admin->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success">Tambah Admin</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <!-- Form Pencarian -->
+                    <form class="flex items-center w-full">
+                        <label for="simple-search" class="sr-only">Search</label>
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                                </svg>
+                            </div>
+                            <input type="text" id="simple-search"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Search branch name..." required />
+                        </div>
+                        <button type="submit"
+                            class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            </svg>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </form>
                 </div>
             </div>
+
 
             <!-- Daftar Admin -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -193,23 +316,22 @@
         }
     </style>
     <script>
-       function searchFunction() {
-    // Ambil input dari kolom pencarian
-    let input = document.getElementById('searchInput').value.toLowerCase();
+        function searchFunction() {
+            // Ambil input dari kolom pencarian
+            let input = document.getElementById('searchInput').value.toLowerCase();
 
-    // Ambil semua elemen yang ingin dicari (nama admin)
-    let admins = document.querySelectorAll('.admin-card'); // Gunakan kelas untuk elemen admin
+            // Ambil semua elemen yang ingin dicari (nama admin)
+            let admins = document.querySelectorAll('.admin-card'); // Gunakan kelas untuk elemen admin
 
-    // Iterasi melalui semua elemen admin
-    admins.forEach(function(admin) {
-        let name = admin.querySelector('.admin-name').innerText.toLowerCase();
-        if (name.includes(input)) {
-            admin.style.display = 'block'; // Tampilkan admin yang cocok
-        } else {
-            admin.style.display = 'none'; // Sembunyikan admin yang tidak cocok
+            // Iterasi melalui semua elemen admin
+            admins.forEach(function(admin) {
+                let name = admin.querySelector('.admin-name').innerText.toLowerCase();
+                if (name.includes(input)) {
+                    admin.style.display = 'block'; // Tampilkan admin yang cocok
+                } else {
+                    admin.style.display = 'none'; // Sembunyikan admin yang tidak cocok
+                }
+            });
         }
-    });
-}
-
     </script>
 </x-layouts>

@@ -25,7 +25,8 @@ class PaymentController extends Controller
         return view('pembayaran/listAdmin', [
             'title' => 'List Admin - ' . $group->name,
             'admins' => $admins,
-            'group' => $group
+            'group' => $group,
+            'adminAll' => Admin::all()  
         ]);
     }
 
