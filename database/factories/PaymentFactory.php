@@ -16,7 +16,7 @@ class PaymentFactory extends Factory
 
         return [
             'loan_id' => $loan->id,  // Link to the Loan model
-            'amount' => $this->faker->randomFloat(2, 1000, 5000),
+            'amount' => $this->faker->randomFloat(2, 1000000, 5000000),
             'payment_date' => $this->faker->date,
             'method' => $this->faker->word,
             'description' => $this->faker->text,

@@ -12,25 +12,24 @@ return new class extends Migration
         // Query untuk membuat view
         DB::statement("
             CREATE VIEW admin_loan_view AS
-            SELECT 
-                ag.group_id,
-                ag.admin_id,
-                l.codes_id,
-                a.name,
-                a.phone,
-                a.foto,
-                SUM(l.total_payment) AS total_payments,
-                SUM(l.total_amount) AS total_amount,
-                SUM(l.outstanding_amount) AS outstanding_amount
-            FROM 
-                admin_groups ag
-            JOIN 
-                admins a ON ag.admin_id = a.id
-            JOIN 
-                loans l ON a.id = l.admin_id
-            GROUP BY 
-                ag.group_id, ag.admin_id, a.name, a.phone,a.foto,l.codes_id;
-        ");
+SELECT 
+    ag.group_id,
+    ag.admin_id,
+    a.name,
+    a.phone,
+    a.foto,
+    COALESCE(SUM(l.total_payment), 0) AS total_payments,
+    COALESCE(SUM(l.total_amount), 0) AS total_amount,
+    COALESCE(SUM(l.total_payment) / NULLIF(SUM(l.total_amount), 0), 0) AS payment_to_amount_ratio
+FROM 
+    admin_groups ag
+JOIN 
+    admins a ON ag.admin_id = a.id
+LEFT JOIN 
+    loans l ON ag.id = l.admin_group_id
+GROUP BY 
+    ag.group_id, ag.admin_id, a.name, a.phone, a.foto;
+ ");
     }
 
     public function down()

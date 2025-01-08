@@ -2,11 +2,18 @@
     <x-slot:title>{{ $title }}</x-slot:title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Bootstrap JS Bundle (termasuk Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <div class="bg-[#2D3748] py-16 sm:py-20">
+        @if (session('status') && session('message'))
+            <div class="alert alert-{{ session('status') }} alert-dismissible fade show mt-3" role="alert">
+                {{ session('message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="container mx-auto px-6 lg:px-8">
             <div class="container mx-auto px-6 lg:px-8">
                 <div class="mb-8">
@@ -34,7 +41,7 @@
                                 <path
                                     d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
                             </svg>
-                            Tambah Data
+                            Tambah Admin
                         </button>
 
 
@@ -66,10 +73,16 @@
                                                         </td>
                                                         <td class="text-white">{{ $admin->name }}</td>
                                                         <td>
-                                                            <button class="btn btn-danger"
-                                                                onclick="deleteAdmin({{ $admin->id }})">
-                                                                Hapus
-                                                            </button>
+                                                            <!-- Form untuk menghapus group -->
+                                                            <form style="display: inline-block;">
+                                                                <!-- Tombol untuk memicu modal konfirmasi hapus -->
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal{{ $admin->admin_id }}">
+                                                                    <i class="bi bi-trash"></i> Hapus
+                                                                </button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -86,6 +99,45 @@
                         </div>
 
                     </div>
+                    @foreach ($admins as $admin)
+                        <div class="modal fade" id="deleteModal{{ $admin->admin_id }}" tabindex="-1"
+                            aria-labelledby="deleteModalLabel{{ $admin->admin_id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ $admin->admin_id }}">Konfirmasi
+                                            Hapus
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Apakah Anda yakin ingin menghapus admin "<strong>{{ $admin->name }}</strong>"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <!-- Tombol Batal dengan Ikon -->
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle"></i> Batal
+                                        </button>
+
+                                        <!-- Form untuk menghapus admin -->
+                                        @dump($group->id);
+                                        <form id="deleteForm{{ $admin->id }}"
+                                            action="{{ route('admin.destroy', ['group' => $group->id]) }}"
+                                            method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="admin_id" value="{{ $admin->admin_id }}">
+                                            <input type="hidden" name="group_id" value="{{ $group->id }}">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                     <!-- Modal Menambah Admin Baru (Modal Kedua) -->
                     <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel"
                         aria-hidden="true">
@@ -98,23 +150,33 @@
                                 </div>
                                 <div class="modal-body">
                                     <p>Pilih admin yang mau ditambahkan</p>
-                                    <form action="" method="POST">
+                                    <form action="{{ route('admin.store', ['group' => $group->name]) }}"
+                                        method="POST">
                                         @csrf
                                         <div class="mb-3">
                                             <label for="admin_id" class="form-label">Pilih Admin</label>
-                                            <select class="form-select" name="admin_id" id="admin_id">
-                                                @foreach ($adminAll as $admin)
-                                                    <option value="{{ $admin->id }}"
-                                                        data-profile="{{ $admin->profile_picture }}">
-                                                        {{ $admin->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            @if ($adminAll->isEmpty())
+                                                <p class="text-danger">Tidak ada admin yang bisa ditambahkan.</p>
+                                            @else
+                                                <select class="form-select" name="admin_id" id="admin_id">
+                                                    @foreach ($adminAll as $admin)
+                                                        <option value="{{ $admin->id }}"
+                                                            data-profile="{{ $admin->profile_picture }}">
+                                                            {{ $admin->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            @endif
                                         </div>
 
-                                        <button type="submit" class="btn btn-success">Tambah Admin</button>
+                                        @if (!$adminAll->isEmpty())
+                                            <button type="submit" class="btn btn-success">Tambah Admin</button>
+                                        @endif
                                     </form>
+
                                 </div>
+
+
                             </div>
                         </div>
                     </div>
@@ -151,10 +213,16 @@
                     </form>
                 </div>
             </div>
-
+            @if ($admins->isEmpty())
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Admin</h5>
+                    <p class="mb-0">Grup ini saat ini belum memiliki admin. Silakan tambahkan admin.</p>
+                </div>
+            @endif
 
             <!-- Daftar Admin -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
                 @foreach ($admins as $admin)
                     <div
                         class="bg-[#1A2634] border border-[#2D3748] rounded-lg shadow-lg hover:shadow-xl transition-all">
@@ -189,15 +257,21 @@
                         <!-- Progress Bar -->
                         <div class="p-6 bg-[#2D3748]">
                             <div class="progress custom-progress">
+                                @php
+                                    // Cek apakah total_amount tidak nol
+                                    $percentage =
+                                        $admin->total_amount != 0
+                                            ? ($admin->total_payments / $admin->total_amount) * 100
+                                            : 0;
+                                @endphp
                                 <div class="progress-bar custom-progress-bar" role="progressbar"
-                                    style="width: {{ ($admin->total_payments / $admin->total_amount) * 100 }}%"
-                                    aria-valuenow="{{ ($admin->total_payments / $admin->total_amount) * 100 }}"
+                                    style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}"
                                     aria-valuemin="0" aria-valuemax="100">
-                                    <span
-                                        class="progress-text">{{ number_format(($admin->total_payments / $admin->total_amount) * 100, 2) }}%</span>
+                                    <span class="progress-text">{{ number_format($percentage, 2) }}%</span>
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Link ke halaman admin -->
                         <div class="p-6 bg-[#2D3748] text-right">
@@ -315,23 +389,5 @@
             background-color: #003366;
         }
     </style>
-    <script>
-        function searchFunction() {
-            // Ambil input dari kolom pencarian
-            let input = document.getElementById('searchInput').value.toLowerCase();
 
-            // Ambil semua elemen yang ingin dicari (nama admin)
-            let admins = document.querySelectorAll('.admin-card'); // Gunakan kelas untuk elemen admin
-
-            // Iterasi melalui semua elemen admin
-            admins.forEach(function(admin) {
-                let name = admin.querySelector('.admin-name').innerText.toLowerCase();
-                if (name.includes(input)) {
-                    admin.style.display = 'block'; // Tampilkan admin yang cocok
-                } else {
-                    admin.style.display = 'none'; // Sembunyikan admin yang tidak cocok
-                }
-            });
-        }
-    </script>
 </x-layouts>

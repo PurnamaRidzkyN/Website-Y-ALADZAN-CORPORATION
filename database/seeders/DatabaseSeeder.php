@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
         ])->create();
         Attendance::factory(100)->create();
         Groups::factory(3)->create();
-        AdminGroups::factory(40)->create();
+        AdminGroups::factory(29)->create();
         Code::factory(4)->create();
         Expense::factory(6)->recycle([
             CategoryExpense::factory(3)->create()

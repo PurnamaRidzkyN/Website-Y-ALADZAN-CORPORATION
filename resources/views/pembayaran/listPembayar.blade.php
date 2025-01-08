@@ -77,6 +77,18 @@
                                         <input type="number" class="form-control" id="phone" name="phone"
                                             required>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="code_id" class="form-label">Pilih Kode</label>
+                                        <select class="form-select" name="code_id" id="code_id">
+                                            @foreach ($codes as $code)
+                                                <option value="{{ $code->id }}">
+                                                    {{ $code->code }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
                             </div>
 
                             <!-- Modal Footer -->
@@ -206,7 +218,8 @@
                                     <div>
                                         <h4 class="text-lg font-semibold text-[#F7FAFC] mb-2">Total</h4>
                                         <div class="bg-[#00B5D8] p-0 rounded-lg text-center">
-                                            <p class="text-xl">Rp {{ number_format($loan->total_amount, 0, ',', '.') }}
+                                            <p class="text-xl">Rp
+                                                {{ number_format($loan->total_amount, 0, ',', '.') }}
                                             </p>
                                         </div>
                                     </div>

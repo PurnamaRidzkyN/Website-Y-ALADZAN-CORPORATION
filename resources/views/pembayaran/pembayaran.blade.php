@@ -1,11 +1,18 @@
 <x-layouts>
     <x-slot:title>{{ $title }}</x-slot:title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Bootstrap JS Bundle (termasuk Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <div class="bg-[#2D3748] py-16 sm:py-20">
+        @if (session('status') && session('message'))
+            <div class="alert alert-{{ session('status') }} alert-dismissible fade show mt-3" role="alert">
+                {{ session('message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="container mx-auto px-6 lg:px-8 w-full">
 
             <!-- Tombol untuk menambah group -->
@@ -17,7 +24,7 @@
                     <path
                         d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
                 </svg>
-                Tambah Data
+                Tambah Group
             </button>
 
             <!-- Modal Daftar Group (Modal Pertama) -->
@@ -42,17 +49,29 @@
                                 </thead>
                                 <tbody style="background-color: #1A2634; color: #F7FAFC !important;">
                                     @foreach ($groups as $group)
-                                        <tr>
+                                        <tr id="group-row-{{ $group->id }}">
                                             <td style="color: #F7FAFC !important;">{{ $group->name }}</td>
                                             <td style="color: #F7FAFC !important;">{{ $group->description }}</td>
                                             <td style="color: #F7FAFC !important;">
-                                                <button class="btn btn-danger"
-                                                    onclick="deleteGroup({{ $group->id }})">Hapus</button>
+                                                <!-- Form untuk menghapus group -->
+                                                <form style="display: inline-block;">
+                                                    <!-- Tombol untuk memicu modal konfirmasi hapus -->
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal{{ $group->id }}">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+
+
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+
+
 
 
                             <!-- Tombol untuk membuka modal tambah Group baru -->
@@ -65,43 +84,6 @@
                 </div>
             </div>
 
-
-            <!-- Modal Tambah Group Baru -->
-            <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
-                        <div class="modal-header" style="border-bottom: 1px solid #003366;">
-                            <h5 class="modal-title" id="addGroupModalLabel">Tambah Group Baru</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Isi nama dan deskripsi Group baru</p>
-                            <form action="" method="POST">
-                                @csrf
-                                <!-- Input untuk nama Group -->
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Nama Group</label>
-                                    <input type="text" class="form-control" id="name" name="name" required
-                                        style="background-color: #1A2634; color: #F7FAFC; border: 1px solid #3182CE;">
-                                </div>
-
-                                <!-- Input untuk deskripsi Group -->
-                                <div class="mb-3">
-                                    <label for="description" class="form-label">Deskripsi Group</label>
-                                    <textarea class="form-control" id="description" name="description" rows="3" required
-                                        style="background-color: #1A2634; color: #F7FAFC; border: 1px solid #3182CE;"></textarea>
-                                </div>
-
-                                <!-- Tombol untuk menambah Group, berwarna hijau -->
-                                <button type="submit" class="btn"
-                                    style="background-color: #38A169; color: white;">Tambah Group</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Menampilkan Grup dalam bentuk card -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -129,6 +111,7 @@
                         </div>
 
                         <!-- Bagian bawah card -->
+
                         <div class="p-6 bg-[#2D3748] text-right">
                             <a href="{{ route('List Admin', ['group' => $group->name]) }}"
                                 class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
@@ -141,4 +124,75 @@
             </div>
         </div>
     </div>
+    <!-- Modal Konfirmasi Hapus -->
+    @foreach ($groups as $group)
+        <div class="modal fade" id="deleteModal{{ $group->id }}" tabindex="-1"
+            aria-labelledby="deleteModalLabel{{ $group->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ $group->id }}">Konfirmasi Hapus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Apakah Anda yakin ingin menghapus group "<strong>{{ $group->name }}</strong>"?
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Tombol Batal dengan Ikon -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </button>
+
+                        <!-- Form untuk menghapus group -->
+                        <form id="deleteForm{{ $group->id }}" action="{{ route('group.destroy') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="group_id" value="{{ $group->id }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+
+    <!-- Modal Tambah Group Baru -->
+    <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <div class="modal-header" style="border-bottom: 1px solid #003366;">
+                    <h5 class="modal-title" id="addGroupModalLabel">Tambah Group Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Isi nama dan deskripsi Group baru</p>
+                    <form action="{{ route('group.store', ['group' => $group->name]) }}" method="POST">
+                        @csrf
+                        <!-- Input untuk nama Group -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Group</label>
+                            <input type="text" class="form-control" id="name" name="name" required
+                                style="background-color: #1A2634; color: #F7FAFC; border: 1px solid #3182CE;">
+                        </div>
+
+                        <!-- Input untuk deskripsi Group -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi Group</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required
+                                style="background-color: #1A2634; color: #F7FAFC; border: 1px solid #3182CE;"></textarea>
+                        </div>
+
+                        <!-- Tombol untuk menambah Group, berwarna hijau -->
+                        <button type="submit" class="btn" style="background-color: #38A169; color: white;">Tambah
+                            Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </x-layouts>

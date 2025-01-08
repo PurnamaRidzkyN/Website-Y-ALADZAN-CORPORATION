@@ -28,7 +28,7 @@
                             <path
                                 d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
                         </svg>
-                        Tambah Data
+                        Pembayaran Baru
                     </button>
                 </div>
 
@@ -36,8 +36,8 @@
 
             </div>
             <!-- Detail Pembayaran -->
+            <h5 class="text-2xl font-bold text-[#F7FAFC] mb-4">Informasi Pembayaran</h5>
             <div class="bg-[#1A2634] border border-[#2D3748] rounded-lg shadow-lg p-6 mb-6">
-                <h5 class="text-2xl font-bold text-[#F7FAFC] mb-4">Informasi Pembayaran</h5>
                 <ul class="list-none text-[#E2E8F0]">
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Nama:</strong> {{ $loans->name }}</li>
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Kode:</strong>

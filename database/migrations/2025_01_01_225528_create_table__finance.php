@@ -14,7 +14,7 @@ return new class extends Migration
         // Tabel Loans
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('admins'); // Menggunakan foreignId untuk relasi
+            $table->foreignId('admin_group_id')->constrained('admin_groups'); // Menggunakan foreignId untuk relasi
             $table->string('name');
             $table->text('description')->nullable();
             $table->date('loan_date');

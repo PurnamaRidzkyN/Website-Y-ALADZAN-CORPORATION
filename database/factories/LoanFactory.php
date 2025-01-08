@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Loan;
 use App\Models\Admin;
+use App\Models\AdminGroups;
 use App\Models\Code;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,15 +14,15 @@ class LoanFactory extends Factory
 
     public function definition()
     {
-        $admin = Admin::inRandomOrder()->first(); 
+        $admin = AdminGroups::inRandomOrder()->first(); 
         $code = Code::inRandomOrder()->first(); 
 
         return [
-            'admin_id' => $admin->id,  // Assuming Admin factory is defined
+            'admin_group_id' => $admin->id,  // Assuming Admin factory is defined
             'name' => $this->faker->name,
             'description' => $this->faker->text,
             'loan_date' => $this->faker->date,
-            'total_amount' => $this->faker->randomFloat(2, 1000, 10000),
+            'total_amount' => $this->faker->randomFloat(2, 100000, 1000000),
             'total_payment' => 0,
             'outstanding_amount' => 0,
             'phone' => $this->faker->phoneNumber,

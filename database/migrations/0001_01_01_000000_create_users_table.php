@@ -96,6 +96,7 @@ return new class extends Migration
             $table->foreignId('admin_id')->constrained('admins')->onDelete('cascade');
             $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
             $table->timestamps();
+            $table->unique(['admin_id', 'group_id']);
         });
     }
 

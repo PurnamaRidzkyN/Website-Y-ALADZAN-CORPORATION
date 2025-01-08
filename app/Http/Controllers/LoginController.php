@@ -43,7 +43,7 @@ class LoginController extends Controller
             // Regenerasi sesi setelah login berhasil
             $request->session()->regenerate();
 
-            return redirect()->intended('home'); // Redirect ke halaman tujuan
+            return redirect()->intended('/home'); // Redirect ke halaman tujuan
         }
 
         // Jika login gagal, kembalikan dengan pesan error
