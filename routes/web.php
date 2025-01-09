@@ -37,6 +37,7 @@ Route::post('/transaksi-pembayaran/{group:name}/{admin:name}/store', [PaymentCon
 
 // loans
 Route::get('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}', [PaymentController::class, 'showLoanDetail'])->middleware('auth')->name('Loan Detail');
+Route::post('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/store', [PaymentController::class, 'storePayment'])->name('payment.store');
 
 
 Route::get('/manajemen-data', function () {

@@ -34,7 +34,6 @@ return new class extends Migration
             $table->date('payment_date');
             $table->string('method');
             $table->text('description')->nullable();
-            $table->string('image_url')->nullable();
             $table->timestamps(); // Menambahkan kolom timestamps
         });
 

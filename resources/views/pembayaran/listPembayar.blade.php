@@ -69,8 +69,11 @@
 
                                     <div class="mb-3">
                                         <label for="total_payment" class="form-label">Total Pembayaran</label>
-                                        <input type="text" class="form-control" id="total_amount" name="total_amount"
-                                            required>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" class="form-control" id="total_amount"
+                                                name="total_amount"required>
+                                        </div>
                                     </div>
 
                                     <div class="mb-3">
@@ -112,6 +115,29 @@
                         </div>
                     </div>
                 </div>
+                <script>
+                    const nominalInput = document.getElementById('total_amount');
+                
+                    nominalInput.addEventListener('input', function(e) {
+                        // Remove non-numeric characters except comma and dot
+                        let value = this.value.replace(/[^\d]/g, '');
+                
+                        // Format to Rupiah
+                        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                
+                        // Set formatted value back to input
+                        this.value = value;
+                    });
+                
+                    // Add event listener for form submission
+                    const form = document.querySelector('form');
+                    form.addEventListener('submit', function(e) {
+                        // Remove the dots before sending the value to the server
+                        const valueWithoutDot = nominalInput.value.replace(/\./g, '');
+                        nominalInput.value = valueWithoutDot;
+                    });
+                </script>
+                
 
                 <script>
                     const totalPaymentInput = document.getElementById('total_payment');

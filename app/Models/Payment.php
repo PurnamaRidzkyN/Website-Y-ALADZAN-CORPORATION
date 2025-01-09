@@ -11,12 +11,11 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_loan',
+        'loan_id',
         'amount',
         'payment_date',
         'method',
         'description',
-        'image_url',
     ];
 
     protected static function booted()

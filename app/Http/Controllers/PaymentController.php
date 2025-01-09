@@ -174,14 +174,14 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function storeLoan(Request $request,$group,$admin)
+    public function storeLoan(Request $request, $group, $admin)
     {
-        
+
         $groups = AdminGroups::find($request->admin_group_id);
 
         if ($groups) {
             // Buat entri baru di tabel loans
-       
+
             Loan::create([
                 'admin_group_id' => $groups->id,
                 'name' => $request->name,
@@ -204,10 +204,6 @@ class PaymentController extends Controller
         return back()->with('status', 'error')->with('message', 'Admin group tidak ditemukan.');
     }
 
-    // Jika grup dan admin ditemukan, tambahkan admin ke grup
-
-
-
     public function showLoanDetail($group, $admin, $loan)
     {
         // Ambil grup berdasarkan nama
@@ -228,7 +224,33 @@ class PaymentController extends Controller
             'loans' => $loan, // Data pinjaman tunggal
             'group' => $group,
             'admin' => $admin,
-            'payments' => $payments
+            'payments' => $payments,
         ]);
+    }
+
+    public function storePayment(Request $request, $group, $admin, $loan)
+    {
+        $loans = Loan::find($request->loan_id);
+
+        if ($loans) {
+            Payment::create([
+                'loan_id' => $loans->id, // ID pinjaman yang telah diajukan
+                'amount' => $request->nominal, // Jumlah yang dibayar
+                'payment_date' => $request->tanggal, // Tanggal pembayaran
+                'method' => $request->payment_method,
+                'description' => $request->deskripsi // Cara pembayaran (Transfer, Tunai, dll)
+            ]);
+
+            // Redirect setelah berhasil
+            return redirect()->route('Loan Detail', [
+                'group' => $group,
+                'admin' => $admin,
+                'loan' => $loan,
+            ])->with('status', 'success')
+                ->with('message', 'Pembayaran berhasil ditambahkan!');
+        }
+
+        // Jika grup tidak ditemukan
+        return back()->with('status', 'error')->with('message', 'Admin group tidak ditemukan.');
     }
 }

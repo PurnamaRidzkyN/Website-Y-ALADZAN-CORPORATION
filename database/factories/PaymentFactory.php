@@ -20,7 +20,6 @@ class PaymentFactory extends Factory
             'payment_date' => $this->faker->date,
             'method' => $this->faker->word,
             'description' => $this->faker->text,
-            'image_url' => $this->faker->imageUrl,
         ];
     }
 }
