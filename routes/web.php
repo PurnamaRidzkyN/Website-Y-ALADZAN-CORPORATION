@@ -32,8 +32,8 @@ Route::post('/transaksi-pembayaran/{group:name}/store', [PaymentController::clas
 Route::get('/transaksi-pembayaran/{group:name}/{admin:name}', [PaymentController::class, 'showListLoans'])
     ->middleware(['auth'])
     ->name('Daftar Pembayaran');
-Route::delete('/transaksi-pembayaran/{group:name}/{admin:name}/destroy', [PaymentController::class, 'destroyAdmin'])->name('loan.destroy');
-Route::post('/transaksi-pembayaran/{group:name}/{admin:name}/store', [PaymentController::class, 'storeAdmin'])->name('loan.store');
+Route::delete('/transaksi-pembayaran/{group:name}/{admin:name}/destroy', [PaymentController::class, 'destroyLoan'])->name('loan.destroy');
+Route::post('/transaksi-pembayaran/{group:name}/{admin:name}/store', [PaymentController::class, 'storeLoan'])->name('loan.store');
 
 // loans
 Route::get('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}', [PaymentController::class, 'showLoanDetail'])->middleware('auth')->name('Loan Detail');

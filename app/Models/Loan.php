@@ -12,7 +12,7 @@ class Loan extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_admin',
+        'admin_group_id',
         'name',
         'description',
         'loan_date',

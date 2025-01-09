@@ -93,7 +93,7 @@ class PaymentController extends Controller
 
     public function destroyAdmin(Request $request)
     {
-        
+
         $adminId = $request->input('admin_id');  // Ambil ID grup dari form yang dikirimkan
         $groupId = $request->input('group_id');
         $group = Groups::find($groupId);
@@ -148,7 +148,7 @@ class PaymentController extends Controller
 
         return back()->with('status', 'danger')->with('message', 'Grup atau admin tidak ditemukan!');
     }
-
+    //loans
     public function showListLoans($group, $admin)
     {
 
@@ -169,9 +169,43 @@ class PaymentController extends Controller
             'loans' => $loans,
             'group' => $group,
             'admin' => $admin,
-            'codes' => $codes
+            'codes' => $codes,
+            'adminGroup' => $adminGroup
         ]);
     }
+
+    public function storeLoan(Request $request,$group,$admin)
+    {
+        
+        $groups = AdminGroups::find($request->admin_group_id);
+
+        if ($groups) {
+            // Buat entri baru di tabel loans
+       
+            Loan::create([
+                'admin_group_id' => $groups->id,
+                'name' => $request->name,
+                'description' => $request->description,
+                'loan_date' => $request->loan_date,
+                'total_amount' => $request->total_amount,
+                'outstanding_amount' => $request->total_amount,
+                'phone' => $request->phone,
+                'codes_id' => $request->code_id,
+            ]);
+
+            return redirect()->route('Daftar Pembayaran', [
+                'group' => $group,
+                'admin' => $admin,
+            ])->with('status', 'success')
+                ->with('message', 'Loan berhasil ditambahkan!');
+        }
+
+        // Jika tidak ditemukan grup
+        return back()->with('status', 'error')->with('message', 'Admin group tidak ditemukan.');
+    }
+
+    // Jika grup dan admin ditemukan, tambahkan admin ke grup
+
 
 
     public function showLoanDetail($group, $admin, $loan)

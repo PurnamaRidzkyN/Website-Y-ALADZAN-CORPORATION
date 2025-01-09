@@ -2,7 +2,12 @@
     <x-slot:title>{{ $title }}</x-slot:title>
 
     <div class="bg-[#2D3748] py-16 sm:py-20">
-
+        @if (session('status') && session('message'))
+            <div class="alert alert-{{ session('status') }} alert-dismissible fade show mt-3" role="alert">
+                {{ session('message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="container mx-auto px-6 lg:px-8">
             <div class="mb-8">
                 <!-- Tombol Kembali dan Tambah Data -->
@@ -47,7 +52,9 @@
                             <!-- Modal Body -->
                             <div class="modal-body" style="background-color: #2D3748;">
                                 <!-- Form inside the modal -->
-                                <form action="{{ url('send') }}" method="POST">
+                                <form
+                                    action="{{ route('loan.store', ['group' => $group->name, 'admin' => $admin->name]) }}"
+                                    method="POST">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Nama</label>
@@ -62,13 +69,13 @@
 
                                     <div class="mb-3">
                                         <label for="total_payment" class="form-label">Total Pembayaran</label>
-                                        <input type="text" class="form-control" id="total_payment"
-                                            name="total_payment" required>
+                                        <input type="text" class="form-control" id="total_amount" name="total_amount"
+                                            required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="end_date" class="form-label">Tanggal Akhir</label>
-                                        <input type="date" class="form-control" id="end_date" name="end_date"
+                                        <input type="date" class="form-control" id="loan_date" name="loan_date"
                                             required>
                                     </div>
 
@@ -76,6 +83,10 @@
                                         <label for="phone" class="form-label">No HP</label>
                                         <input type="number" class="form-control" id="phone" name="phone"
                                             required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="hidden" class="form-control" id="admin_group_id"
+                                            name="admin_group_id" value="{{ $adminGroup->id }}" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="code_id" class="form-label">Pilih Kode</label>
