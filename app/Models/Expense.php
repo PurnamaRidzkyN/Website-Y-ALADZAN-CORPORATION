@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\CategoryExpense;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Expense extends Model
@@ -12,21 +13,21 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_user',
+        'user_id',
         'date',
         'amount',
-        'id_category',
+        'category_id',
         'description',
         'method',
         'image_url',
     ];
 
-    public function categoryExpense()
+    public function categoryExpense(): BelongsTo
     {
         return $this->belongsTo(CategoryExpense::class, 'category_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id'); // Assuming Admin model is used for 'admins' table
     }

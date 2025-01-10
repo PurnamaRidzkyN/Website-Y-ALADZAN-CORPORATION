@@ -13,6 +13,7 @@ class CategoryExpenseFactory extends Factory
     {
         return [
             'name' => $this->faker->word, // Generates a random name for category
+            'role' => $this->faker->numberBetween(0,1), // Generates a random role for category
         ];
     }
 }

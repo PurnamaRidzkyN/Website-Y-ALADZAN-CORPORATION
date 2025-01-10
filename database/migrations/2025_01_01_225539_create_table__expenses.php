@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('category_expenses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('role');
             $table->timestamps(); // Menambahkan kolom timestamps
         });
 
@@ -24,7 +25,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users'); // Menggunakan foreignId untuk relasi ke admins
             $table->date('date');
             $table->decimal('amount', 15, 2);
-            $table->foreignId('category_category')->constrained('category_expenses'); // Menggunakan foreignId untuk relasi ke category_expenses
+            $table->foreignId('category_id')->constrained('category_expenses'); // Menggunakan foreignId untuk relasi ke category_expenses
             $table->text('description')->nullable();
             $table->string('method');
             $table->string('image_url')->nullable();

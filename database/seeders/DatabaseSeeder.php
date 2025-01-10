@@ -32,9 +32,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('purnama'),
             'role' => 1 
         ]);
-        Manager::factory(2)->recycle([
+        Manager::factory(1)->recycle([
             $gwh,
-            User::factory(2)->create()
         ])->create();
 
         $gwh =User::create([
@@ -42,7 +41,7 @@ class DatabaseSeeder extends Seeder
             'username' => 'PurnamaAdmin',
             'email' => 'purnamaM@gmail.com',
             'password' => Hash::make('purnama'),
-            'role' => 1 
+            'role' => 2 
         ]);
         Admin::factory(10)->recycle([
             $gwh,
@@ -55,7 +54,7 @@ class DatabaseSeeder extends Seeder
         Code::factory(4)->create();
         Expense::factory(6)->recycle([
             CategoryExpense::factory(3)->create()
-        ]);
+        ])->create();
         Loan::factory(30)->create();
         Payment::factory(50)->create();
 

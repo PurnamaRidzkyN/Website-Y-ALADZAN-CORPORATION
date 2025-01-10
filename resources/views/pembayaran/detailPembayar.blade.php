@@ -14,7 +14,8 @@
                 <!-- Tombol Kembali dan Tambah Data -->
                 <div class="flex justify-between items-center mb-4">
                     <!-- Tombol Kembali, di ujung kiri -->
-                    <button type="button"
+                    <!-- Tombol Kembali -->
+                    <a href=" {{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="size-6 mr-2 w-5 h-5">
@@ -23,7 +24,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                         Kembali
-                    </button>
+                    </a>
 
                     <!-- Tombol Tambah Data, di ujung kanan -->
                     <button type="button"
@@ -89,8 +90,8 @@
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <input type="hidden" class="form-control" id="loan_id"
-                                        name="loan_id" value="{{ $loans->id }}" required>
+                                    <input type="hidden" class="form-control" id="loan_id" name="loan_id"
+                                        value="{{ $loans->id }}" required>
                                 </div>
 
                                 <!-- Submit Button -->
@@ -111,18 +112,18 @@
             <!-- JavaScript for Formatting -->
             <script>
                 const nominalInput = document.getElementById('nominal');
-            
+
                 nominalInput.addEventListener('input', function(e) {
                     // Remove non-numeric characters except comma and dot
                     let value = this.value.replace(/[^\d]/g, '');
-            
+
                     // Format to Rupiah
                     value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            
+
                     // Set formatted value back to input
                     this.value = value;
                 });
-            
+
                 // Add event listener for form submission
                 const form = document.querySelector('form');
                 form.addEventListener('submit', function(e) {
@@ -131,7 +132,7 @@
                     nominalInput.value = valueWithoutDot;
                 });
             </script>
-            
+
 
             <!-- Detail Pembayaran -->
             <h5 class="text-2xl font-bold text-[#F7FAFC] mb-4">Informasi Pembayaran</h5>
