@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
     <!-- Vite CSS and JS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -20,14 +20,15 @@
 
     <title>{{ $title }}</title>
     <style>
-  a {
-    text-decoration: none;
-  }
+        a {
+            text-decoration: none;
+        }
 
-  a:hover {
-    text-decoration: none; /* Pastikan hover juga tidak ada garis bawah */
-  }
-</style>
+        a:hover {
+            text-decoration: none;
+            /* Pastikan hover juga tidak ada garis bawah */
+        }
+    </style>
 
 </head>
 
@@ -35,23 +36,23 @@
 
     <div class="min-h-full flex flex-col">
         <!-- Sidebar -->
-        
+
 
         <!-- Main Content Area -->
         <div class="flex flex-1 flex-col w-full">
             <!-- Navbar (Header) -->
             <x-navbar></x-navbar>
             <!-- Content Area -->
-              
 
-                <!-- Header Section -->
-                <x-header>            
-                  {{ $title }}</x-header>
 
-                <!-- Main Content -->
-                <div class="mt-1">
-                    {{ $slot }}
-                </div>
+            <!-- Header Section -->
+            <x-header>
+                {{ $title }}</x-header>
+
+            <!-- Main Content -->
+            <div class="mt-1">
+                {{ $slot }}
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
