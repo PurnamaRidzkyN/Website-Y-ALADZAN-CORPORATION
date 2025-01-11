@@ -167,7 +167,7 @@
                                 Rp{{ number_format($payment->amount, 0, ',', '.') }}
                             </li>
                             <li><strong>Tanggal:</strong>
-                                {{ $payment->payment_date }}
+                                {{ \Carbon\Carbon::parse($payment->payment_date)->locale('id')->diffForHumans() }}
                             </li>
                             <li><strong>Cara Bayar:</strong>
                                 {{ $payment->method }}

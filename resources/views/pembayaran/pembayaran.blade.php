@@ -113,10 +113,18 @@
                         <!-- Bagian bawah card -->
 
                         <div class="p-6 bg-[#2D3748] text-right">
-                            <a href="{{ route('List Admin', ['group' => $group->name]) }}"
-                                class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
-                                Lihat Group
-                            </a>
+
+                            @if (auth()->user()->role == 1)
+                                <a href="{{ route('List Admin', ['group' => $group->name]) }}"
+                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
+                                    Lihat Group
+                                </a>
+                            @else
+                                <a href="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin]) }}"
+                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
+                                    Lihat Group
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforeach

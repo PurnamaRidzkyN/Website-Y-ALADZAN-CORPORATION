@@ -41,6 +41,12 @@ Route::get('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}', [Payme
 Route::post('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/store', [PaymentController::class, 'storePayment'])->middleware('auth')->name('payment.store');
 
 Route::get('/pengeluaran', [ExpensesController::class, 'index'])->name('expenses.index');
+Route::post('/pengeluaran/store', [ExpensesController::class, 'store'])->name('expenses.store');
+Route::put('/pengeluaran/update/{id}', [ExpensesController::class, 'update'])->name('expenses.update');
+Route::get('/pengeluaran/edit/{id}', [ExpensesController::class, 'edit'])->name('expenses.edit');
+Route::delete('/pengeluaran/delete/{id}', [ExpensesController::class, 'destroy'])->name('expenses.destroy');
+
+
 
 Route::get('/manajemen-data', function () {
     return view('manajemenData', ["title" => "Manajemen Data"]);

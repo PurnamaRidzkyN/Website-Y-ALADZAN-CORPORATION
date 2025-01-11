@@ -10,14 +10,20 @@ use App\Models\Payment;
 use App\Models\AdminGroups;
 use Illuminate\Http\Request;
 use App\Models\AdminLoanView;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
     // groups
     public function showPaymentGroups()
     {
-        $groups = Groups::select('id', 'name', 'description', 'created_at')->get(); // Ambil kolom 'name' saja
-        return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups]);
+        $groups = Groups::select('id', 'name', 'description', 'created_at')->get();
+        if (Auth::user()->role == 2) {
+            $admin = Admin::where('user_id', Auth::user()->id)->first();
+            return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups, 'admin' => $admin],);
+        } else {
+            return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups],);
+        }
     }
     // Menambahkan group baru
     public function storeGroup(Request $request)
@@ -176,23 +182,34 @@ class PaymentController extends Controller
 
     public function storeLoan(Request $request, $group, $admin)
     {
+        // Validasi data input
+        $validatedData = $request->validate([
+            'admin_group_id' => 'required|exists:admin_groups,id', // Harus ada di tabel admin_groups
+            'name' => 'required|string|max:255', // Nama wajib, berupa string, max 255 karakter
+            'description' => 'nullable|string|max:500', // Deskripsi opsional, max 500 karakter
+            'loan_date' => 'required|date', // Tanggal wajib, format tanggal valid
+            'total_amount' => 'required|numeric|min:0', // Total harus angka, minimal 0
+            'phone' => 'required|string|max:15', // Telepon wajib, max 15 karakter
+            'code_id' => 'required|exists:codes,id', // Harus ada di tabel codes
+        ]);
 
-        $groups = AdminGroups::find($request->admin_group_id);
+        // Temukan grup admin berdasarkan ID
+        $groups = AdminGroups::find($validatedData['admin_group_id']);
 
         if ($groups) {
             // Buat entri baru di tabel loans
-
             Loan::create([
                 'admin_group_id' => $groups->id,
-                'name' => $request->name,
-                'description' => $request->description,
-                'loan_date' => $request->loan_date,
-                'total_amount' => $request->total_amount,
-                'outstanding_amount' => $request->total_amount,
-                'phone' => $request->phone,
-                'codes_id' => $request->code_id,
+                'name' => $validatedData['name'],
+                'description' => $validatedData['description'],
+                'loan_date' => $validatedData['loan_date'],
+                'total_amount' => $validatedData['total_amount'],
+                'outstanding_amount' => $validatedData['total_amount'], // Outstanding sama dengan total saat awal
+                'phone' => $validatedData['phone'],
+                'codes_id' => $validatedData['code_id'],
             ]);
 
+            // Redirect ke rute 'Daftar Pembayaran' dengan pesan sukses
             return redirect()->route('Daftar Pembayaran', [
                 'group' => $group,
                 'admin' => $admin,
@@ -200,9 +217,11 @@ class PaymentController extends Controller
                 ->with('message', 'Loan berhasil ditambahkan!');
         }
 
-        // Jika tidak ditemukan grup
-        return back()->with('status', 'error')->with('message', 'Admin group tidak ditemukan.');
+        // Jika grup admin tidak ditemukan
+        return back()->with('status', 'error')
+            ->with('message', 'Admin group tidak ditemukan.');
     }
+
 
     public function showLoanDetail($group, $admin, $loan)
     {
@@ -230,15 +249,26 @@ class PaymentController extends Controller
 
     public function storePayment(Request $request, $group, $admin, $loan)
     {
-        $loans = Loan::find($request->loan_id);
+        // Validasi data input
+        $validatedData = $request->validate([
+            'loan_id' => 'required|exists:loans,id', // loan_id harus ada di tabel loans
+            'nominal' => 'required|numeric|min:0', // nominal harus angka, minimal 0
+            'tanggal' => 'required|date', // tanggal harus format tanggal yang valid
+            'payment_method' => 'required|string|max:100', // metode pembayaran wajib, max 100 karakter
+            'deskripsi' => 'nullable|string|max:500', // deskripsi opsional, max 500 karakter
+        ]);
+
+        // Temukan pinjaman berdasarkan ID
+        $loans = Loan::find($validatedData['loan_id']);
 
         if ($loans) {
+            // Buat entri baru di tabel payments
             Payment::create([
-                'loan_id' => $loans->id, // ID pinjaman yang telah diajukan
-                'amount' => $request->nominal, // Jumlah yang dibayar
-                'payment_date' => $request->tanggal, // Tanggal pembayaran
-                'method' => $request->payment_method,
-                'description' => $request->deskripsi // Cara pembayaran (Transfer, Tunai, dll)
+                'loan_id' => $loans->id,
+                'amount' => $validatedData['nominal'],
+                'payment_date' => $validatedData['tanggal'],
+                'method' => $validatedData['payment_method'],
+                'description' => $validatedData['deskripsi'],
             ]);
 
             // Redirect setelah berhasil
@@ -250,7 +280,7 @@ class PaymentController extends Controller
                 ->with('message', 'Pembayaran berhasil ditambahkan!');
         }
 
-        // Jika grup tidak ditemukan
-        return back()->with('status', 'error')->with('message', 'Admin group tidak ditemukan.');
+        // Jika pinjaman tidak ditemukan
+        return back()->with('status', 'error')->with('message', 'Pinjaman tidak ditemukan.');
     }
 }

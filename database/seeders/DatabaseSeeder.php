@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         ]);
         Admin::factory(10)->recycle([
             $gwh,
-            User::factory(10)->create(),
+            User::factory(9)->create(),
             Bonuses::factory(10)->create()
         ])->create();
         Attendance::factory(100)->create();

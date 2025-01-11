@@ -57,7 +57,7 @@
                                         required="">
                                     <button type="button" id="togglePassword"
                                         class="absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
-                                        Show
+                                        Lihat
                                     </button>
                                     @error('password')
                                         <div class="text-[#FF6347] text-sm mt-2">{{ $message }}</div>
