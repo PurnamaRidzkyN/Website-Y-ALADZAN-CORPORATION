@@ -16,17 +16,18 @@
         <div class="container mx-auto px-6 lg:px-8 w-full">
 
             <!-- Tombol untuk menambah group -->
-            <button type="button"
-                class="text-right mb-8 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
-                data-bs-toggle="modal" data-bs-target="#GroupModal">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                    class="size-6 mr-2 w-5 h-5">
-                    <path
-                        d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
-                </svg>
-                Tambah Group
-            </button>
-
+            @if (auth()->user()->role == 1)
+                <button type="button"
+                    class="text-right mb-8 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                    data-bs-toggle="modal" data-bs-target="#GroupModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6 mr-2 w-5 h-5">
+                        <path
+                            d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                    </svg>
+                    Edit Group
+                </button>
+            @endif
             <!-- Modal Daftar Group (Modal Pertama) -->
             <div class="modal fade" id="GroupModal" tabindex="-1" aria-labelledby="GroupModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -53,9 +54,18 @@
                                             <td style="color: #F7FAFC !important;">{{ $group->name }}</td>
                                             <td style="color: #F7FAFC !important;">{{ $group->description }}</td>
                                             <td style="color: #F7FAFC !important;">
-                                                <!-- Form untuk menghapus group -->
+                                                <!-- Tombol Edit -->
+                                                <button type="button"
+                                                    class="btn btn-warning btn-sm rounded-pill shadow-lg"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editModal{{ $group->id }}"
+                                                    data-name="{{ $group->name }}"
+                                                    data-description="{{ $group->description }}">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </button>
+
+                                                <!-- Tombol Hapus -->
                                                 <form style="display: inline-block;">
-                                                    <!-- Tombol untuk memicu modal konfirmasi hapus -->
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm rounded-pill shadow-lg"
                                                         data-bs-toggle="modal"
@@ -63,13 +73,12 @@
                                                         <i class="bi bi-trash"></i> Hapus
                                                     </button>
                                                 </form>
-
-
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+
 
 
 
@@ -105,8 +114,8 @@
 
                             <!-- Tanggal Dibuat -->
                             <p class="text-xs text-[#A0AEC0] mt-4">
-                                Dibuat pada:
-                                {{ $group->created_at ? $group->created_at->format('d M Y') : 'Tanggal tidak tersedia' }}
+                                Terakhir Di Ubah pada:
+                                {{ $group->updated_at ? $group->updated_at->locale('id')->diffForHumans() : 'Tanggal tidak tersedia' }}
                             </p>
                         </div>
 
@@ -116,12 +125,12 @@
 
                             @if (auth()->user()->role == 1)
                                 <a href="{{ route('List Admin', ['group' => $group->name]) }}"
-                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
+                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all no-underline">
                                     Lihat Group
                                 </a>
                             @else
                                 <a href="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin]) }}"
-                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#003366] transition-all no-underline">
+                                    class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all no-underline">
                                     Lihat Group
                                 </a>
                             @endif
@@ -132,6 +141,46 @@
             </div>
         </div>
     </div>
+    @foreach ($groups as $group)
+        <!-- Modal Edit -->
+        <div class="modal fade" id="editModal{{ $group->id }}" tabindex="-1"
+            aria-labelledby="editModalLabel{{ $group->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <div class="modal-header" style="background-color: #1A2634;">
+                        <h5 class="modal-title" id="editModalLabel{{ $group->id }}">Edit Group</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="background-color: #2D3748;">
+                        <!-- Form untuk Edit -->
+                        <form action="{{ route('group.update', $group->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="mb-3">
+                                <label for="group_name{{ $group->id }}" class="form-label"
+                                    style="color: #fff;">Nama</label>
+                                <input type="text" class="form-control" id="group_name{{ $group->id }}"
+                                    name="name" value="{{ $group->name }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="group_description{{ $group->id }}" class="form-label"
+                                    style="color: #fff;">Deskripsi</label>
+                                <textarea class="form-control" id="group_description{{ $group->id }}" name="description" rows="3"
+                                    required>{{ $group->description }}</textarea>
+                            </div>
+
+                            <div class="mb-3 text-center">
+                                <button type="submit" class="btn btn-success">Update Group</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
     <!-- Modal Konfirmasi Hapus -->
     @foreach ($groups as $group)
         <div class="modal fade" id="deleteModal{{ $group->id }}" tabindex="-1"
@@ -140,7 +189,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalLabel{{ $group->id }}">Konfirmasi Hapus</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         Apakah Anda yakin ingin menghapus group "<strong>{{ $group->name }}</strong>"?
@@ -152,7 +202,8 @@
                         </button>
 
                         <!-- Form untuk menghapus group -->
-                        <form id="deleteForm{{ $group->id }}" action="{{ route('group.destroy') }}" method="POST">
+                        <form id="deleteForm{{ $group->id }}" action="{{ route('group.destroy') }}"
+                            method="POST">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="group_id" value="{{ $group->id }}">
@@ -202,5 +253,18 @@
             </div>
         </div>
     </div>
+    <script>
+        // Mengisi data ke form modal edit
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const name = this.getAttribute('data-name');
+                const description = this.getAttribute('data-description');
+                const modal = document.querySelector(this.getAttribute('data-bs-target'));
 
+                // Mengisi inputan form modal dengan data yang dikirim
+                modal.querySelector('input[name="name"]').value = name;
+                modal.querySelector('textarea[name="description"]').value = description;
+            });
+        });
+    </script>
 </x-layouts>

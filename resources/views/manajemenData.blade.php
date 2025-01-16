@@ -1,386 +1,401 @@
 <x-layouts>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <?php
-    // Data array PHP
-    $admins = [
-        ['name' => 'John Doe', 'email' => 'john@example.com', 'salary' => 5000000, 'bonus' => 500000, 'ig' => '@john_doe', 'fb' => 'john.doe.fb','phone'=>"0909"],
-        ['name' => 'Jane Smith', 'email' => 'jane@example.com', 'salary' => 6000000, 'bonus' => 600000, 'ig' => '@jane_smith', 'fb' => 'jane.smith.fb','phone'=>"0909"],
-    ];
+    <header>
+        <div class="sticky top-0 z-10 bg-gray-800">
+            <nav class="flex justify-between items-center p-4">
+                <!-- Tombol hamburger menu untuk tampilan mobile -->
+                <button class="text-gray-300 block lg:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
 
-    $attendance = [
-        ['id' => 1, 'time' => '07:00 - 08:00', 'location' => 'Room A'],
-        ['id' => 2, 'time' => '12:00 - 13:00', 'location' => 'Room B'],
-    ];
-   
-$message = 
-    [
-        'title' => 'Pesan Pengumuman 1',
-        'content' => 'Ini adalah isi pesan pengumuman pertama. Mohon untuk memperhatikan pengumuman ini dengan baik.',
-        'created_at' => '2025-01-01 08:30:00'  // Waktu pengumuman
-];
-    
-
-
-    $expenseCategories = [
-        ['name' => 'Utilities'],
-        ['name' => 'Salary'],
-    ];
-    ?>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-        }
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        .card-title {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .card-text {
-            font-size: 1rem;
-        }
-        .container {
-            padding-top: 30px;
-        }
-        .form-control {
-            margin-bottom: 10px;
-        }
-        .card-body {
-            text-align: left;
-        }
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        
-
-    .search-container {
-      display: inline-block;
-      margin-top: 20px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 300px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-    </style>
-
-    <div class="container">
-        
-        <h2 class="text-center mb-4">Manajemen Data</h2>
-        <h1>Search Data</h1>
-        <div class="search-container">
-          <input type="text" placeholder="Enter data to search" id="search-input">
-          <button onclick="search()">Search</button>
+                <!-- Navbar untuk tampilan desktop (lg) dan mobile yang disembunyikan -->
+                <div class="flex space-x-4 lg:flex-row lg:space-x-6 lg:block hidden" id="navbar-links">
+                    <button onclick="toggleSection('data-admin')"
+                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Data Admin</button>
+                    <button onclick="toggleSection('data-manajer')"
+                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Data Manajer</button>
+                    <button onclick="toggleSection('log-data')"
+                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Log Data</button>
+                    <button onclick="toggleSection('pengaturan-pesan')"
+                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Pengaturan Pesan</button>
+                </div>
+            </nav>
         </div>
-      
-        <script>
-          function search() {
-            alert('Search functionality will be implemented here.');
-          }
-        </script>
-        <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs" id="managementTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="true">Data Admin</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">Absensi</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="message-tab" data-bs-toggle="tab" data-bs-target="#message" type="button" role="tab" aria-controls="message" aria-selected="false">Pengaturan Pesan</button>
-            </li>
-          
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false">Log Data</button>
-            </li>
-        </ul>
+    </header>
 
-        <!-- Tabs Content -->
-        <div class="tab-content" id="managementTabsContent">
 
-            <!-- Data Admin -->
-            <div class="tab-pane fade show active" id="admin" role="tabpanel" aria-labelledby="admin-tab">
-                <div class="row mt-4">
-                    <?php foreach ($admins as $admin): ?>
-                    <div class="col-md-4 mb-3">
-                        <div class="card" data-bs-toggle="modal" data-bs-target="#editAdminModal">
-                            <!-- Gambar acak menggunakan Lorem Picsum -->
-                            <img src="https://picsum.photos/200/200?random=<?= rand() ?>" class="card-img-top" alt="Admin Photo" style="max-height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($admin['name']) ?></h5>
-                                <p class="card-text">
-                                    Email: <?= htmlspecialchars($admin['email']) ?><br>
-                                    IG: <?= htmlspecialchars($admin['ig']) ?><br>
-                                    FB: <?= htmlspecialchars($admin['fb']) ?><br>
-                                    Phone: <?= htmlspecialchars($admin['phone']) ?><br>
-                                    Gaji: Rp<?= number_format($admin['salary'], 0, ',', '.') ?><br>
-                                    Bonus: Rp<?= number_format($admin['bonus'], 0, ',', '.') ?>
-                                </p>
-                                <div class="btn-container">
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editAdminModal">Edit</button>
-                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Hapus</button>
-                                </div>
+    <main class="p-6 bg-[#2D3748] py-16 sm:py-20">
+        <!-- Data Admin Section -->
+        <div id="data-admin" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-gray-300">Data Admin</h1>
+            </div>
+            <!-- Search and Add Data -->
+            <div
+                class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+                <!-- Add Data Button -->
+                <button type="button"
+                    class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                    data-bs-toggle="modal" data-bs-target="#addDataAdmin">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6 mr-2 w-5 h-5">
+                        <path
+                            d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                    </svg>
+                    Tambah Data
+                </button>
+                <!-- Search Form -->
+                <form action="{{ route('Manajemen Data') }}" method="GET" class="flex items-center w-full md:w-auto">
+                    <label for="search-admin" class="sr-only">Search Admin</label>
+                    <div class="relative w-full md:w-96">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                            </svg>
+                        </div>
+                        <input type="text" id="search-admin" name="search_admin"
+                            value="{{ request()->search_admin }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Search Admin..." />
+                    </div>
+                    <button type="submit"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                        <span class="sr-only">Search Admin</span>
+                    </button>
+                    <a href="{{ route('Manajemen Data') }}"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-gray-500 rounded-lg border border-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                        Reset
+                    </a>
+                </form>
+            </div>
+
+            <!-- Card Container -->
+            <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                @foreach ($admins as $admin)
+                    <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
+                        <div class="flex justify-center items-center mb-4">
+                            <img src="{{ $admin['foto'] }}" alt="Admin Photo"
+                                class="w-16 h-16 mx-auto rounded-full mb-4">
+                        </div>
+
+                        <hr id="separator" class="border-2 rounded mb-10"
+                            style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
+
+                        <div class="text-center text-gray-300">
+                            <h2 class="text-lg font-bold">{{ $admin['name'] }}</h2>
+                            <p class="text-sm">{{ $admin->user->email }}</p>
+                            <p class="text-sm">{{ $admin->user->username }}</p>
+                        </div>
+
+                        <button onclick="toggleDetails('details-{{ $loop->index }}')"
+                            class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all">
+                            Lihat Detail
+                        </button>
+
+                        <!-- Hidden Details -->
+                        <div id="details-{{ $loop->index }}" class="hidden mt-4 text-sm text-gray-300">
+                            <p><strong>Phone:</strong> {{ $admin['phone'] }}</p>
+                            <p><strong>Gaji:</strong> {{ $admin['salary'] }}</p>
+                            <p><strong>Total Bonus:</strong> {{ $admin->bonuses->total_amount }}</p>
+                            <p><strong>Bonus Diambil:</strong> {{ $admin->bonuses->used_amount }}</p>
+                            <p><strong>Bonus Sisa:</strong> {{ $admin->bonuses->remaining_amount }}</p>
+                            <p><strong>Updated At:</strong> {{ $admin['updated_at'] }}</p>
+                            <div class="mt-4 flex justify-between">
+                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">
+                                    Edit
+                                </button>
+                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">
+                                    Hapus
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
-                </div>
-                <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addAdminModal">Tambah Admin</button>
+                @endforeach
             </div>
-            
+        </div>
 
-            <!-- Absensi -->
-            <!-- Tabel Absensi Karyawan dan Grafik Kehadiran -->
-<div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
-    <!-- Tabel Absensi -->
-    <div class="table-responsive mt-4">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">ID Absensi</th>
-                    <th scope="col">Admin</th>
-                    <th scope="col">Tanggal</th>
-                    <th scope="col">Lokasi</th>
-                    <th scope="col">Bukti Kehadiran</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Data Absensi
-                $attendanceData = [
-                    ['id' => 'A001', 'id_user' => '1', 'date' => '2025-01-01 08:00:00', 'location' => 'Office', 'image_url' => 'image1.jpg'],
-                    ['id' => 'A002', 'id_user' => '2', 'date' => '2025-01-02 08:00:00', 'location' => 'Office', 'image_url' => 'image2.jpg'],
-                    ['id' => 'A003', 'id_user' => '3', 'date' => '2025-01-03 08:00:00', 'location' => 'Office', 'image_url' => 'image3.jpg'],
-                    ['id' => 'A004', 'id_user' => '2', 'date' => '2025-01-04 08:00:00', 'location' => 'Office', 'image_url' => 'image4.jpg'],
-                    ['id' => 'A005', 'id_user' => '2', 'date' => '2025-01-05 08:00:00', 'location' => 'Office', 'image_url' => 'image5.jpg'],
-                    ['id' => 'A006', 'id_user' => '2', 'date' => '2025-01-06 08:00:00', 'location' => 'Office', 'image_url' => 'image6.jpg'],
-                    ['id' => 'A007', 'id_user' => '3', 'date' => '2025-01-07 08:00:00', 'location' => 'Office', 'image_url' => 'image7.jpg'],
-                    ['id' => 'A008', 'id_user' => '3', 'date' => '2025-01-08 08:00:00', 'location' => 'Office', 'image_url' => 'image8.jpg'],
-                    ['id' => 'A009', 'id_user' => '3', 'date' => '2025-01-09 08:00:00', 'location' => 'Office', 'image_url' => 'image9.jpg'],
-                    ['id' => 'A010', 'id_user' => '3', 'date' => '2025-01-10 08:00:00', 'location' => 'Office', 'image_url' => 'image10.jpg'],
-                ];
+        <!-- Data Managers Section -->
+        <div id="data-manajer" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-gray-300">Data Manajer</h1>
+            </div>
+            <!-- Search and Add Data -->
+            <div
+                class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+                <!-- Add Data Button -->
+                <button type="button"
+                    class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                    data-bs-toggle="modal" data-bs-target="#addDataManajer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6 mr-2 w-5 h-5">
+                        <path
+                            d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                    </svg>
+                    Tambah Data
+                </button>
+                <!-- Search Form -->
+                <form action="{{ route('Manajemen Data') }}" method="GET"
+                    class="flex items-center w-full md:w-auto">
+                    <label for="search-manager" class="sr-only">Search Manager</label>
+                    <div class="relative w-full md:w-96">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                            </svg>
+                        </div>
+                        <input type="text" id="search-manager" name="search_manager"
+                            value="{{ request()->search_manager }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Search Manager..." />
+                    </div>
+                    <button type="submit"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                        <span class="sr-only">Search Manager</span>
+                    </button>
+                </form>
+            </div>
 
-                // Array Admin (ID => Nama)
-                $admins = [
-                    1 => 'Admin 1',
-                    2 => 'Admin 2',
-                    3 => 'Admin 3',
-                    // Anda bisa menambahkan admin lebih banyak jika perlu
-                ];
+            <!-- Card Container -->
+            <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                @foreach ($managers as $manager)
+                    <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
+                        <div class="flex justify-center items-center mb-4">
+                            <img src="{{ $manager['foto'] }}" alt="Manager Photo"
+                                class="w-16 h-16 mx-auto rounded-full mb-4">
+                        </div>
 
-                // Menampilkan data absensi
-                foreach ($attendanceData as $attendance):
-                    $adminName = $admins[$attendance['id_user']];
-                ?>
-                <tr>
-                    <td><?= htmlspecialchars($attendance['id']) ?></td>
-                    <td><?= htmlspecialchars($adminName) ?></td>
-                    <td><?= htmlspecialchars($attendance['date']) ?></td>
-                    <td><?= htmlspecialchars($attendance['location']) ?></td>
-                    <td><img src="<?= htmlspecialchars($attendance['image_url']) ?>" alt="Bukti Kehadiran" width="100"></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                        <hr id="separator" class="border-2 rounded mb-10"
+                            style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
+
+                        <div class="text-center text-gray-300">
+                            <h2 class="text-lg font-bold">{{ $manager['name'] }}</h2>
+                            <p class="text-sm">{{ $manager->user->email }}</p>
+                            <p class="text-sm">{{ $manager->user->username }}</p>
+                        </div>
+                        <hr id="separator" class="border-2 rounded mb-0"
+                            style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
+
+                        <div id="details-{{ $loop->iteration }}" class=" mt-4 text-sm text-gray-300">
+                            <p><strong>Phone:</strong> {{ $manager['phone'] }}</p>
+                            <p><strong>Updated At:</strong> {{ $manager['updated_at'] }}</p>
+                            <div class="mt-4 flex justify-between">
+                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">
+                                    Edit
+                                </button>
+                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">
+                                    Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        <!-- Pengaturan Pesan Section -->
+        <div id="pengaturan-pesan" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-gray-300">Pengaturan Pesan</h1>
+            </div>
+
+            <!-- Card Pesan -->
+            <div class="bg-gray-700 rounded-lg shadow-md p-6 mb-4">
+                <h2 class="text-xl font-semibold text-gray-300 mb-4">Pesan Pengaturan</h2>
+                <p class="text-gray-200 mb-4">Ini adalah pesan yang akan dikirim otomatis. Kamu dapat mengubahnya kapan
+                    saja.</p>
+
+                <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
+
+                <div class="text-gray-300 mb-4">
+                    <p><strong>Dikirim otomatis pada:</strong> 10:00 AM</p>
+                </div>
+
+                <!-- Tombol Edit Pesan -->
+                <div class="text-center">
+                    <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                        Edit Pesan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addDataAdmin" tabindex="-1" aria-labelledby="addDataAdminLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title" id="addDataModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body" style="background-color: #2D3748;">
+                    <!-- Form inside the modal -->
+                    <form action="{{ route('Manajemen Data.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">No HP</label>
+                            <input type="number" class="form-control" id="phone" name="phone" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="salary" class="form-label">Gaji</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" id="salary" name="salary" required>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Input for Username -->
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" id="username" name="username"
+                                value="username_value" required>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addDataManajer" tabindex="-1" aria-labelledby="addDataManajerLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title" id="addDataModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body" style="background-color: #2D3748;">
+                    <!-- Form inside the modal -->
+                    <form action="" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">No HP</label>
+                            <input type="number" class="form-control" id="phone" name="phone" required>
+                        </div>
+
+                        <!-- Hidden Input for Username -->
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" id="username" name="username"
+                                value="username_value" required>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Grafik Kehadiran -->
-    <div class="mt-4">
-        <canvas id="attendanceChart" width="400" height="200"></canvas>
     </div>
 
-    <!-- Script untuk Grafik -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
-        const attendanceChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Admin 1', 'Admin 2', 'Admin 3'], // Daftar nama admin yang akan ditampilkan
-                datasets: [
-                    <?php foreach ($admins as $adminId => $adminName): ?>
-                    {
-                        label: 'Jumlah Kehadiran <?= $adminName ?>',
-                        data: [
-                            <?php 
-                            // Hitung jumlah absensi berdasarkan ID Admin
-                            $attendanceCount = 0;
-                            foreach ($attendanceData as $attendance) {
-                                if ($attendance['id_user'] == $adminId) {
-                                    $attendanceCount++;
-                                }
-                            }
-                            echo $attendanceCount; 
-                            ?>
-                        ],
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    },
-                    <?php endforeach; ?>
-                ]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+        // Toggle Section
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+
+            // Menyembunyikan semua konten
+            var sections = document.querySelectorAll('.section');
+            sections.forEach(function(sec) {
+                sec.classList.add('hidden');
+            });
+
+            // Menampilkan konten yang sesuai
+            section.classList.remove('hidden');
+
+            // Menyimpan ID section yang sedang ditampilkan ke localStorage
+            localStorage.setItem('active-section', sectionId);
+        }
+
+        // Memeriksa status section yang sedang ditampilkan setelah halaman dimuat
+        window.addEventListener('load', function() {
+            const activeSectionId = localStorage.getItem('active-section');
+
+            if (activeSectionId) {
+                var section = document.getElementById(activeSectionId);
+                if (section) {
+                    // Menampilkan section yang disimpan sebelumnya
+                    section.classList.remove('hidden');
                 }
             }
         });
+
+        // Toggle Details (untuk bagian lain yang perlu di-toggle)
+        function toggleDetails(detailsId) {
+            const details = document.getElementById(detailsId);
+            details.classList.toggle('hidden');
+        }
+
+
+        function toggleMobileMenu() {
+            const navbarLinks = document.getElementById('navbar-links');
+
+            // Jika ukuran layar kurang dari atau sama dengan 1024px (mobile), toggle navbar
+            if (window.innerWidth <= 1024) {
+                navbarLinks.classList.toggle('hidden'); // Toggle antara hidden dan tampil
+                navbarLinks.classList.toggle('flex'); // Menambahkan class flex agar itemnya tampil vertikal
+                navbarLinks.classList.toggle('flex-col'); // Mengubah menu agar berjejer ke bawah
+            }
+        }
     </script>
-</div>
-
-
-            <!-- Pengaturan Pesan -->
-            <div class="tab-pane fade" id="message" role="tabpanel" aria-labelledby="message-tab">
-                <div class="row mt-4">
-                    <!-- Template Pesan -->
-                    <div class="col-md-12 mb-3">
-                        <h5><?= htmlspecialchars($message['title']) ?></h5>
-                        <p><?= htmlspecialchars($message['content']) ?></p>
-                        <p class="text-muted"><?= date('H:i', strtotime($message['created_at'])) ?></p> <!-- Jam -->
-                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMessageModal">Edit</button>
-                    </div>
-                </div>
-                <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addMessageModal">Tambah Pesan</button>
-            </div>
-        
-           
-
-            <!-- Log Data -->
-            <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">
-                <p>Log Data akan ditampilkan di sini.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal untuk tambah dan edit data -->
-    <!-- Modal untuk tambah dan edit admin, absensi, pesan, dan kategori pengeluaran dapat menggunakan struktur modal berikut -->
-
-    <!-- Modal Edit Admin -->
-    <div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editAdminModalLabel">Edit Admin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="adminName" class="form-label">Nama Admin</label>
-                            <input type="text" class="form-control" id="adminName" value="John Doe">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="adminEmail" value="john@example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminSalary" class="form-label">Gaji</label>
-                            <input type="number" class="form-control" id="adminSalary" value="5000000">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminBonus" class="form-label">Bonus</label>
-                            <input type="number" class="form-control" id="adminBonus" value="500000">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminIG" class="form-label">IG</label>
-                            <input type="text" class="form-control" id="adminIG" value="500000">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminFB" class="form-label">IG</label>
-                            <input type="text" class="form-control" id="adminIG" value="500000">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Tambah Admin -->
-    <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAdminModalLabel">Tambah Admin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="adminNameAdd" class="form-label">Nama Admin</label>
-                            <input type="text" class="form-control" id="adminNameAdd">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminEmailAdd" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="adminEmailAdd">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminSalaryAdd" class="form-label">Gaji</label>
-                            <input type="number" class="form-control" id="adminSalaryAdd">
-                        </div>
-                        <div class="mb-3">
-                            <label for="adminBonusAdd" class="form-label">Bonus</label>
-                            <input type="number" class="form-control" id="adminBonusAdd">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Tambah Admin</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Hapus -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus data ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger">Hapus</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tambahkan file JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </x-layouts>

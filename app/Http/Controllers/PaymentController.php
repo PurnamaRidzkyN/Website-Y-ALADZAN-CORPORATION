@@ -17,7 +17,7 @@ class PaymentController extends Controller
     // groups
     public function showPaymentGroups()
     {
-        $groups = Groups::select('id', 'name', 'description', 'created_at')->get();
+        $groups = Groups::select('id', 'name', 'description', 'updated_at')->get();
         if (Auth::user()->role == 2) {
             $admin = Admin::where('user_id', Auth::user()->id)->first();
             return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups, 'admin' => $admin],);
@@ -51,6 +51,16 @@ class PaymentController extends Controller
                 ->with('message', 'Grup berhasil ditambahkan!');
         }
     }
+    public function updateGroup(Request $request, $id)
+    {
+        $group = Groups::findOrFail($id);
+        $group->name = $request->input('name');
+        $group->description = $request->input('description');
+        $group->save();
+
+        return redirect()->route('Transaksi Pembayaran')->with('status', 'success')->with('message', 'Group Berhasil Di Update');
+    }
+
 
 
     public function destroyGroup(Request $request)
@@ -77,22 +87,35 @@ class PaymentController extends Controller
 
 
     // admin
-    public function showListAdminLoans(Groups $group)
+    public function showListAdminLoans(Groups $group, Request $request)
     {
-        // Ambil data admin berdasarkan group_id
-        $admins = AdminLoanView::where('group_id', $group->id)->get();
+        // Ambil kata kunci pencarian dari parameter query
+        $query = $request->input('query');
 
-        // Ambil semua admin yang belum ada di dalam $admins berdasarkan id
+        // Ambil data admin berdasarkan group_id dengan filter pencarian
+        $admins = AdminLoanView::where('group_id', $group->id)
+            ->when($query, function ($q) use ($query) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']) // Case-insensitive untuk nama
+                    ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . strtolower($query) . '%']); // Case-insensitive untuk nomor HP
+            })
+            ->get();
+        // Ambil semua admin yang belum ada di dalam $admins berdasarkan id dengan filter pencarian
         $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
 
-        $adminAll = Admin::whereNotIn('id', $adminIds)->get(); // Ambil admin yang id-nya tidak ada di dalam $adminIds
+        $adminAll = Admin::whereNotIn('id', $adminIds)
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where('name', 'like', "%{$query}%")
+                    ->orWhere('phone', 'like', "%{$query}%");
+            })
+            ->get();
 
-        // Kirim data grup dan admins ke view
+        // Kirim data grup, admins, dan adminAll ke view
         return view('pembayaran/listAdmin', [
             'title' => 'List Admin - ' . $group->name,
             'admins' => $admins,
             'group' => $group,
-            'adminAll' => $adminAll
+            'adminAll' => $adminAll,
+            'query' => $query // Kirim query ke view untuk menampilkan hasil pencarian
         ]);
     }
 
@@ -157,7 +180,6 @@ class PaymentController extends Controller
     //loans
     public function showListLoans($group, $admin)
     {
-
         // Ambil grup berdasarkan nama
         $group = Groups::where('name', $group)->first(); // Menggunakan first() untuk mendapatkan satu entitas grup
 
@@ -165,8 +187,19 @@ class PaymentController extends Controller
         $admin = Admin::where('name', $admin)->first(); // Menggunakan first() untuk mendapatkan satu entitas admin
 
         $adminGroup = AdminGroups::where('group_id', $group->id)->where('admin_id', $admin->id)->first();
-        // Ambil data pinjaman (loans) berdasarkan admin_id
-        $loans = Loan::where('admin_group_id', $adminGroup->id)->get();
+
+        // Filter pinjaman berdasarkan query pencarian
+        $loans = Loan::where('admin_group_id', $adminGroup->id)
+            ->when(request('query'), function ($query) {
+                // Pencarian berdasarkan nama (case-insensitive)
+                $query->where(function ($q) {
+                    $q->whereRaw('LOWER(name) like ?', ['%' . strtolower(request('query')) . '%'])
+                        ->orWhere('phone', 'like', '%' . request('query') . '%');
+                });
+            })
+            ->get();
+
+
         $codes = Code::all();
 
         // Kirim data grup, admin, dan pinjaman ke view
@@ -179,6 +212,7 @@ class PaymentController extends Controller
             'adminGroup' => $adminGroup
         ]);
     }
+
 
     public function storeLoan(Request $request, $group, $admin)
     {
@@ -233,8 +267,7 @@ class PaymentController extends Controller
 
         // Ambil pinjaman berdasarkan nama
         $loan = Loan::where('name', $loan)->firstOrFail();
-
-        // Ambil semua pembayaran terkait pinjaman
+        $codes = Code::all();          // Ambil semua pembayaran terkait pinjaman
         $payments = Payment::where('loan_id', $loan->id)->get();
 
         // Kirim data ke view
@@ -244,8 +277,34 @@ class PaymentController extends Controller
             'group' => $group,
             'admin' => $admin,
             'payments' => $payments,
+            'codes' => $codes
         ]);
     }
+    public function updateLoan(Request $request, $group, $admin, $loan)
+    {
+        // Cek data yang diterima
+        // Ambil data loan berdasarkan ID
+        $loan = Loan::findOrFail($request->loan_id);
+
+        // Update data loan, pastikan untuk memasukkan 'code_id' atau parameter lainnya sesuai
+        $loan->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'total_amount' => $request->total_amount,
+            'code_id' => $request->code_id, // Pastikan ini sesuai dengan kolom di tabel loans
+            'phone' => $request->phone,
+        ]);
+
+        // Redirect setelah sukses
+        return redirect()->route('Loan Detail', [
+            'group' => $group,
+            'admin' => $admin,
+            'loan' => $loan
+        ])->with('status', 'success')
+            ->with('message', 'Group Berhasil Di Update');
+    }
+
+
 
     public function storePayment(Request $request, $group, $admin, $loan)
     {
@@ -281,6 +340,6 @@ class PaymentController extends Controller
         }
 
         // Jika pinjaman tidak ditemukan
-        return back()->with('status', 'error')->with('message', 'Pinjaman tidak ditemukan.');
+        return back()->with('status', 'error')->with('message', 'Pembayaran tidak ditemukan.');
     }
 }

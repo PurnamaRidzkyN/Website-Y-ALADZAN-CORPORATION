@@ -15,7 +15,7 @@
             </div>
         @endif
         <!-- Header -->
-        <h1 class="text-4xl text-white font-bold mb-6">Manage Expenses</h1>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             @foreach ($category_expenses as $category)
                 <div class="bg-gray-800 text-white p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer"
@@ -28,7 +28,34 @@
         <!-- Expenses Table -->
         <div id="expenses-table" class="hidden">
             <h2 class="text-2xl text-white mb-4">Expenses</h2>
-            <div class="overflow-x-auto">
+            <div
+                class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+                <button id="add-expense-button"
+                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">
+                    Tambah pengeluaran
+                </button>
+                <!-- Search Form -->
+                <form class="flex items-center w-full md:w-auto">
+                    <label for="simple-search" class="sr-only">Search</label>
+                    <div class="relative w-full md:w-96">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                            </svg>
+                        </div>
+                        <input type="text" id="simple-search"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Search branch name..." required />
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="overflow-x-auto mt-4">
                 <table class="w-full text-white bg-gray-800 rounded-lg">
                     <thead class="bg-gray-700">
                         <tr>
@@ -46,11 +73,6 @@
                     </tbody>
                 </table>
             </div>
-            <button id="add-expense-button"
-                class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">
-                Tambah pengeluaran
-            </button>
-
         </div>
 
 
@@ -92,10 +114,11 @@
 
                             <!-- Input for Cara Bayar -->
                             <div class="mb-3">
-                                <label for="payment_method" class="form-label" style="color: #fff;">Cara Bayar</label>
+                                <label for="payment_method" class="form-label" style="color: #fff;">Cara
+                                    Bayar</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="payment_method" name="payment_method"
-                                        required>
+                                    <input type="text" class="form-control" id="payment_method"
+                                        name="payment_method" required>
                                 </div>
                             </div>
 
@@ -278,73 +301,91 @@
             });
         </script>
         <script>
-            // Simulate expenses fetching
-            let allExpenses = @json($expenses);
-            const userRole = @json(Auth::user()->role); // Getting user's role in JavaScript
+            let allExpenses = @json($expensesArray); // Simulating fetching expenses from the backend
+            const userRole = @json(Auth::user()->role); // Get the user's role in JavaScript
             let selectedCategoryId = null; // Variable to store selected category
+            let filteredExpenses = allExpenses; // Initially, no filter is applied
 
+            // Function to display expenses based on category
             function showExpenses(category) {
-                // Store selected category ID
                 selectedCategoryId = category.id;
+                // Filter expenses by selected category
+                filteredExpenses = allExpenses.filter(expense => expense.category_id === category.id);
 
-                // Filter expenses by category
-                const filteredExpenses = allExpenses.filter(expense => expense.category_id === category.id);
-
-                // Populate table with expenses
+                // Populate the table with filtered expenses
                 const tbody = document.getElementById('expenses-body');
                 tbody.innerHTML = buildExpenseRows(filteredExpenses, category.role);
                 document.getElementById('expenses-table').classList.remove('hidden');
 
                 const addExpenseButton = document.getElementById('add-expense-button');
 
-                // Show add expense button if user has proper role or category role is 0
+                // Show "Add Expense" button if user has proper role or category role is 0
                 if (userRole == category.role || category.role == 0) {
                     addExpenseButton.classList.remove('hidden');
-
-                    // Set the button's onclick dynamically to pass the selected category ID
                     addExpenseButton.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
                 } else {
                     addExpenseButton.classList.add('hidden');
                 }
             }
 
-
+            // Function to build table rows for expenses
             function buildExpenseRows(expenses, role) {
                 return expenses.map(expense => {
-                    // Ambil nama admin atau manajer jika admin tidak ada
                     const adminOrManagerName = expense.user.username;
 
                     return `
-                        <tr class="bg-gray-800 hover:bg-gray-700">
-                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(adminOrManagerName)}</td>
-<td class="px-4 py-2 text-xs sm:text-sm">
-  ${new Intl.DateTimeFormat('id-ID').format(new Date(expense.date))}
-</td>
-                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.amount)}</td>
-                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
-                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
-                            <td class="px-4 py-2 text-xs sm:text-sm">
-                                <a href="#" onclick="openModal(' {{ asset('storage/${sanitize(expense.image_url)}') }}')">
-                                    <img src=" {{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
-                                </a>
-                            </td>
-                            <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
-                                ${ (userRole == role || role == 0) ? `
-                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-                                                                                                                                          ` : '<p> Hanya untuk Manajer</p>' }
-                            </td>
-                        </tr>
-                    `;
+        <tr class="bg-gray-800 hover:bg-gray-700">
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(adminOrManagerName)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${new Intl.DateTimeFormat('id-ID').format(new Date(expense.date))}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.amount)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">
+                <a href="#" onclick="openModal(' {{ asset('storage/${sanitize(expense.image_url)}') }}')">
+                    <img src=" {{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
+                </a>
+            </td>
+            <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
+                ${ (userRole == role || role == 0) ? `
+                                            <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+                                            <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+                                        ` : '<p> Hanya untuk Manajer</p>' }
+            </td>
+        </tr>
+    `;
                 }).join('');
             }
 
-
+            // Function to sanitize input to avoid XSS
             function sanitize(input) {
                 const div = document.createElement('div');
                 div.innerText = input;
                 return div.innerHTML;
             }
+
+            // Listen for input in the search bar
+            document.getElementById('simple-search').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+
+                // Filter the expenses based on the search term for multiple fields
+                filteredExpenses = allExpenses.filter(expense => {
+                    return expense.description.toLowerCase().includes(searchTerm) ||
+                        expense.amount.toString().includes(searchTerm) ||
+                        expense.method.toLowerCase().includes(searchTerm) ||
+                        expense.user.username.toLowerCase().includes(searchTerm) ||
+                        new Intl.DateTimeFormat('id-ID').format(new Date(expense.date)).toLowerCase().includes(
+                            searchTerm);
+                });
+
+                // Filter the expenses by the selected category if a category is selected
+                if (selectedCategoryId) {
+                    filteredExpenses = filteredExpenses.filter(expense => expense.category_id === selectedCategoryId);
+                }
+
+                // Populate the table with the filtered expenses
+                const tbody = document.getElementById('expenses-body');
+                tbody.innerHTML = buildExpenseRows(filteredExpenses, 0); // Pass the appropriate role if needed
+            });
 
             function addExpense(categoryId) {
                 // Set nilai categoryId di input hidden di modal
@@ -354,6 +395,7 @@
                 var myModal = new bootstrap.Modal(document.getElementById('addDataModal'));
                 myModal.show();
             }
+
 
             function editExpense(expenseId) {
                 $.ajax({

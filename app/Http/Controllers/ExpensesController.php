@@ -11,10 +11,30 @@ class ExpensesController extends Controller
 {
     public function index()
     {
+        // Fetch category expenses and expenses with related users (admin, manager)
         $category_expenses = CategoryExpense::all();
         $expenses = Expense::with('user.admin', 'user.manager')->get();
-        return view('pengeluaran/pengeluaran', compact('category_expenses', 'expenses'), ["title" => "pengeluaran"]);
+
+        // Convert expenses to an array to pass to JavaScript
+        $expensesArray = $expenses->map(function ($expense) {
+            return [
+                'id' => $expense->id,
+                'amount' => $expense->amount,
+                'description' => $expense->description,
+                'method' => $expense->method,
+                'date' => $expense->date,
+                'image_url' => $expense->image_url,
+                'category_id' => $expense->category_id,
+                'user' => [
+                    'username' => $expense->user->username, // Ensure you have 'username' or adjust based on your user model
+                ],
+            ];
+        });
+
+        // Pass category_expenses and expenses to the view
+        return view('pengeluaran/pengeluaran', compact('category_expenses', 'expensesArray'), ["title" => "Pencatatan Pengeluaran"]);
     }
+
     public function store(Request $request)
     {
         // Validasi input
@@ -61,7 +81,7 @@ class ExpensesController extends Controller
     }
     public function update(Request $request, $id)
     {
-        
+
         // Validasi input
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',

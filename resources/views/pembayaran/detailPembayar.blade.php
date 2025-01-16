@@ -13,7 +13,6 @@
 
                 <!-- Tombol Kembali dan Tambah Data -->
                 <div class="flex justify-between items-center mb-4">
-                    <!-- Tombol Kembali, di ujung kiri -->
                     <!-- Tombol Kembali -->
                     <a href=" {{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -35,7 +34,7 @@
                             <path
                                 d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
                         </svg>
-                        Tambah Data
+                        Pembayaran Baru
                     </button>
                 </div>
             </div>
@@ -108,37 +107,13 @@
                 </div>
             </div>
 
-
-            <!-- JavaScript for Formatting -->
-            <script>
-                const nominalInput = document.getElementById('nominal');
-
-                nominalInput.addEventListener('input', function(e) {
-                    // Remove non-numeric characters except comma and dot
-                    let value = this.value.replace(/[^\d]/g, '');
-
-                    // Format to Rupiah
-                    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-                    // Set formatted value back to input
-                    this.value = value;
-                });
-
-                // Add event listener for form submission
-                const form = document.querySelector('form');
-                form.addEventListener('submit', function(e) {
-                    // Remove the dots before sending the value to the server
-                    const valueWithoutDot = nominalInput.value.replace(/\./g, '');
-                    nominalInput.value = valueWithoutDot;
-                });
-            </script>
-
-
             <!-- Detail Pembayaran -->
             <h5 class="text-2xl font-bold text-[#F7FAFC] mb-4">Informasi Pembayaran</h5>
             <div class="bg-[#1A2634] border border-[#2D3748] rounded-lg shadow-lg p-6 mb-6">
                 <ul class="list-none text-[#E2E8F0]">
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Nama:</strong> {{ $loans->name }}</li>
+                    <li class="detail-item text-[#F7FAFC] mb-4"><strong>Deskripsi:</strong> {{ $loans->description }}
+                    </li>
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Kode:</strong>
                         {{ $loans->code ? $loans->code->code : 'Kode tidak tersedia' }}
                     </li>
@@ -148,7 +123,7 @@
                         Rp{{ number_format($loans->total_payment, 0, ',', '.') }}</li>
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Sisa Pembayaran:</strong>
                         Rp{{ number_format($loans->outstanding_amount, 0, ',', '.') }}</li>
-                    <li class="detail-item text-[#F7FAFC] mb-4"><strong>Tanggal Terakhir Pembayaran:</strong>
+                    <li class="detail-item text-[#F7FAFC] mb-4"><strong>Tanggal Awal :</strong>
                         {{ $loans->loan_date }}</li>
                     <li class="detail-item text-[#F7FAFC] mb-4"><strong>Terakhir Dirubah:</strong>
                         {{ $loans->created_at->diffForHumans() }}</li>
@@ -167,7 +142,7 @@
                                 Rp{{ number_format($payment->amount, 0, ',', '.') }}
                             </li>
                             <li><strong>Tanggal:</strong>
-                                {{ \Carbon\Carbon::parse($payment->payment_date)->locale('id')->diffForHumans() }}
+                                {{ \Carbon\Carbon::parse($payment->payment_date)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
                             </li>
                             <li><strong>Cara Bayar:</strong>
                                 {{ $payment->method }}
@@ -191,13 +166,124 @@
                 <button class="px-6 py-3 bg-[#3182CE] text-white rounded-lg hover:bg-[#1E40AF] transition-all"
                     onclick="sendWhatsapp()">Kirim Pemberitahuan WA</button>
 
-                <!-- Button Edit Data -->
-                <button class="px-6 py-3 bg-[#48BB78] text-white rounded-lg hover:bg-[#2F855A] transition-all"
-                    onclick="sendWhatsapp()">Edit Data</button>
+                <<!-- Button Edit Data -->
+                    <button class="px-6 py-3 bg-[#48BB78] text-white rounded-lg hover:bg-[#2F855A] transition-all"
+                        data-bs-toggle="modal" data-bs-target="#editDataModal">
+                        Edit Data
+                    </button>
+                    <!-- Modal Edit Data -->
+                    <div class="modal fade" id="editDataModal" tabindex="-1" aria-labelledby="editDataModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                                <!-- Modal Header -->
+                                <div class="modal-header" style="background-color: #1A2634;">
+                                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Pembayaran</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <!-- Modal Body -->
+                                <div class="modal-body" style="background-color: #2D3748;">
+                                    <!-- Form inside the modal -->
+                                    <form id="editForm"
+                                        action="{{ route('loans.update', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <!-- Nama -->
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label"
+                                                style="color: #fff;">Nama</label>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                value="{{ $loans->name }}" required>
+                                        </div>
+
+
+                                        {{-- deskripsi --}}
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label"
+                                                style="color: #fff;">Deskripsi</label>
+                                            <input type="text" class="form-control" id="description"
+                                                name="description" value="{{ $loans->description }}" required>
+                                        </div>
+                                        <!-- Total Pembayaran -->
+                                        <div class="mb-3">
+                                            <label for="nominal" class="form-label" style="color: #fff;">Total
+                                                Pembayaran</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control" id="nominal"
+                                                    name="total_amount" value="{{ $loans->total_amount }}" required>
+                                            </div>
+                                        </div>
+
+                                        <!-- Kode -->
+                                        <div class="mb-3">
+                                            <label for="codes_id" class="form-label"
+                                                style="color: #fff;">Kode</label>
+                                            <select class="form-control" id="code" name="codes_id" required>
+                                                <option value="">Pilih Kode</option>
+                                                @foreach ($codes as $code)
+                                                    <option value="{{ $code->id }}"
+                                                        {{ $loans->code_id == $code->id ? 'selected' : '' }}>
+                                                        {{ $code->code }} <!-- Menampilkan kode -->
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+
+
+
+                                        <!-- No HP -->
+                                        <div class="mb-3">
+                                            <label for="phone" class="form-label" style="color: #fff;">No
+                                                HP</label>
+                                            <input type="text" class="form-control" id="phone" name="phone"
+                                                value="{{ $loans->phone }}" required>
+                                            <input type="hidden" name="loan_id" value="{{ $loans->id }}">
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="mb-3 text-center">
+                                            <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
         </div>
 
     </div>
     </div>
 
-    <script></script>
+
+    <!-- JavaScript for Formatting -->
+    <script>
+        const nominalInput = document.getElementById('nominal');
+
+        nominalInput.addEventListener('input', function(e) {
+            // Remove non-numeric characters except comma and dot
+            let value = this.value.replace(/[^\d]/g, '');
+
+            // Format to Rupiah
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            // Set formatted value back to input
+            this.value = value;
+        });
+
+        // Add event listener for form submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            // Remove the dots before sending the value to the server
+            const valueWithoutDot = nominalInput.value.replace(/\./g, '');
+            nominalInput.value = valueWithoutDot;
+        });
+    </script>
+
 </x-layouts>
