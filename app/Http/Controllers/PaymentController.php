@@ -282,8 +282,6 @@ class PaymentController extends Controller
     }
     public function updateLoan(Request $request, $group, $admin, $loan)
     {
-        // Cek data yang diterima
-        // Ambil data loan berdasarkan ID
         $loan = Loan::findOrFail($request->loan_id);
 
         // Update data loan, pastikan untuk memasukkan 'code_id' atau parameter lainnya sesuai
@@ -291,7 +289,7 @@ class PaymentController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'total_amount' => $request->total_amount,
-            'code_id' => $request->code_id, // Pastikan ini sesuai dengan kolom di tabel loans
+            'codes_id' => $request->codes_id,
             'phone' => $request->phone,
         ]);
 
@@ -302,6 +300,31 @@ class PaymentController extends Controller
             'loan' => $loan
         ])->with('status', 'success')
             ->with('message', 'Group Berhasil Di Update');
+    }
+    public function destroyLoan(Request $request, $group, $admin,)
+    {
+        $loansId = $request->input('loans_id');  // Ambil ID grup dari form yang dikirimkan
+
+        // Temukan grup berdasarkan ID
+        $loans = loan::find($loansId);
+        if ($loans) {
+            // Hapus grup
+            $loans->delete();
+
+            return redirect()->route('Daftar Pembayaran', [
+                'group' => $group,
+                'admin' => $admin
+            ])  // Pastikan rute ini benar
+                ->with('status', 'success')
+                ->with('message', 'Pembayar  berhasil dihapus!');
+        } else {
+            return redirect()->route('Daftar Pembayaran', [
+                'group' => $group,
+                'admin' => $admin
+            ]) // Pastikan rute ini benar
+                ->with('status', 'danger')
+                ->with('message', 'Pembayar tidak ditemukan!');
+        }
     }
 
 
@@ -341,5 +364,62 @@ class PaymentController extends Controller
 
         // Jika pinjaman tidak ditemukan
         return back()->with('status', 'error')->with('message', 'Pembayaran tidak ditemukan.');
+    }
+    public function updatePayment(Request $request, $group, $admin, $loan)
+    {
+
+        $validatedData = $request->validate([
+            'amount' => 'required|numeric|min:0', // nominal harus angka, minimal 0
+            'payment_date' => 'required|date', // tanggal harus format tanggal yang valid
+            'payment_method' => 'required|string|max:100', // metode pembayaran wajib, max 100 karakter
+            'deskripsi' => 'nullable|string|max:500', // deskripsi opsional, max 500 karakter
+        ]);
+        $loan = Loan::findOrFail($validatedData['loan_id']);
+
+        // Update data loan, pastikan untuk memasukkan 'code_id' atau parameter lainnya sesuai
+        $loan->update([
+            'loan_id' => $validatedData['loan_id'],
+            'amount' => $validatedData['nominal'],
+            'payment_date' => $validatedData['tanggal'],
+            'method' => $validatedData['payment_method'],
+            'description' => $validatedData['deskripsi'],
+
+        ]);
+
+        // Redirect setelah sukses
+        return redirect()->route('Loan Detail', [
+            'group' => $group,
+            'admin' => $admin,
+            'loan' => $loan
+        ])->with('status', 'success')
+            ->with('message', ' pembayaran  Berhasil Di Update');
+    }
+    public function destroyPayment(Request $request, $group, $admin, $loan)
+    {
+
+        $paymentId = $request->input('payment_id');  // Ambil ID grup dari form yang dikirimkan
+
+        // Temukan grup berdasarkan ID
+        $payment = Payment::find($paymentId);
+        if ($payment) {
+            // Hapus grup
+            $payment->delete();
+
+            return redirect()->route('Loan Detail', [
+                'group' => $group,
+                'admin' => $admin,
+                'loan' => $loan
+            ])  // Pastikan rute ini benar
+                ->with('status', 'success')
+                ->with('message', 'Pembayar  berhasil dihapus!');
+        } else {
+            return redirect()->route('Loan Detail', [
+                'group' => $group,
+                'admin' => $admin,
+                'loan' => $loan
+            ]) // Pastikan rute ini benar
+                ->with('status', 'danger')
+                ->with('message', 'Pembayar tidak ditemukan!');
+        }
     }
 }

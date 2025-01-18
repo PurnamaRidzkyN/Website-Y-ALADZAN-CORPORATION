@@ -6,7 +6,6 @@
 
     <!-- Bootstrap JS Bundle (termasuk Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <div class="bg-gray-900 min-h-screen p-6">
         @if (session('status') && session('message'))
             <div class="alert alert-{{ session('status') }} alert-dismissible fade show mt-3" role="alert">
@@ -74,7 +73,55 @@
                 </table>
             </div>
         </div>
+        <div id="exception-table" class="hidden">
+            <h2 class="text-2xl text-white mb-4">Expenses</h2>
+            <div
+                class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+                <button id="add-expense-button-exception"
+                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden ">
+                    Tambah pengeluaran
+                </button>
+                <!-- Search Form -->
+                <form class="flex items-center w-full md:w-auto">
+                    <label for="simple-search-exception" class="sr-only">Search</label>
+                    <div class="relative w-full md:w-96">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                            </svg>
+                        </div>
+                        <input type="text" id="simple-search-exception"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Search branch name..." required />
+                    </div>
 
+                </form>
+            </div>
+
+
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full text-white bg-gray-800 rounded-lg">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Nama</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Tanggal</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Total</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Deskripsi</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Metode</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Admin</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Image</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exception-body">
+                        <!-- Rows will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         {{-- modal tambah data  --}}
         <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel" aria-hidden="true">
@@ -102,7 +149,8 @@
                                 <label for="nominal" class="form-label" style="color: #fff;">Total</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" class="form-control" id="nominal" name="nominal" required>
+                                    <input type="text" class="form-control" id="nominal" name="nominal"
+                                        required>
                                 </div>
                             </div>
 
@@ -110,6 +158,16 @@
                             <div class="mb-3">
                                 <label for="deskripsi" class="form-label" style="color: #fff;">Deskripsi</label>
                                 <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
+                            </div>
+                            <div class="hidden" id="Select-admin">
+                                <select class="form-select" name="admin_id" id="admin_id">
+                                    @foreach ($admins as $admin)
+                                        <option value="{{ $admin->id }}"
+                                            data-profile="{{ $admin->profile_picture }}">
+                                            {{ $admin->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <!-- Input for Cara Bayar -->
@@ -188,6 +246,16 @@
                             <div class="mb-3">
                                 <label for="deskripsi" class="form-label" style="color: #fff;">Deskripsi</label>
                                 <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
+                            </div>
+                            <div class="hidden" id="Select-admin-edit">
+                                <select class="form-select" name="edit_admin_id" id="edit_admin_id">
+                                    @foreach ($admins as $admin)
+                                        <option value="{{ $admin->id }}"
+                                            data-profile="{{ $admin->profile_picture }}">
+                                            {{ $admin->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <!-- Input for Cara Bayar -->
@@ -309,51 +377,88 @@
             // Function to display expenses based on category
             function showExpenses(category) {
                 selectedCategoryId = category.id;
+
                 // Filter expenses by selected category
                 filteredExpenses = allExpenses.filter(expense => expense.category_id === category.id);
 
-                // Populate the table with filtered expenses
-                const tbody = document.getElementById('expenses-body');
-                tbody.innerHTML = buildExpenseRows(filteredExpenses, category.role);
-                document.getElementById('expenses-table').classList.remove('hidden');
-
-                const addExpenseButton = document.getElementById('add-expense-button');
-
-                // Show "Add Expense" button if user has proper role or category role is 0
-                if (userRole == category.role || category.role == 0) {
-                    addExpenseButton.classList.remove('hidden');
-                    addExpenseButton.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
+                const isGajiOrBonus = category.name === 'Gaji' || category.name === 'Bonus';
+                const tbody = isGajiOrBonus ? document.getElementById('exception-body') : document.getElementById(
+                    'expenses-body');
+                // Show Gaji table and hide general table for Gaji or Bonus category
+                if (isGajiOrBonus) {
+                    document.getElementById('exception-table').classList.remove('hidden');
+                    document.getElementById('expenses-table').classList.add('hidden');
                 } else {
-                    addExpenseButton.classList.add('hidden');
+                    document.getElementById('expenses-table').classList.remove('hidden');
+                    document.getElementById('exception-table').classList.add('hidden');
+                }
+                tbody.innerHTML = buildExpenseRows(filteredExpenses, category.role, category.name);
+                const addExpenseButtonException = document.getElementById('add-expense-button-exception');
+                const addExpenseButton = document.getElementById('add-expense-button');
+                // Populate the rows for the selected category
+
+                if (isGajiOrBonus) {
+                    // Show "Add Expense" button if user has proper role or category role is 0
+                    if (userRole == category.role || category.role == 0) {
+                        addExpenseButtonException.classList.remove('hidden');
+                        addExpenseButtonException.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
+                    } else {
+                        addExpenseButtonException.classList.add('hidden');
+                    }
+                } else {
+                    if (userRole == category.role || category.role == 0) {
+                        addExpenseButton.classList.remove('hidden');
+                        addExpenseButton.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
+                    } else {
+                        addExpenseButton.classList.add('hidden');
+                    }
                 }
             }
 
             // Function to build table rows for expenses
-            function buildExpenseRows(expenses, role) {
+            function buildExpenseRows(expenses, role, category) {
                 return expenses.map(expense => {
                     const adminOrManagerName = expense.user.username;
 
                     return `
         <tr class="bg-gray-800 hover:bg-gray-700">
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(adminOrManagerName)}</td>
-            <td class="px-4 py-2 text-xs sm:text-sm">${new Intl.DateTimeFormat('id-ID').format(new Date(expense.date))}</td>
-            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.amount)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.date)}</td>
+            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(formatCurrency(expense.amount))}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
+            ${category === 'Gaji' || category === 'Bonus' ? `
+                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
             <td class="px-4 py-2 text-xs sm:text-sm">
-                <a href="#" onclick="openModal(' {{ asset('storage/${sanitize(expense.image_url)}') }}')">
-                    <img src=" {{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
+                <a href="#" onclick="openModal('{{ asset('storage/${sanitize(expense.image_url)}') }}')">
+                    <img src="{{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
                 </a>
             </td>
             <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
                 ${ (userRole == role || role == 0) ? `
-                                            <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-                                            <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-                                        ` : '<p> Hanya untuk Manajer</p>' }
+                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
             </td>
         </tr>
     `;
                 }).join('');
+            }
+
+
+            function formatCurrency(amount) {
+                // Pastikan amount adalah angka
+                amount = parseFloat(amount);
+
+                // Periksa jika amount adalah angka yang valid
+                if (isNaN(amount)) {
+                    return "Rp 0";
+                }
+
+                // Menghapus bagian desimal .00 jika ada
+                amount = amount.toFixed(0); // Menghilangkan desimal
+                // Menambahkan "Rp" di depan dan format ribuan dengan titik
+                return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
 
             // Function to sanitize input to avoid XSS
@@ -386,15 +491,44 @@
                 const tbody = document.getElementById('expenses-body');
                 tbody.innerHTML = buildExpenseRows(filteredExpenses, 0); // Pass the appropriate role if needed
             });
+            document.getElementById('simple-search-exception').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+
+                // Filter the expenses based on the search term for multiple fields
+                filteredExpenses = allExpenses.filter(expense => {
+                    return expense.description.toLowerCase().includes(searchTerm) ||
+                        expense.amount.toString().includes(searchTerm) ||
+                        expense.method.toLowerCase().includes(searchTerm) ||
+                        expense.user.username.toLowerCase().includes(searchTerm) ||
+                        new Intl.DateTimeFormat('id-ID').format(new Date(expense.date)).toLowerCase().includes(
+                            searchTerm);
+                });
+
+                // Filter the expenses by the selected category if a category is selected
+                if (selectedCategoryId) {
+                    filteredExpenses = filteredExpenses.filter(expense => expense.category_id === selectedCategoryId);
+                }
+
+                // Populate the table with the filtered expenses
+                const tbody = document.getElementById('gaji-body');
+                tbody.innerHTML = buildExpenseRows(filteredExpenses, 0); // Pass the appropriate role if needed
+            });
 
             function addExpense(categoryId) {
                 // Set nilai categoryId di input hidden di modal
                 document.getElementById('category_id').value = categoryId;
-
+                if (categoryId === 1 || categoryId === 2) {
+                    // Tampilkan elemen Select-admin jika categoryId 1 atau 2
+                    document.getElementById('Select-admin').style.display = 'block';
+                } else {
+                    // Sembunyikan elemen Select-admin jika categoryId bukan 1 atau 2
+                    document.getElementById('Select-admin').style.display = 'none';
+                }
                 // Tampilkan modal
                 var myModal = new bootstrap.Modal(document.getElementById('addDataModal'));
                 myModal.show();
             }
+
 
 
             function editExpense(expenseId) {
@@ -411,8 +545,17 @@
                         $('#editDataModal #payment_method').val(data.method);
                         $('#editDataModal #category_id').val(data.category_id);
                         // Jika ada gambar, tampilkan gambar yang sudah ada
+                        console.log(data.admin_id)
                         if (data.image_url) {
                             $('#editDataModal img').attr('src', '/storage/' + data.image_url).show();
+                        }
+                        if (data.category_id == 1 || data.category_id == 2) {
+                            // Tampilkan elemen Select-admin jika categoryId 1 atau 2
+                            document.getElementById('Select-admin-edit').style.display = 'block';
+                            $('#editDataModal #edit_admin_id').val(data.admin_id).trigger('change');
+                        } else {
+                            // Sembunyikan elemen Select-admin jika categoryId bukan 1 atau 2
+                            document.getElementById('Select-admin-edit').style.display = 'none';
                         }
 
                         // Mengarahkan form ke route yang sesuai dengan ID

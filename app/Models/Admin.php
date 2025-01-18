@@ -32,6 +32,7 @@ class Admin extends Model
     public function bonuses():BelongsTo{
         return $this->belongsTo(Bonuses::class,'bonus_id');
     }
-    
-    
+    public function expenses() : HasMany {
+        return $this->hasMany(Expense::class);
+    }
 }

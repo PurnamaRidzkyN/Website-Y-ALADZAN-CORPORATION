@@ -14,6 +14,7 @@ class Expense extends Model
 
     protected $fillable = [
         'user_id',
+        'admin_id',
         'date',
         'amount',
         'category_id',
@@ -30,5 +31,9 @@ class Expense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id'); // Assuming Admin model is used for 'admins' table
+    }
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'admin_id'); // Assuming Admin model is used for 'admins' table
     }
 }

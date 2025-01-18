@@ -137,7 +137,7 @@
                 @foreach ($payments as $payment)
                     <div
                         class="bg-[#1A2634] border border-[#2D3748] rounded-lg shadow-lg hover:shadow-xl transition-all p-6">
-                        <ul class="space-y-4 text-[#F7FAFC]">
+                        <ul class="space-y-4 text-[#F7FAFC] mb-4">
                             <li><strong>Nominal:</strong>
                                 Rp{{ number_format($payment->amount, 0, ',', '.') }}
                             </li>
@@ -151,13 +151,145 @@
                                 {{ $payment->description }}
                             </li>
                         </ul>
+                        <div class="flex justify-between items-center">
+                            <!-- Edit Button -->
+                            <button
+                                class="btn btn-warning btn-sm rounded-pill shadow-lg flex items-center px-4 py-2 text-sm font-medium text-[#F7FAFC] bg-blue-600 hover:bg-blue-700 rounded-lg"
+                                data-bs-toggle="modal" data-bs-target="#editPaymentModal-{{ $payment->id }}">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+
+                            <!-- Delete Button -->
+                            <button
+                                class="btn btn-danger btn-sm rounded-pill shadow-lg flex items-center px-4 py-2 text-sm font-medium text-[#F7FAFC] bg-red-600 hover:bg-red-700 rounded-lg"
+                                data-bs-toggle="modal" data-bs-target="#deletePaymentModal-{{ $payment->id }}">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editPaymentModal-{{ $payment->id }}" tabindex="-1"
+                        aria-labelledby="editModalLabel{{ $payment->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                                <div class="modal-header" style="background-color: #1A2634;">
+                                    <h5 class="modal-title" id="editModalLabel{{ $payment->id }}">Edit Pembayaran
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="background-color: #2D3748;">
+                                    <!-- Form untuk Edit -->
+                                    <form
+                                        action="{{ route('payment.update', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <!-- Input Nominal Pembayaran -->
+                                        <div class="mb-3">
+                                            <label for="amount" class="form-label"
+                                                style="color: #fff;">Nominal</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control formattedNominal"
+                                                    value="{{ number_format(floor($payment->amount), 0, ',', '.') }}"
+                                                    required>
+                                                <input type="hidden" class="form-control nominal" name="nominal"
+                                                    required>
+                                                <input type="hidden" class="form-control payment_amount"
+                                                    name="payment_id" value="{{ $payment->id }}" required>
+                                                <input type="hidden" class="form-control"
+                                                    id="payment_amount{{ $payment->id }}" name="payment_id"
+                                                    value="{{ $payment->id }}" required>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- Input Tanggal Pembayaran -->
+                                        <div class="mb-3">
+                                            <label for="payment_date{{ $payment->id }}" class="form-label"
+                                                style="color: #fff;">Tanggal</label>
+                                            <input type="date" class="form-control"
+                                                id="payment_date{{ $payment->id }}" name="payment_date"
+                                                value="{{ \Carbon\Carbon::parse($payment->payment_date)->toDateString() }}"
+                                                required>
+                                        </div>
+
+                                        <!-- Input Metode Pembayaran -->
+                                        <div class="mb-3">
+                                            <label for="payment_method{{ $payment->id }}" class="form-label"
+                                                style="color: #fff;">Metode Bayar</label>
+                                            <input type="text" class="form-control"
+                                                id="payment_method{{ $payment->id }}" name="method"
+                                                value="{{ $payment->method }}" required>
+                                        </div>
+
+                                        <!-- Input Deskripsi -->
+                                        <div class="mb-3">
+                                            <label for="payment_description{{ $payment->id }}" class="form-label"
+                                                style="color: #fff;">Deskripsi</label>
+                                            <textarea class="form-control" id="payment_description{{ $payment->id }}" name="description" rows="3"
+                                                required>{{ $payment->description }}</textarea>
+                                        </div>
+
+                                        <!-- Tombol Submit -->
+                                        <div class="mb-3 text-center">
+                                            <button type="submit" class="btn btn-success">Update Pembayaran</button>
+                                        </div>
+                                    </form>
+                                    @dump($payment->id)
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deletePaymentModal-{{ $payment->id }}" tabindex="-1"
+                        aria-labelledby="deletePaymentModalLabel{{ $payment->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deletePaymentModalLabel{{ $payment->id }}">
+                                        Konfirmasi Hapus</h5>
+
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Apakah Anda yakin ingin menghapus pembayaran dengan nominal
+                                    <strong>Rp{{ number_format($payment->amount, 0, ',', '.') }}</strong>?
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- Tombol Batal -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="bi bi-x-circle"></i> Batal
+                                    </button>
+
+                                    <!-- Form untuk menghapus pembayaran -->
+                                    <form
+                                        action="{{ route('payment.destroy', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="payment_id" value="{{ $payment->id }}">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @endforeach
             </div>
 
 
+
+
             <!-- Tombol Aksi -->
-            <<div class="d-flex justify-content-center mt-8 space-x-4">
+            <div class="d-flex justify-content-center mt-8 space-x-4">
                 <!-- Button Cetak Laporan -->
                 <button class="px-6 py-3 bg-[#FF6347] text-white rounded-lg hover:bg-[#FF4500] transition-all"
                     onclick="printReport()">Cetak Laporan</button>
@@ -166,99 +298,140 @@
                 <button class="px-6 py-3 bg-[#3182CE] text-white rounded-lg hover:bg-[#1E40AF] transition-all"
                     onclick="sendWhatsapp()">Kirim Pemberitahuan WA</button>
 
-                <<!-- Button Edit Data -->
-                    <button class="px-6 py-3 bg-[#48BB78] text-white rounded-lg hover:bg-[#2F855A] transition-all"
-                        data-bs-toggle="modal" data-bs-target="#editDataModal">
-                        Edit Data
-                    </button>
-                    <!-- Modal Edit Data -->
-                    <div class="modal fade" id="editDataModal" tabindex="-1" aria-labelledby="editDataModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
-                                <!-- Modal Header -->
-                                <div class="modal-header" style="background-color: #1A2634;">
-                                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Pembayaran</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <!-- Modal Body -->
-                                <div class="modal-body" style="background-color: #2D3748;">
-                                    <!-- Form inside the modal -->
-                                    <form id="editForm"
-                                        action="{{ route('loans.update', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
-                                        method="POST">
-                                        @csrf
-                                        @method('PUT')
+                <!-- Button Edit Data -->
+                <button
+                    class="btn btn-warning px-6 py-3 text-white rounded-lg hover:bg-[#D97706] transition-all"data-bs-toggle="modal"
+                    data-bs-target="#editDataModal">
+                    <i class="bi bi-pencil"></i> Edit Data
+                </button>
 
-                                        <!-- Nama -->
-                                        <div class="mb-3">
-                                            <label for="name" class="form-label"
-                                                style="color: #fff;">Nama</label>
-                                            <input type="text" class="form-control" id="name" name="name"
-                                                value="{{ $loans->name }}" required>
+                <!-- Button Delete Data -->
+                <button type="button"
+                    class="btn btn-danger px-6 py-3 text-white rounded-lg hover:bg-[#9B2C2C] transition-all"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash"></i> Hapus
+                </button>
+
+                <!-- Modal Edit Data -->
+                <div class="modal fade" id="editDataModal" tabindex="-1" aria-labelledby="editDataModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                            <!-- Modal Header -->
+                            <div class="modal-header" style="background-color: #1A2634;">
+                                <h5 class="modal-title" id="editDataModalLabel">Edit Data Pembayaran</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <!-- Modal Body -->
+                            <div class="modal-body" style="background-color: #2D3748;">
+                                <!-- Form inside the modal -->
+                                <form id="editForm"
+                                    action="{{ route('loans.update', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
+                                    method="POST">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <!-- Nama -->
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label" style="color: #fff;">Nama</label>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            value="{{ $loans->name }}" required>
+                                    </div>
+
+
+                                    {{-- deskripsi --}}
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label"
+                                            style="color: #fff;">Deskripsi</label>
+                                        <input type="text" class="form-control" id="description"
+                                            name="description" value="{{ $loans->description }}" required>
+                                    </div>
+                                    <!-- Total Pembayaran -->
+                                    <div class="mb-3">
+                                        <label for="nominal" class="form-label" style="color: #fff;">Total
+                                            Pembayaran</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" class="form-control formattedNominal"
+                                                value="{{ number_format(floor($loans->total_amount), 0, ',', '.') }}"
+                                                required>
+                                            <input type="hidden" class="form-control nominal" name="total_amount"
+                                                value="{{ number_format(floor($loans->total_amount), 0, '', '') }}"
+                                                required>
                                         </div>
+                                    </div>
 
 
-                                        {{-- deskripsi --}}
-                                        <div class="mb-3">
-                                            <label for="description" class="form-label"
-                                                style="color: #fff;">Deskripsi</label>
-                                            <input type="text" class="form-control" id="description"
-                                                name="description" value="{{ $loans->description }}" required>
-                                        </div>
-                                        <!-- Total Pembayaran -->
-                                        <div class="mb-3">
-                                            <label for="nominal" class="form-label" style="color: #fff;">Total
-                                                Pembayaran</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="text" class="form-control" id="nominal"
-                                                    name="total_amount" value="{{ $loans->total_amount }}" required>
-                                            </div>
-                                        </div>
+                                    <!-- Kode -->
+                                    <div class="mb-3">
+                                        <label for="codes_id" class="form-label" style="color: #fff;">Kode</label>
+                                        <select class="form-control" id="code" name="codes_id" required>
+                                            <option value="">Pilih Kode</option>
+                                            @foreach ($codes as $code)
+                                                <option value="{{ $code->id }}"
+                                                    {{ $loans->code_id == $code->id ? 'selected' : '' }}>
+                                                    {{ $code->code }} <!-- Menampilkan kode -->
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                        <!-- Kode -->
-                                        <div class="mb-3">
-                                            <label for="codes_id" class="form-label"
-                                                style="color: #fff;">Kode</label>
-                                            <select class="form-control" id="code" name="codes_id" required>
-                                                <option value="">Pilih Kode</option>
-                                                @foreach ($codes as $code)
-                                                    <option value="{{ $code->id }}"
-                                                        {{ $loans->code_id == $code->id ? 'selected' : '' }}>
-                                                        {{ $code->code }} <!-- Menampilkan kode -->
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    <!-- No HP -->
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label" style="color: #fff;">No
+                                            HP</label>
+                                        <input type="text" class="form-control" id="phone" name="phone"
+                                            value="{{ $loans->phone }}" required>
+                                        <input type="hidden" name="loan_id" value="{{ $loans->id }}">
+                                    </div>
 
-
-
-
-                                        <!-- No HP -->
-                                        <div class="mb-3">
-                                            <label for="phone" class="form-label" style="color: #fff;">No
-                                                HP</label>
-                                            <input type="text" class="form-control" id="phone" name="phone"
-                                                value="{{ $loans->phone }}" required>
-                                            <input type="hidden" name="loan_id" value="{{ $loans->id }}">
-                                        </div>
-
-                                        <!-- Submit Button -->
-                                        <div class="mb-3 text-center">
-                                            <button type="submit" class="btn btn-success">Simpan Perubahan</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    <!-- Submit Button -->
+                                    <div class="mb-3 text-center">
+                                        <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Apakah Anda yakin ingin menghapus pembayar "<strong>{{ $loans->name }}</strong>"?
+                            </div>
+                            <div class="modal-footer">
+                                <!-- Tombol Batal dengan Ikon -->
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle"></i> Batal
+                                </button>
 
+                                <!-- Form untuk menghapus group -->
+                                <form id="deleteForm{{ $loans->name }}"
+                                    action="{{ route('loan.destroy', ['group' => $group->name, 'admin' => $admin->name, 'loan' => $loans->name]) }}"
+                                    method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="loans_id" value="{{ $loans->id }}">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
 
         </div>
-
-    </div>
     </div>
 
 
@@ -283,6 +456,32 @@
             // Remove the dots before sending the value to the server
             const valueWithoutDot = nominalInput.value.replace(/\./g, '');
             nominalInput.value = valueWithoutDot;
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const formattedNominals = document.querySelectorAll(".formattedNominal");
+            const nominals = document.querySelectorAll(".nominal");
+
+            formattedNominals.forEach((formattedNominal, index) => {
+                const nominal = nominals[
+                    index]; // Mendapatkan input hidden yang sesuai dengan formattedNominal
+
+                // Event listener untuk input
+                formattedNominal.addEventListener("input", function() {
+                    let value = formattedNominal.value.replace(/\D/g,
+                        ""); // Hapus karakter non-numerik
+
+                    // Update tampilan formattedNominal (misalnya format dengan titik)
+                    formattedNominal.value = formatCurrency(value);
+
+                    // Simpan nilai asli ke input hidden
+                    nominal.value = value;
+                });
+            });
+
+            // Fungsi untuk memformat angka
+            function formatCurrency(value) {
+                return new Intl.NumberFormat("id-ID").format(value); // Format sesuai lokal Indonesia
+            }
         });
     </script>
 

@@ -17,6 +17,7 @@ class ExpenseFactory extends Factory
 
         return [
             'user_id' => $user->id, // Generates a random Admin ID
+            'admin_id' => null, // Generates a random Admin ID
             'date' => $this->faker->date, // Generates a random date
             'amount' => $this->faker->randomFloat(2, 10, 10000), // Generates a random amount
             'category_id' => CategoryExpense::factory(), // Generates a random CategoryExpense ID

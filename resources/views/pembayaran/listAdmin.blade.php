@@ -119,7 +119,6 @@
                                         </button>
 
                                         <!-- Form untuk menghapus admin -->
-                                        @dump($group->id);
                                         <form id="deleteForm{{ $admin->id }}"
                                             action="{{ route('admin.destroy', ['group' => $group->id]) }}"
                                             method="POST">

@@ -13,7 +13,7 @@ class AdminGroups extends Model
     use HasFactory;
     protected $fillable = [
         'admin_id',
-        'group_id'       
+        'group_id'
     ];
 
     public function groups(): BelongsTo
@@ -21,7 +21,7 @@ class AdminGroups extends Model
         return $this->belongsTo(Groups::class);
     }
 
-    public function admin(): BelongsTo
+    public function admins(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
     }

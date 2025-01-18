@@ -25,23 +25,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $gwh =User::create([
+        $gwh = User::create([
             'name' => 'Purnama',
             'username' => 'PurnamaManajer',
             'email' => 'purnamaA@gmail.com',
             'password' => Hash::make('purnama'),
-            'role' => 1 
+            'role' => 1
         ]);
         Manager::factory(1)->recycle([
             $gwh,
         ])->create();
 
-        $gwh =User::create([
+        $gwh = User::create([
             'name' => 'Purnama',
             'username' => 'PurnamaAdmin',
             'email' => 'purnamaM@gmail.com',
             'password' => Hash::make('purnama'),
-            'role' => 2 
+            'role' => 2
         ]);
         Admin::factory(10)->recycle([
             $gwh,
@@ -52,12 +52,21 @@ class DatabaseSeeder extends Seeder
         Groups::factory(3)->create();
         AdminGroups::factory(29)->create();
         Code::factory(4)->create();
+        CategoryExpense::factory()->create([
+            'name' => 'Gaji',
+            'role' => 1
+        ]);
+
+        CategoryExpense::factory()->create([
+            'name' => 'Bonus',
+            'role' => 1
+        ]);
         Expense::factory(6)->recycle([
-            CategoryExpense::factory(3)->create()
+            CategoryExpense::factory(2)->create()
         ])->create();
+
+
         Loan::factory(30)->create();
         Payment::factory(50)->create();
-
-
     }
 }

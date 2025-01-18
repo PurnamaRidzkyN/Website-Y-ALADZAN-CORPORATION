@@ -22,13 +22,104 @@ class Loan extends Model
         'phone',
         'codes_id',
     ];
+    protected static function booted()
+    {
+        // Event ketika Loan diubah
+        static::updated(function ($loan) {
+            // Cek apakah total_amount atau pembayaran telah berubah untuk menghindari update yang tidak perlu
+            if ($loan->isDirty('total_amount') || $loan->payments->isNotEmpty() && $loan->payments->some(fn($payment) => $payment->isDirty('amount'))) {
+                // Panggil method untuk memperbarui jumlah pembayaran dan jumlah pinjaman
+                self::updatePaymentAndLoanAmounts($loan);
+            }
+        });
+
+        // Event ketika Loan dibuat
+        static::created(function ($loan) {
+            // Cek apakah Loan memiliki relasi ke adminGroup
+            $adminGroup = $loan->adminGroup;
+
+            if ($adminGroup) {
+                // Ambil admin yang terkait dengan adminGroup
+                $admin = Admin::find($adminGroup->admin_id); // Ambil admin pertama yang terkait
+
+                // Pastikan admin memiliki bonus yang terkait
+                if ($admin) {
+                    // Ambil bonus yang terkait dengan admin
+                    $bonus = Bonuses::find($admin->bonus_id);
+
+                    // Cek apakah bonus ditemukan
+                    if ($bonus) {
+                        // Ambil kode yang terkait dengan loan untuk menghitung bonus
+                        $code = $loan->code;
+
+                        if ($code) {
+                            // Tambahkan bonus yang ada di kode ke bonus admin
+                            $bonus->total_amount += $code->bonus; // Menambahkan bonus amount dari kode ke bonus yang ada
+                            $bonus->save(); // Simpan perubahan bonus ke database
+                        }
+                    }
+                }
+            }
+        });
+        // Event ketika Loan diperbarui
+        static::updated(function ($loan) {
+            // Cek apakah Loan memiliki relasi ke adminGroup
+            $adminGroup = $loan->adminGroup;
+
+            if ($adminGroup) {
+                // Ambil admin yang terkait dengan adminGroup
+                $admin = Admin::find($adminGroup->admin_id); // Ambil admin pertama yang terkait
+
+                // Pastikan admin memiliki bonus yang terkait
+                if ($admin) {
+                    // Ambil bonus yang terkait dengan admin
+                    $bonus = Bonuses::find($admin->bonus_id);
+
+                    // Cek apakah bonus ditemukan
+                    if ($bonus) {
+                        // Ambil kode yang terkait dengan loan untuk menghitung bonus
+                        $code = Code::find($loan->codes_id); // Gunakan codes_id yang terbaru
+
+                        $previousCode = Code::find($loan->getOriginal('codes_id')); // Ambil kode sebelumnya menggunakan getOriginal
+                        if ($previousCode) {
+                            // Kurangi bonus berdasarkan kode sebelumnya
+                            $previousBonus = $previousCode->bonus; // Bonus yang diberikan oleh kode sebelumnya
+                            $bonus->total_amount -= $previousBonus; // Kurangi bonus sebelumnya
+                        }
+
+                        // Tambahkan bonus yang ada di kode baru
+                        $bonus->total_amount += $code->bonus; // Menambahkan bonus amount dari kode baru ke bonus yang ada
+
+                        // Simpan perubahan bonus ke database
+                        $bonus->save();
+                    }
+                }
+            }
+        });
+    }
+
+
+    // Fungsi untuk memperbarui total_payment dan outstanding_amount
+    private static function updatePaymentAndLoanAmounts($loan)
+    {
+        // Hanya hitung ulang jika ada perubahan yang relevan
+        $totalPayment = $loan->payments->sum('amount');
+
+        // Hanya lakukan update jika ada perubahan pada total_payment atau outstanding_amount
+        if ($loan->total_payment !== $totalPayment || $loan->outstanding_amount !== ($loan->total_amount - $totalPayment)) {
+            $loan->update([
+                'total_payment' => $totalPayment,
+                'outstanding_amount' => $loan->total_amount - $totalPayment,
+            ]);
+        }
+    }
 
     /**
      * Relationship: Loan belongs to an Admin.
      */
-    public function admin(): BelongsTo
+    public function adminGroup(): BelongsTo
     {
-        return $this->belongsTo(Admin::class, 'admin_id');
+        return $this->belongsTo(AdminGroups::class, 'admin_group_id');
     }
 
     /**

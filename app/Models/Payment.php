@@ -20,16 +20,33 @@ class Payment extends Model
 
     protected static function booted()
     {
+        // Event ketika Payment dibuat
         static::created(function ($payment) {
-            // Update total_payment dan outstanding_amount pada Loan setelah Payment ditambahkan
-            $loan = $payment->loan;
-            $totalPayment = $loan->payments->sum('amount');
-            $loan->update([
-                'total_payment' => $totalPayment,
-                'outstanding_amount' => $loan->total_amount - $totalPayment,
-            ]);
+            self::updateLoanAmounts($payment->loan);
+        });
+
+        // Event ketika Payment dihapus
+        static::deleted(function ($payment) {
+            self::updateLoanAmounts($payment->loan);
+        });
+
+        // Event ketika Payment diubah
+        static::updated(function ($payment) {
+            self::updateLoanAmounts($payment->loan);
         });
     }
+
+    // Fungsi untuk memperbarui total_payment dan outstanding_amount
+    private static function updateLoanAmounts($loan)
+    {
+        $totalPayment = $loan->payments->sum('amount');
+        $loan->update([
+            'total_payment' => $totalPayment,
+            'outstanding_amount' => $loan->total_amount - $totalPayment,
+        ]);
+    }
+
+    
     public function loan(): BelongsTo
     {
         return $this->belongsTo(Loan::class, 'loan_id');

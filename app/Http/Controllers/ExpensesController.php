@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Models\CategoryExpense;
@@ -13,8 +14,8 @@ class ExpensesController extends Controller
     {
         // Fetch category expenses and expenses with related users (admin, manager)
         $category_expenses = CategoryExpense::all();
+        $admins = Admin::get();
         $expenses = Expense::with('user.admin', 'user.manager')->get();
-
         // Convert expenses to an array to pass to JavaScript
         $expensesArray = $expenses->map(function ($expense) {
             return [
@@ -28,25 +29,41 @@ class ExpensesController extends Controller
                 'user' => [
                     'username' => $expense->user->username, // Ensure you have 'username' or adjust based on your user model
                 ],
+                'admin' => [
+                    'name' => $expense->admin ? $expense->admin->name : 'tidak ada admin',
+                ]
             ];
         });
 
         // Pass category_expenses and expenses to the view
-        return view('pengeluaran/pengeluaran', compact('category_expenses', 'expensesArray'), ["title" => "Pencatatan Pengeluaran"]);
+        return view('pengeluaran/pengeluaran', compact('admins', 'category_expenses', 'expensesArray'), ["title" => "Pencatatan Pengeluaran"]);
     }
 
     public function store(Request $request)
     {
-        // Validasi input
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'tanggal' => 'required|date',
-            'nominal' => 'required|numeric|min:0',
-            'deskripsi' => 'required|string|max:500',
-            'payment_method' => 'required|string|max:100',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
-            'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
-        ]);
+        if ($request->category_id == 1 || $request->category_id == 2) {
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'admin_id' => 'required|exists:admins,id',
+                'tanggal' => 'required|date',
+                'nominal' => 'required|numeric|min:0',
+                'deskripsi' => 'required|string|max:500',
+                'payment_method' => 'required|string|max:100',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
+            ]);
+        } else {
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'tanggal' => 'required|date',
+                'nominal' => 'required|numeric|min:0',
+                'deskripsi' => 'required|string|max:500',
+                'payment_method' => 'required|string|max:100',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
+            ]);
+        }
+
 
         try {
             // Cek apakah ada file gambar yang diunggah
@@ -59,6 +76,7 @@ class ExpensesController extends Controller
             // Simpan data pengeluaran ke database
             Expense::create([
                 'user_id' => $validatedData['user_id'],
+                'admin_id' => $validatedData['admin_id'],
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -83,15 +101,28 @@ class ExpensesController extends Controller
     {
 
         // Validasi input
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'tanggal' => 'required|date',
-            'nominal' => 'required|numeric|min:0',
-            'deskripsi' => 'required|string|max:500',
-            'payment_method' => 'required|string|max:100',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
-            'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
-        ]);
+        if ($request->category_id == 1 || $request->category_id == 2) {
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'admin_id' => 'required|exists:admins,id',
+                'tanggal' => 'required|date',
+                'nominal' => 'required|numeric|min:0',
+                'deskripsi' => 'required|string|max:500',
+                'payment_method' => 'required|string|max:100',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
+            ]);
+        } else {
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'tanggal' => 'required|date',
+                'nominal' => 'required|numeric|min:0',
+                'deskripsi' => 'required|string|max:500',
+                'payment_method' => 'required|string|max:100',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
+            ]);
+        }
         try {
             // Cari pengeluaran berdasarkan ID
             $expense = Expense::findOrFail($id);
@@ -110,6 +141,7 @@ class ExpensesController extends Controller
             // Perbarui data pengeluaran
             $expense->update([
                 'user_id' => $validatedData['user_id'],
+                'admin_id' => $validatedData['admin_id'],
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],

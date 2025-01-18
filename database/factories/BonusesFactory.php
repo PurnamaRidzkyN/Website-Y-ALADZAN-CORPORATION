@@ -18,8 +18,8 @@ class BonusesFactory extends Factory
     public function definition(): array
     {
         return [
-            'total_amount' => $this->faker->randomFloat(2, 100, 10000), 
-            'used_amount' => $this->faker->randomFloat(2, 0, 10000)
+            'total_amount' => 0, 
+            'used_amount' => 0
         ];
     }
 }
