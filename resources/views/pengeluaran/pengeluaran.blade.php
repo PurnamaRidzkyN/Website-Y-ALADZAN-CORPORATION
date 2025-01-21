@@ -3,7 +3,6 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
     <!-- Bootstrap JS Bundle (termasuk Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <div class="bg-gray-900 min-h-screen p-6">
@@ -14,6 +13,212 @@
             </div>
         @endif
         <!-- Header -->
+        @if (auth()->user()->role == 1)
+            <button type="button"
+                class="text-right mb-8 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                data-bs-toggle="modal" data-bs-target="#category_expensesModal">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    class="size-6 mr-2 w-5 h-5">
+                    <path
+                        d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                </svg>
+                Edit Kategori Pengeluaran
+            </button>
+        @endif
+        <!-- Modal Daftar category_expenses (Modal Pertama) -->
+        <div class="modal fade" id="category_expensesModal" tabindex="-1" aria-labelledby="category_expensesModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <div class="modal-header" style="border-bottom: 1px solid #003366;">
+                        <h5 class="modal-title" id="category_expensesModalLabel" style="color: #F7FAFC;">Kategori
+                            Pengeluaran </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Tabel dengan latar belakang gelap dan teks terang -->
+                        <table class="table table-striped table-bordered table-hover"
+                            style="background-color: #2D3748; color: #F7FAFC !important;">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th style="color: #F7FAFC !important;">Nama</th>
+                                    <th style="color: #F7FAFC !important;">Akses</th>
+                                    <th style="color: #F7FAFC !important;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: #1A2634; color: #F7FAFC !important;">
+                                @foreach ($category_expenses as $category)
+                                    <tr id="category_expenses-row-{{ $category->id }}">
+                                        <td style="color: #F7FAFC !important;">{{ $category->name }}</td>
+                                        <td style="color: #F7FAFC !important;">
+                                            {{ $category->role == 1 ? 'Hanya untuk manajer' : 'Semua bisa akses' }}</td>
+                                        <td style="color: #F7FAFC !important;">
+                                            <!-- Tombol Edit -->
+                                            <button type="button" class="btn btn-warning btn-sm rounded-pill shadow-lg"
+                                                data-bs-toggle="modal" data-bs-target="#editModal{{ $category->id }}"
+                                                data-name="{{ $category->name }}" data-role="{{ $category->role }}">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+
+                                            <!-- Tombol Hapus -->
+                                            <form style="display: inline-block;">
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal{{ $category->id }}">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+
+
+
+                        <!-- Tombol untuk membuka modal tambah category_expenses baru -->
+                        <button type="button" class="btn" style="background-color: #38A169; color: white;"
+                            data-bs-toggle="modal" data-bs-target="#addcategory_expensesModal">
+                            Tambah Kategori Pengeluaran Baru
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @foreach ($category_expenses as $category)
+            <!-- Modal Edit -->
+            <div class="modal fade" id="editModal{{ $category->id }}" tabindex="-1"
+                aria-labelledby="editModalLabel{{ $category->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                        <div class="modal-header" style="background-color: #1A2634;">
+                            <h5 class="modal-title" id="editModalLabel{{ $category->id }}">Edit Kategori Pengeluaran
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="background-color: #2D3748;">
+                            <!-- Form untuk Edit -->
+
+                            <form action="{{ route('category.update', $category->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="mb-3">
+                                    <label for="category_expenses_name{{ $category->id }}" class="form-label"
+                                        style="color: #fff;">Nama</label>
+                                    <input type="text" class="form-control"
+                                        id="category_expenses_name{{ $category->id }}" name="name"
+                                        value="{{ $category->name }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="category_expenses_role{{ $category->id }}" class="form-label"
+                                        style="color: #fff;">Akses</label>
+                                    <select class="form-control" id="category_expenses_role{{ $category->id }}"
+                                        name="role" required>
+                                        <option value="0" {{ $category->role == 0 ? 'selected' : '' }}>Semua bisa
+                                            akses</option>
+                                        <option value="1" {{ $category->role == 1 ? 'selected' : '' }}>Hanya
+                                            untuk Manajer</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="mb-3 text-center">
+                                    <button type="submit" class="btn btn-success">Update kategori
+                                        Pengeluaran</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+
+        <!-- Modal Konfirmasi Hapus -->
+        @foreach ($category_expenses as $category)
+            <div class="modal fade" id="deleteModal{{ $category->id }}" tabindex="-1"
+                aria-labelledby="deleteModalLabel{{ $category->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel{{ $category->id }}">Konfirmasi Hapus</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Apakah Anda yakin ingin menghapus Kategori pengeluaran
+                            "<strong>{{ $category->name }}</strong>"?
+                        </div>
+                        <div class="modal-footer">
+                            <!-- Tombol Batal dengan Ikon -->
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle"></i> Batal
+                            </button>
+
+                            <!-- Form untuk menghapus category_expenses -->
+                            {{-- <form id="deleteForm{{ $category->id }}" action="{{ route('category.destroy') }}" --}}
+                            <form id="deleteForm{{ $category->id }}" action="{{ route('category.destroy',$category->id) }} " method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="category_expenses_id" value="{{ $category->id }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+
+
+        <!-- Modal Tambah category_expenses Baru -->
+        <div class="modal fade" id="addcategory_expensesModal" tabindex="-1"
+            aria-labelledby="addcategory_expensesModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <div class="modal-header" style="border-bottom: 1px solid #003366;">
+                        <h5 class="modal-title" id="addcategory_expensesModalLabel">Tambah Kategori Pengeluaran Baru Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('category.store', $category->id) }}" method="POST">
+                            @csrf
+                            <!-- Input untuk nama category_expenses -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nama category_expenses</label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                    style="background-color: #1A2634; color: #F7FAFC; border: 1px solid #3182CE;">
+                            </div>
+
+                            <!-- Input untuk deskripsi category_expenses -->
+                            <div class="mb-3">
+                                <label for="category_expenses_role{{ $category->id }}" class="form-label"
+                                    style="color: #fff;">Akses</label>
+                                <select class="form-control" id="category_expenses_role{{ $category->id }}"
+                                    name="role" required>
+                                    <option value="0">Semua bisa
+                                        akses</option>
+                                    <option value="1">Hanya
+                                        untuk Manajer</option>
+                                </select>
+                            </div>
+
+                            <!-- Tombol untuk menambah category_expenses, berwarna hijau -->
+                            <button type="submit" class="btn"
+                                style="background-color: #38A169; color: white;">Tambah
+                                Kategori Pengeluaran</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             @foreach ($category_expenses as $category)
@@ -47,7 +252,7 @@
                         </div>
                         <input type="text" id="simple-search"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search branch name..." required />
+                            placeholder="Cari..." required />
                     </div>
 
                 </form>
@@ -124,13 +329,15 @@
         </div>
 
         {{-- modal tambah data  --}}
-        <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
                     <!-- Modal Header -->
                     <div class="modal-header" style="background-color: #1A2634;">
                         <h5 class="modal-title" id="addDataModalLabel">Tambah Pengeluaran</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <!-- Modal Body -->
                     <div class="modal-body" style="background-color: #2D3748;">
@@ -147,8 +354,8 @@
                             <!-- Input for Nominal -->
                             <div class="mb-3">
                                 <label for="nominal" class="form-label" style="color: #fff;">Total</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
+                                <div class="input-category_expenses">
+                                    <span class="input-category_expenses-text">Rp</span>
                                     <input type="text" class="form-control" id="nominal" name="nominal"
                                         required>
                                 </div>
@@ -174,7 +381,7 @@
                             <div class="mb-3">
                                 <label for="payment_method" class="form-label" style="color: #fff;">Cara
                                     Bayar</label>
-                                <div class="input-group">
+                                <div class="input-category_expenses">
                                     <input type="text" class="form-control" id="payment_method"
                                         name="payment_method" required>
                                 </div>
@@ -235,8 +442,8 @@
                             <!-- Input for Nominal -->
                             <div class="mb-3">
                                 <label for="nominal" class="form-label" style="color: #fff;">Total</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
+                                <div class="input-category_expenses">
+                                    <span class="input-category_expenses-text">Rp</span>
                                     <input type="text" class="form-control" id="nominal" name="nominal"
                                         required>
                                 </div>
@@ -262,7 +469,7 @@
                             <div class="mb-3">
                                 <label for="payment_method" class="form-label" style="color: #fff;">Cara
                                     Bayar</label>
-                                <div class="input-group">
+                                <div class="input-category_expenses">
                                     <input type="text" class="form-control" id="payment_method"
                                         name="payment_method" required>
                                 </div>
@@ -428,7 +635,7 @@
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
             ${category === 'Gaji' || category === 'Bonus' ? `
-                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
+                                                                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
             <td class="px-4 py-2 text-xs sm:text-sm">
                 <a href="#" onclick="openModal('{{ asset('storage/${sanitize(expense.image_url)}') }}')">
                     <img src="{{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
@@ -436,9 +643,9 @@
             </td>
             <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
                 ${ (userRole == role || role == 0) ? `
-                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
+                                                                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+                                                                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+                                                                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
             </td>
         </tr>
     `;
@@ -510,7 +717,7 @@
                 }
 
                 // Populate the table with the filtered expenses
-                const tbody = document.getElementById('gaji-body');
+                const tbody = document.getElementById('exception-body');
                 tbody.innerHTML = buildExpenseRows(filteredExpenses, 0); // Pass the appropriate role if needed
             });
 

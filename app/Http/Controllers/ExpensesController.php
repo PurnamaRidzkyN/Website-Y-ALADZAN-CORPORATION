@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Bonuses;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Models\CategoryExpense;
@@ -84,6 +85,12 @@ class ExpensesController extends Controller
                 'method' => $validatedData['payment_method'],
                 'image_url' => $validatedData['image_url'] ?? null,  // Jika tidak ada gambar, set ke null
             ]);
+            if ($validatedData['category_id'] == 2) {
+                $admin = Admin::find($validatedData['admin_id']);
+                $bonus = Bonuses::find($admin["bonus_id"]);
+                $bonus->used_amount += $validatedData['nominal'];
+                $bonus->save();
+            }
             // Redirect dengan pesan sukses
             return redirect()->route('expenses.index')->with([
                 'status' => 'success',
@@ -99,12 +106,11 @@ class ExpensesController extends Controller
     }
     public function update(Request $request, $id)
     {
-
         // Validasi input
         if ($request->category_id == 1 || $request->category_id == 2) {
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'admin_id' => 'required|exists:admins,id',
+                'edit_admin_id' => 'required|exists:admins,id',
                 'tanggal' => 'required|date',
                 'nominal' => 'required|numeric|min:0',
                 'deskripsi' => 'required|string|max:500',
@@ -141,7 +147,7 @@ class ExpensesController extends Controller
             // Perbarui data pengeluaran
             $expense->update([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => $validatedData['admin_id'],
+                'admin_id' => $validatedData['edit_admin_id'],
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -199,5 +205,48 @@ class ExpensesController extends Controller
                 'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
             ]);
         }
+    }
+
+    public function categoryStore(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|max:255',
+        ]);
+
+        CategoryExpense::create([
+            'name' => $validatedData['name'],
+            'role' => $validatedData['role'],
+        ]);
+        return redirect()->route('expenses.index')->with([
+            'status' => 'success',
+            'message' => 'Kategori berhasil ditambahkan !',
+        ]);
+    }
+    public function categoryUpdate(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|max:255',
+        ]);
+
+        $category = CategoryExpense::findOrFail($id);
+        $category->update([
+            'name' => $validatedData['name'],
+            'role' => $validatedData['role'],
+        ]);
+        return redirect()->route('expenses.index')->with([
+            'status' => 'success',
+            'message' => 'Kategori berhasil ditambahkan !',
+        ]);
+    }
+    public function categoryDestroy($id)
+    {
+        $category = CategoryExpense::findOrFail($id);
+        $category->delete();
+        return redirect()->route('expenses.index')->with([
+            'status' => 'success',
+            'message' => 'Kategori berhasil dihapus!',
+        ]);
     }
 }

@@ -54,6 +54,10 @@ Route::put('/pengeluaran/update/{id}', [ExpensesController::class, 'update'])->m
 Route::get('/pengeluaran/edit/{id}', [ExpensesController::class, 'edit'])->middleware('auth')->name('expenses.edit');
 Route::delete('/pengeluaran/delete/{id}', [ExpensesController::class, 'destroy'])->middleware('auth')->name('expenses.destroy');
 
+Route::post('/pengeluaran/category-store', [ExpensesController::class, 'categoryStore'])->middleware('auth')->name('category.store');
+Route::put('/pengeluaran/category-update/{id}', [ExpensesController::class, 'categoryUpdate'])->middleware('auth')->name('category.update');
+Route::delete('/pengeluaran/category-destroy/{id}', [ExpensesController::class, 'categoryDestroy'])->middleware('auth')->name('category.destroy');
+
 
 
 Route::get('/manajemen-data', [DataController::class, 'index'])
