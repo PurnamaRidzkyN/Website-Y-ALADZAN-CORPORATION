@@ -26,7 +26,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $gwh = User::create([
-            'name' => 'Purnama',
             'username' => 'PurnamaManajer',
             'email' => 'purnamaA@gmail.com',
             'password' => Hash::make('purnama'),
@@ -37,7 +36,6 @@ class DatabaseSeeder extends Seeder
         ])->create();
 
         $gwh = User::create([
-            'name' => 'Purnama',
             'username' => 'PurnamaAdmin',
             'email' => 'purnamaM@gmail.com',
             'password' => Hash::make('purnama'),

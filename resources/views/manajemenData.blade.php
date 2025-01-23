@@ -87,8 +87,8 @@
                 @foreach ($admins as $admin)
                     <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
                         <div class="flex justify-center items-center mb-4">
-                            <img src="{{ $admin['foto'] }}" alt="Admin Photo"
-                                class="w-16 h-16 mx-auto rounded-full mb-4">
+                            <img src="{{ $admin['foto'] ? asset('storage/' . $admin['foto']) : asset('Default_pfp.jpg') }}"
+                                alt="Admin Photo" class="w-16 h-16 mx-auto rounded-full mb-4">
                         </div>
 
                         <hr id="separator" class="border-2 rounded mb-10"
@@ -114,10 +114,13 @@
                             <p><strong>Bonus Sisa:</strong> {{ $admin->bonuses->remaining_amount }}</p>
                             <p><strong>Updated At:</strong> {{ $admin['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">
+                                <button id="editDataAdmin"
+                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
+                                    data-bs-toggle="modal" data-bs-target="#editModalAdmin{{ $admin->id }}">
                                     Edit
                                 </button>
-                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">
+                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
+                                    data-bs-toggle="modal" data-bs-target="#deleteModalAdmin{{ $admin->id }}">
                                     Hapus
                                 </button>
                             </div>
@@ -181,8 +184,8 @@
                 @foreach ($managers as $manager)
                     <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
                         <div class="flex justify-center items-center mb-4">
-                            <img src="{{ $manager['foto'] }}" alt="Manager Photo"
-                                class="w-16 h-16 mx-auto rounded-full mb-4">
+                            <img src="{{ $manager['foto'] ? asset('storage/' . $manager['foto']) : asset('images/Default_pfp.jpg') }}"
+                                alt="Manager Photo" class="w-16 h-16 mx-auto rounded-full mb-4">
                         </div>
 
                         <hr id="separator" class="border-2 rounded mb-10"
@@ -200,10 +203,13 @@
                             <p><strong>Phone:</strong> {{ $manager['phone'] }}</p>
                             <p><strong>Updated At:</strong> {{ $manager['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">
+                                <button
+                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600" data-bs-toggle="modal"
+                                    data-bs-target="#editModalManager{{ $manager->id }}">
                                     Edit
                                 </button>
-                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">
+                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
+                                    data-bs-toggle="modal" data-bs-target="#deleteModalManager{{ $manager->id }}">
                                     Hapus
                                 </button>
                             </div>
@@ -254,7 +260,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body" style="background-color: #2D3748;">
                     <!-- Form inside the modal -->
-                    <form action="{{ route('Manajemen Data.store') }}" method="POST">
+                    <form action="{{ route('Manajemen Data.AdminStore') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Nama</label>
@@ -279,11 +285,6 @@
                             </div>
                         </div>
 
-                        <!-- Hidden Input for Username -->
-                        <div class="mb-3">
-                            <input type="hidden" class="form-control" id="username" name="username"
-                                value="username_value" required>
-                        </div>
 
                         <!-- Modal Footer -->
                         <div class="modal-footer" style="background-color: #1A2634;">
@@ -296,6 +297,110 @@
             </div>
         </div>
     </div>
+    {{-- edit admin --}}
+    @foreach ($admins as $admin)
+        <div class="modal fade" id="editModalAdmin{{ $admin->id }}" tabindex="-1"
+            aria-labelledby="editDataAdminLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <!-- Modal Header -->
+                    <div class="modal-header" style="background-color: #1A2634;">
+                        <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body" style="background-color: #2D3748;">
+                        <!-- Form inside the modal -->
+                        <form action="{{ route('Manajemen Data.AdminUpdate') }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="edit_name" class="form-label">Nama</label>
+                                <input type="text" class="form-control" id="edit_name" name="name"
+                                    value="{{ $admin->name }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="edit_email" name="email"
+                                    value="{{ $admin->user->email }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_phone" class="form-label">No HP</label>
+                                <input type="number" class="form-control" id="edit_phone" name="phone"
+                                    value="{{ $admin->phone }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_salary" class="form-label">Gaji</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" class="form-control" id="edit_salary" name="salary"
+                                        value="{{ $admin->salary }}" required>
+                                </div>
+                            </div>
+
+
+                            <!-- Hidden Input for ID -->
+                            <div class="mb-3">
+                                <input type="hidden" class="form-control" id="edit_id" name="id"
+                                    value="{{ $admin->id }}">
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="modal-footer" style="background-color: #1A2634;">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn"
+                                    style="background-color: #4CAF50; color: white;">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    {{-- hapus admin --}}
+    <!-- Modal Konfirmasi Hapus -->
+    @foreach ($admins as $admin)
+        <div class="modal fade" id="deleteModalAdmin{{ $admin->id }}" tabindex="-1"
+            aria-labelledby="deleteModalLabel{{ $admin->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ $admin->id }}">Konfirmasi Hapus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Apakah Anda yakin ingin menghapus admin "<strong>{{ $admin->name }}</strong>"?
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Tombol Batal dengan Ikon -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </button>
+
+                        <!-- Form untuk menghapus admin -->
+                        <form id="deleteForm{{ $admin->id }}" action="{{ route('Manajemen Data.AdminDestroy') }}"
+                            method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="admin_id" value="{{ $admin->id }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    {{-- manajer modal --}}
     <div class="modal fade" id="addDataManajer" tabindex="-1" aria-labelledby="addDataManajerLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -309,7 +414,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body" style="background-color: #2D3748;">
                     <!-- Form inside the modal -->
-                    <form action="" method="POST">
+                    <form action="{{ route('Manajemen Data.managerStore') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Nama</label>
@@ -326,11 +431,6 @@
                             <input type="number" class="form-control" id="phone" name="phone" required>
                         </div>
 
-                        <!-- Hidden Input for Username -->
-                        <div class="mb-3">
-                            <input type="hidden" class="form-control" id="username" name="username"
-                                value="username_value" required>
-                        </div>
 
                         <!-- Modal Footer -->
                         <div class="modal-footer" style="background-color: #1A2634;">
@@ -343,8 +443,99 @@
             </div>
         </div>
     </div>
+    {{-- edit manager --}}
+    @foreach ($managers as $manager)
+        <div class="modal fade" id="editModalManager{{ $manager->id }}" tabindex="-1"
+            aria-labelledby="editDataManagerLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <!-- Modal Header -->
+                    <div class="modal-header" style="background-color: #1A2634;">
+                        <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
 
-    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body" style="background-color: #2D3748;">
+                        <!-- Form inside the modal -->
+                        <form action="{{ route('Manajemen Data.managerUpdate') }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="edit_name" class="form-label">Nama</label>
+                                <input type="text" class="form-control" id="edit_name" name="name"
+                                    value="{{ $manager->name }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="edit_email" name="email"
+                                    value="{{ $manager->user->email }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_phone" class="form-label">No HP</label>
+                                <input type="number" class="form-control" id="edit_phone" name="phone"
+                                    value="{{ $manager->phone }}" required>
+                            </div>
+
+                            <!-- Hidden Input for ID -->
+                            <div class="mb-3">
+                                <input type="hidden" class="form-control" id="edit_id" name="id"
+                                    value="{{ $manager->id }}">
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="modal-footer" style="background-color: #1A2634;">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn"
+                                    style="background-color: #4CAF50; color: white;">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    {{-- hapus manager --}}
+    <!-- Modal Konfirmasi Hapus -->
+    @foreach ($managers as $manager)
+        <div class="modal fade" id="deleteModalManager{{ $manager->id }}" tabindex="-1"
+            aria-labelledby="deleteModalLabel{{ $manager->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ $manager->id }}">Konfirmasi Hapus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Apakah Anda yakin ingin menghapus manager "<strong>{{ $manager->name }}</strong>"?
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Tombol Batal dengan Ikon -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </button>
+
+                        <!-- Form untuk menghapus manager -->
+                        <form id="deleteForm{{ $manager->id }}"
+                            action="{{ route('Manajemen Data.managerDestroy') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="manager_id" value="{{ $manager->id }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
 
 
     <script>

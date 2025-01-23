@@ -42,6 +42,7 @@ class ExpensesController extends Controller
 
     public function store(Request $request)
     {
+
         if ($request->category_id == 1 || $request->category_id == 2) {
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
@@ -65,8 +66,9 @@ class ExpensesController extends Controller
             ]);
         }
 
-
         try {
+            $validatedData['nominal'] =  str_replace('.', '', $validatedData['nominal']);
+
             // Cek apakah ada file gambar yang diunggah
             if ($request->hasFile('image')) {
                 // Simpan gambar dan ambil path-nya
@@ -130,6 +132,8 @@ class ExpensesController extends Controller
             ]);
         }
         try {
+            $validatedData['nominal'] =  str_replace('.', '', $validatedData['nominal']);
+
             // Cari pengeluaran berdasarkan ID
             $expense = Expense::findOrFail($id);
 
@@ -156,6 +160,27 @@ class ExpensesController extends Controller
                 'image_url' => $validatedData['image_url'] ?? $expense->image_url, // Jika tidak ada gambar baru, gunakan gambar lama
             ]);
 
+            if ($validatedData['category_id'] == 2) {
+                // Temukan admin berdasarkan admin_id yang diubah
+                $admin = Admin::find($validatedData['edit_admin_id']);
+
+                // Temukan bonus berdasarkan bonus_id yang terkait dengan admin
+                $bonus = Bonuses::find($admin->bonus_id);
+
+                // Ambil nilai used_amount yang lama
+                $oldUsedAmount = $bonus->used_amount;
+
+                // Kurangi nilai lama dari used_amount
+                $bonus->used_amount -= $oldUsedAmount;
+
+                // Tambahkan nominal baru ke used_amount
+                $bonus->used_amount += $validatedData['nominal'];
+
+                // Simpan perubahan
+                $bonus->save();
+            }
+
+
             // Redirect dengan pesan sukses
             return redirect()->route('expenses.index')->with([
                 'status' => 'success',
@@ -180,10 +205,27 @@ class ExpensesController extends Controller
 
     public function destroy($id)
     {
+        
         try {
             // Cari pengeluaran berdasarkan ID
             $expense = Expense::findOrFail($id);
-
+            if ($expense['category_id'] == 2) {
+                // Temukan admin berdasarkan admin_id yang diubah
+                $admin = Admin::find($expense['admin_id']);
+                
+                // Temukan bonus berdasarkan bonus_id yang terkait dengan admin
+                $bonus = Bonuses::find($admin->bonus_id);
+            
+                // Ambil nilai used_amount yang lama
+                $oldUsedAmount = $bonus->used_amount;
+            
+                // Kurangi nilai lama dari used_amount
+                $bonus->used_amount -= $oldUsedAmount;
+                        
+                // Simpan perubahan
+                $bonus->save();
+            }
+            
             // Hapus gambar dari penyimpanan jika ada
             if ($expense->image_url) {
                 // Menghapus gambar yang disimpan di folder 'public/expenses'

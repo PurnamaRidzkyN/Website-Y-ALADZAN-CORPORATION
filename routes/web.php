@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfilController;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 
@@ -54,27 +55,45 @@ Route::put('/pengeluaran/update/{id}', [ExpensesController::class, 'update'])->m
 Route::get('/pengeluaran/edit/{id}', [ExpensesController::class, 'edit'])->middleware('auth')->name('expenses.edit');
 Route::delete('/pengeluaran/delete/{id}', [ExpensesController::class, 'destroy'])->middleware('auth')->name('expenses.destroy');
 
-Route::post('/pengeluaran/category-store', [ExpensesController::class, 'categoryStore'])->middleware('auth')->name('category.store');
-Route::put('/pengeluaran/category-update/{id}', [ExpensesController::class, 'categoryUpdate'])->middleware('auth')->name('category.update');
-Route::delete('/pengeluaran/category-destroy/{id}', [ExpensesController::class, 'categoryDestroy'])->middleware('auth')->name('category.destroy');
+Route::post('/pengeluaran/category-store', [ExpensesController::class, 'categoryStore'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.store');
+Route::put('/pengeluaran/category-update/{id}', [ExpensesController::class, 'categoryUpdate'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.update');
+Route::delete('/pengeluaran/category-destroy/{id}', [ExpensesController::class, 'categoryDestroy'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.destroy');
 
-
-
+// manajemen data
 Route::get('/manajemen-data', [DataController::class, 'index'])
     ->middleware(['auth', CheckRole::class . ':' . 1])
     ->name('Manajemen Data');
 
-Route::post('/manajemen-data/store', [DataController::class, 'Adminstore'])
+Route::post('/manajemen-data/store-admin', [DataController::class, 'adminStore'])
     ->middleware(['auth', CheckRole::class . ':' . 1])
-    ->name('Manajemen Data.store');
+    ->name('Manajemen Data.AdminStore');
 
-Route::get('/tambah-peminjam', function () {
-    return view('tambahPeminjam', ["title" => "Peminjam baru"]);
-});
+Route::put('/manajemen-data/update-admin', [DataController::class, 'adminUpdate'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.AdminUpdate');
+
+Route::delete('/manajemen-data/destroy-admin', [DataController::class, 'adminDestroy'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.AdminDestroy');
+
+Route::post('/manajemen-data/store-manager', [DataController::class, 'managerStore'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.managerStore');
+
+Route::put('/manajemen-data/update-manager', [DataController::class, 'managerUpdate'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.managerUpdate');
+
+Route::delete('/manajemen-data/destroy-manager', [DataController::class, 'managerDestroy'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.managerDestroy');
+
+Route::get('/profil/{username}', [ProfilController::class, 'index'])->middleware('auth')->name('indexProfils');
+Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->middleware('auth')->name('updateUser');
+
+
+
+
 Route::get('/absensi', function () {
     return view('absensi', ["title" => "Absensi"]);
-});
-
-Route::get('/pengeluaran-detail', function () {
-    return view('pengeluaran/pengeluaranDetail', ["title" => "pengeluaran"]);
 });

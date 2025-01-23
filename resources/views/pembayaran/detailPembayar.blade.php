@@ -239,8 +239,6 @@
                                             <button type="submit" class="btn btn-success">Update Pembayaran</button>
                                         </div>
                                     </form>
-                                    @dump($payment->id)
-
                                 </div>
                             </div>
                         </div>

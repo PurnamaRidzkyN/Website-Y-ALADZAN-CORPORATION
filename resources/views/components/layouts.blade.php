@@ -28,6 +28,18 @@
             text-decoration: none;
             /* Pastikan hover juga tidak ada garis bawah */
         }
+
+        /* Untuk browser berbasis WebKit (Chrome, Safari, Edge) */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Untuk Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
 
 </head>

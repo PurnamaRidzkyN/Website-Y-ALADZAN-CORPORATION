@@ -19,9 +19,8 @@ SELECT
     a.phone,
     a.foto,
     COALESCE(SUM(l.total_payment), 0) AS total_payments,
-    COALESCE(SUM(l.total_amount), 0) AS total_amount,
-    COALESCE(SUM(l.total_payment) / NULLIF(SUM(l.total_amount), 0), 0) AS payment_to_amount_ratio
-FROM 
+    COALESCE(SUM(l.total_amount), 0) AS total_amount
+    FROM 
     admin_groups ag
 JOIN 
     admins a ON ag.admin_id = a.id

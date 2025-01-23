@@ -15,7 +15,6 @@ return new class extends Migration
         // Tabel Users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->string('username')->unique();
             $table->tinyInteger('role');
             $table->string('email')->unique();
