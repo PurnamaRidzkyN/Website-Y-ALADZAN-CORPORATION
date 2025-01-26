@@ -46,9 +46,9 @@ return new class extends Migration
             $table->decimal('remaining_amount', 15, 2)->default(0);
             $table->timestamps(); // Tambahkan kolom timestamps jika diperlukan
         });
-    
-        
-            
+
+
+
 
         // Tabel Admins
         Schema::create('admins', function (Blueprint $table) {
@@ -75,11 +75,20 @@ return new class extends Migration
         // Tabel Attendance
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke users
-            $table->string('location');
-            $table->string('image_url')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke tabel users
+            $table->string('location');  // Lokasi
+            $table->string('image_url')->nullable();  // URL gambar, opsional
+
+            // Menambahkan kolom waktu masuk dan waktu keluar
+            $table->time('entry_time');  // Waktu masuk (tanpa tanggal)
+            $table->time('exit_time');   // Waktu keluar (tanpa tanggal)
+
+            // Menambahkan kolom tanggal
+            $table->date('attendance_date');  // Tanggal absensi
+
             $table->timestamps();
         });
+
 
         // Tabel Groups
         Schema::create('groups', function (Blueprint $table) {
@@ -105,7 +114,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('bonuses');
-      
+
         Schema::dropIfExists('admin_groups');
         Schema::dropIfExists('groups');
         Schema::dropIfExists('attendances');

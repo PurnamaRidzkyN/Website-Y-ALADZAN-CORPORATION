@@ -53,17 +53,20 @@ class User extends Authenticatable
         ];
     }
 
-    public function admin():HasOne{
+    public function admin(): HasOne
+    {
         return $this->hasOne(Admin::class);
     }
-    public function manager():HasOne{
+    public function manager(): HasOne
+    {
         return $this->hasOne(Manager::class);
     }
-    public function attendances():HasMany{
+    public function attendances(): HasMany
+    {
         return $this->hasMany(Attendance::class);
     }
-    public function expenses() : HasMany {
+    public function expenses(): HasMany
+    {
         return $this->hasMany(Expense::class);
     }
-    
 }

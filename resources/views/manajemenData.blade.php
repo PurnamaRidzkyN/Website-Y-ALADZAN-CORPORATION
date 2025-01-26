@@ -227,8 +227,8 @@
             <!-- Card Pesan -->
             <div class="bg-gray-700 rounded-lg shadow-md p-6 mb-4">
                 <h2 class="text-xl font-semibold text-gray-300 mb-4">Pesan Pengaturan</h2>
-                <p class="text-gray-200 mb-4">Ini adalah pesan yang akan dikirim otomatis. Kamu dapat mengubahnya kapan
-                    saja.</p>
+                <p class="text-gray-200 mb-4">
+                    a</p>
 
                 <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
 

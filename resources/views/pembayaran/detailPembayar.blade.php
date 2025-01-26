@@ -290,11 +290,22 @@
             <div class="d-flex justify-content-center mt-8 space-x-4">
                 <!-- Button Cetak Laporan -->
                 <button class="px-6 py-3 bg-[#FF6347] text-white rounded-lg hover:bg-[#FF4500] transition-all"
-                    onclick="printReport()">Cetak Laporan</button>
+                    onclick="window.print()">Cetak Laporan</button>
 
                 <!-- Button Kirim Pemberitahuan WA -->
                 <button class="px-6 py-3 bg-[#3182CE] text-white rounded-lg hover:bg-[#1E40AF] transition-all"
                     onclick="sendWhatsapp()">Kirim Pemberitahuan WA</button>
+
+                <script>
+                    function sendWhatsapp() {
+                        const phoneNumber = '62895351651010'; // Ganti dengan nomor tujuan dalam format internasional tanpa '+'
+                        const message = 'Halo, saya ingin memberikan pemberitahuan penting kepada Anda.'; // Pesan default
+                        const encodedMessage = encodeURIComponent(message); // Encode pesan agar URL valid
+                        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`; // Buat URL WhatsApp
+
+                        window.open(whatsappUrl, '_blank'); // Buka URL di tab baru
+                    }
+                </script>
 
                 <!-- Button Edit Data -->
                 <button
@@ -431,7 +442,9 @@
 
         </div>
     </div>
-
+    <style>
+       
+    </style>
 
     <!-- JavaScript for Formatting -->
     <script>

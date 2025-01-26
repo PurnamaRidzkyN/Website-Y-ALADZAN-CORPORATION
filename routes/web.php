@@ -1,20 +1,30 @@
 <?php
 
-use App\Http\Controllers\DataController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Carbon;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ExpensesController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ExpensesController;
 
-Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+// auth
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/', [AuthController::class, 'authenticate']);
 
-Route::post('/', [LoginController::class, 'authenticate']);
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgotPassword');
+Route::post('/forgot-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
+
+Route::post('/change-password', [AuthController::class, 'changePassword'])->name('changePassword');
+
+
+
+Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
 
 Route::get('/home', [HomeController::class, 'showHome'])->middleware('auth')->name('home');
 

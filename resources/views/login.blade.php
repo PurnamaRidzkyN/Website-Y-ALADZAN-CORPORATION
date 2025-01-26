@@ -74,7 +74,7 @@
                             </div>
 
                             <div class="flex items-center justify-between">
-                                <a href="#" class="text-sm font-medium text-[#F7FAFC] hover:text-[#00B5D8]">Lupa
+                                <a href="{{ route ('forgotPassword') }}" class="text-sm font-medium text-[#F7FAFC] hover:text-[#00B5D8]">Lupa
                                     password?</a>
                             </div>
                             <button type="submit"

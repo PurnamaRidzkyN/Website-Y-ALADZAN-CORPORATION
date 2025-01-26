@@ -38,11 +38,102 @@
                             data-bs-toggle="modal" data-bs-target="#editUsersModal-{{ $user->id }}">
                             Edit Profil
                         </button>
-                        <button class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded">Ganti Kata
+                        <button class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded"
+                            data-bs-toggle="modal" data-bs-target="#changePasswordModal">Ganti Kata
                             Sandi</button>
                     </div>
                 </div>
             </div>
+            <!-- Modal Ganti Kata Sandi -->
+            <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                        <!-- Header Modal -->
+                        <div class="modal-header" style="background-color: #1A2634;">
+                            <h5 class="modal-title font-bold" id="changePasswordModalLabel">Ganti Kata Sandi</h5>
+                            <button type="button" class="btn-close bg-[#A0AEC0] hover:bg-[#F7FAFC]"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Body Modal -->
+                        <div class="modal-body bg-[#2D3748]">
+                            @if (session('success'))
+                                <div class="alert alert-success text-[#38A169]">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+                            <form action="{{ route('changePassword') }}" method="POST">
+                                @csrf
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                                <!-- Password Lama -->
+                                <div class="mb-4">
+                                    <label for="currentPassword"
+                                        class="block mb-2 text-sm font-medium text-[#F7FAFC]">Password Lama</label>
+                                    <div class="relative">
+                                        <input type="password" name="currentPassword"
+                                            class="password-field bg-[#1A2634] border border-[#A0AEC0] text-[#F7FAFC] rounded-lg focus:ring-[#00B5D8] focus:border-[#00B5D8] block w-full p-2.5"
+                                            placeholder="••••••••" required>
+                                        <button type="button"
+                                            class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
+                                            Lihat
+                                        </button>
+                                        @error('currentPassword')
+                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Password Baru -->
+                                <div class="mb-4">
+                                    <label for="newPassword"
+                                        class="block mb-2 text-sm font-medium text-[#F7FAFC]">Password Baru</label>
+                                    <div class="relative">
+                                        <input type="password" name="newPassword"
+                                            class="password-field bg-[#1A2634] border border-[#A0AEC0] text-[#F7FAFC] rounded-lg focus:ring-[#00B5D8] focus:border-[#00B5D8] block w-full p-2.5"
+                                            placeholder="••••••••" required>
+                                        <button type="button"
+                                            class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
+                                            Lihat
+                                        </button>
+                                        @error('newPassword')
+                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Konfirmasi Password Baru -->
+                                <div class="mb-4">
+                                    <label for="confirmNewPassword"
+                                        class="block mb-2 text-sm font-medium text-[#F7FAFC]">Konfirmasi Password
+                                        Baru</label>
+                                    <div class="relative">
+                                        <input type="password" name="confirmNewPassword"
+                                            class="password-field bg-[#1A2634] border border-[#A0AEC0] text-[#F7FAFC] rounded-lg focus:ring-[#00B5D8] focus:border-[#00B5D8] block w-full p-2.5"
+                                            placeholder="••••••••" required>
+                                        <button type="button"
+                                            class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
+                                            Lihat
+                                        </button>
+                                        @error('confirmNewPassword')
+                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit"
+                                    class="w-full text-[#F7FAFC] bg-[#3182CE] hover:bg-[#00B5D8] focus:ring-4 focus:outline-none focus:ring-[#00B5D8] font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Simpan Perubahan
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal Edit Pengguna -->
             <div class="modal fade" id="editUsersModal-{{ $user->id }}" tabindex="-1"
                 aria-labelledby="editUsersModalLabel{{ $user->id }}" aria-hidden="true">
@@ -60,7 +151,8 @@
                                 @csrf
                                 @method('PUT') <!-- Menggunakan method PUT untuk update -->
                                 <div class="mb-4">
-                                    <label for="photo" class="block text-sm text-gray-600" style="color: #fff;">Foto
+                                    <label for="photo" class="block text-sm text-gray-600"
+                                        style="color: #fff;">Foto
                                         Profil</label>
 
                                     <!-- Menampilkan foto yang sudah ada -->
@@ -93,8 +185,8 @@
                                 <div class="mb-4">
                                     <label for="username"
                                         class="block text-sm text-gray-600"style="color: #fff;">Username</label>
-                                    <input type="text" id="username" name="username" value="{{ $users->username }}"
-                                        class="w-full mt-2 p-2 border rounded"
+                                    <input type="text" id="username" name="username"
+                                        value="{{ $users->username }}" class="w-full mt-2 p-2 border rounded"
                                         style="background-color: #1A2634; color: #F7FAFC;" required>
                                 </div>
 
@@ -114,6 +206,7 @@
                     </div>
                 </div>
             </div>
+
 
 
             @if ($users->role == 2)
@@ -244,5 +337,21 @@
             });
         </script>
     @endif
+    <script>
+        const togglePasswordButtons = document.querySelectorAll(".toggle-password");
+
+        togglePasswordButtons.forEach((button) => {
+            button.addEventListener("click", function() {
+                const passwordField = this.previousElementSibling;
+
+                // Toggle password visibility
+                const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+                passwordField.setAttribute("type", type);
+
+                // Change button text
+                this.textContent = type === "password" ? "Lihat" : "Sembunyi";
+            });
+        });
+    </script>
 
 </x-layouts>
