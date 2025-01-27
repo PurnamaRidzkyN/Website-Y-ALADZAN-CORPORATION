@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Carbon;
 use App\Http\Middleware\CheckRole;
@@ -104,6 +105,6 @@ Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->mi
 
 
 
-Route::get('/absensi', function () {
-    return view('absensi', ["title" => "Absensi"]);
-});
+Route::get('/absensi',[AttendanceController::class,'showAttendance'])->middleware('auth')->name('attendance');
+Route::post('/absensi',[AttendanceController::class,'recordAttendance'])->middleware('auth')->name('recordAttendance');
+

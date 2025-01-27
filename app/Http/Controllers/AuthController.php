@@ -86,6 +86,8 @@ class AuthController extends Controller
             ], 404);
         }
         $newPassword = Str::random(8);
+        $user->password = Hash::make($newPassword);  // Pastikan password di-hash
+        $user->save(); 
         $data = [
             'subject' => 'Password Baru Anda',
             'title' => 'Password Baru Untuk Akun Anda',
@@ -96,17 +98,15 @@ class AuthController extends Controller
                 'Y-Aladzan'
         ];
 
-        $userEmail = 'himadatsuki@gmail.com';
+        $userEmail = $user->email;
         Mail::raw($data['body'], function ($message) use ($userEmail, $data) {
             $message->to($userEmail)
                 ->subject($data['subject']);
         });
-        // Proses reset password di sini jika email ditemukan
-        // Misalnya, kirimkan email reset password atau lakukan perubahan password
+     
+        
+        return redirect()->route('login')->with('success', 'Password baru berhasil dikirim!');
 
-        return response()->json([
-            'message' => 'Silakan cek email Anda untuk instruksi reset password.',
-        ], 200);
     }
 
 
@@ -136,6 +136,6 @@ class AuthController extends Controller
         $user->save();  // Menyimpan perubahan
 
         // Redirect dengan pesan sukses
-        return redirect()->route('profile')->with('success', 'Password berhasil diubah!');
+        return redirect()->route('indexProfils',['username'=>$user->username])->with('success', 'Password berhasil diubah!');
     }
 }

@@ -14,9 +14,12 @@ class ExpensesController extends Controller
     public function index()
     {
         // Fetch category expenses and expenses with related users (admin, manager)
-        $category_expenses = CategoryExpense::all();
+        $category_expenses = CategoryExpense::orderBy('id', 'asc')->get();
         $admins = Admin::get();
-        $expenses = Expense::with('user.admin', 'user.manager')->get();
+        $expenses = Expense::with('user.admin', 'user.manager')
+            ->orderBy('date', 'desc')  // 'asc' untuk urutan menaik, 'desc' untuk urutan menurun
+            ->get();
+
         // Convert expenses to an array to pass to JavaScript
         $expensesArray = $expenses->map(function ($expense) {
             return [
@@ -99,9 +102,9 @@ class ExpensesController extends Controller
                 'message' => 'Pengeluaran berhasil ditambahkan!',
             ]);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
+            // Tangani jika terjadi danger
             return redirect()->back()->withInput()->with([
-                'status' => 'error',
+                'status' => 'danger',
                 'message' => 'Gagal menambahkan pengeluaran. Silakan coba lagi.',
             ]);
         }
@@ -117,7 +120,7 @@ class ExpensesController extends Controller
                 'nominal' => 'required|numeric|min:0',
                 'deskripsi' => 'required|string|max:500',
                 'payment_method' => 'required|string|max:100',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
                 'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
             ]);
         } else {
@@ -127,7 +130,7 @@ class ExpensesController extends Controller
                 'nominal' => 'required|numeric|min:0',
                 'deskripsi' => 'required|string|max:500',
                 'payment_method' => 'required|string|max:100',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
+                'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Maksimal 2MB
                 'category_id' => 'required|exists:category_expenses,id', // Pastikan ada kategori terkait
             ]);
         }
@@ -151,7 +154,7 @@ class ExpensesController extends Controller
             // Perbarui data pengeluaran
             $expense->update([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => $validatedData['edit_admin_id'],
+                'admin_id' => ($request->category_id == 1 || $request->category_id == 2) ? $validatedData['edit_admin_id'] : null,
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -187,9 +190,9 @@ class ExpensesController extends Controller
                 'message' => 'Pengeluaran berhasil diperbarui!',
             ]);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
+            // Tangani jika terjadi danger
             return redirect()->back()->withInput()->with([
-                'status' => 'error',
+                'status' => 'danger',
                 'message' => 'Gagal memperbarui pengeluaran. Silakan coba lagi.',
             ]);
         }
@@ -205,27 +208,27 @@ class ExpensesController extends Controller
 
     public function destroy($id)
     {
-        
+
         try {
             // Cari pengeluaran berdasarkan ID
             $expense = Expense::findOrFail($id);
             if ($expense['category_id'] == 2) {
                 // Temukan admin berdasarkan admin_id yang diubah
                 $admin = Admin::find($expense['admin_id']);
-                
+
                 // Temukan bonus berdasarkan bonus_id yang terkait dengan admin
                 $bonus = Bonuses::find($admin->bonus_id);
-            
+
                 // Ambil nilai used_amount yang lama
                 $oldUsedAmount = $bonus->used_amount;
-            
+
                 // Kurangi nilai lama dari used_amount
                 $bonus->used_amount -= $oldUsedAmount;
-                        
+
                 // Simpan perubahan
                 $bonus->save();
             }
-            
+
             // Hapus gambar dari penyimpanan jika ada
             if ($expense->image_url) {
                 // Menghapus gambar yang disimpan di folder 'public/expenses'
@@ -241,9 +244,9 @@ class ExpensesController extends Controller
                 'message' => 'Pengeluaran berhasil dihapus!',
             ]);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
+            // Tangani jika terjadi danger
             return redirect()->route('expenses.index')->with([
-                'status' => 'error',
+                'status' => 'danger',
                 'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
             ]);
         }

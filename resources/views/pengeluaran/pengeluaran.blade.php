@@ -12,6 +12,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
+
         <!-- Header -->
         @if (auth()->user()->role == 1)
             <button type="button"
@@ -162,7 +163,8 @@
 
                             <!-- Form untuk menghapus category_expenses -->
                             {{-- <form id="deleteForm{{ $category->id }}" action="{{ route('category.destroy') }}" --}}
-                            <form id="deleteForm{{ $category->id }}" action="{{ route('category.destroy',$category->id) }} " method="POST">
+                            <form id="deleteForm{{ $category->id }}"
+                                action="{{ route('category.destroy', $category->id) }} " method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="category_expenses_id" value="{{ $category->id }}">
@@ -183,7 +185,8 @@
             <div class="modal-dialog">
                 <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
                     <div class="modal-header" style="border-bottom: 1px solid #003366;">
-                        <h5 class="modal-title" id="addcategory_expensesModalLabel">Tambah Kategori Pengeluaran Baru Baru</h5>
+                        <h5 class="modal-title" id="addcategory_expensesModalLabel">Tambah Kategori Pengeluaran Baru
+                            Baru</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
@@ -635,7 +638,7 @@
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
             ${category === 'Gaji' || category === 'Bonus' ? `
-                                                                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
+                                                                                                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
             <td class="px-4 py-2 text-xs sm:text-sm">
                 <a href="#" onclick="openModal('{{ asset('storage/${sanitize(expense.image_url)}') }}')">
                     <img src="{{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
@@ -643,9 +646,9 @@
             </td>
             <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
                 ${ (userRole == role || role == 0) ? `
-                                                                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-                                                                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-                                                                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
+                                                                                                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+                                                                                                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+                                                                                                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
             </td>
         </tr>
     `;

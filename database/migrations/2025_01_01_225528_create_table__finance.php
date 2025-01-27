@@ -41,7 +41,8 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->text('message');
+            $table->text('message_header');
+            $table->text('message_footer');
             $table->timestamp('time'); // Menggunakan timestamp untuk waktu yang lebih fleksibel
         });
     }

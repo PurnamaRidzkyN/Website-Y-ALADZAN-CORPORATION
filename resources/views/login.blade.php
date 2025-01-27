@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
     <!-- Vite CSS and JS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -16,19 +16,44 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Bootstrap 5.3 CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Di dalam tag <head> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <title>Login</title>
 </head>
 
 <body class="h-full bg-[#2D3748]">
+    @if (session('success'))
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Menampilkan toast setelah halaman dimuat
+            var toastEl = document.getElementById('successToast');
+            var toast = new bootstrap.Toast(toastEl, {
+                delay: 3000
+            }); // 3000ms = 3 detik
+            toast.show();
+        </script>
+    @endif
 
     <div class="min-h-full flex flex-col">
         <section class="bg-[#2D3748]">
             <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-[#F7FAFC]">
-                    <img class="w-14 h-14 mr-3  " src="{{ asset('icon.png') }}"
-                        alt="logo">
+                    <img class="w-14 h-14 mr-3  " src="{{ asset('icon.png') }}" alt="logo">
                     Y-ALADZAN
                 </a>
                 <div class="w-full bg-[#1A2634] rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
@@ -74,7 +99,8 @@
                             </div>
 
                             <div class="flex items-center justify-between">
-                                <a href="{{ route ('forgotPassword') }}" class="text-sm font-medium text-[#F7FAFC] hover:text-[#00B5D8]">Lupa
+                                <a href="{{ route('forgotPassword') }}"
+                                    class="text-sm font-medium text-[#F7FAFC] hover:text-[#00B5D8]">Lupa
                                     password?</a>
                             </div>
                             <button type="submit"

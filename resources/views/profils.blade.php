@@ -5,8 +5,24 @@
 
     <!-- Bootstrap JS Bundle (termasuk Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ $error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endforeach
+    @endif
     <div class="min-h-screen bg-gray-800 flex items-start justify-center py-10 h-full">
+
+
         <div class="bg-gray-900 shadow-lg rounded-lg p-6 w-full max-w-4xl h-full">
             <div class="flex flex-col lg:flex-row items-start">
                 <!-- Foto Profil -->
@@ -58,16 +74,8 @@
 
                         <!-- Body Modal -->
                         <div class="modal-body bg-[#2D3748]">
-                            @if (session('success'))
-                                <div class="alert alert-success text-[#38A169]">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
                             <form action="{{ route('changePassword') }}" method="POST">
                                 @csrf
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
                                 <!-- Password Lama -->
                                 <div class="mb-4">
                                     <label for="currentPassword"
@@ -80,9 +88,6 @@
                                             class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
                                             Lihat
                                         </button>
-                                        @error('currentPassword')
-                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -98,9 +103,6 @@
                                             class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
                                             Lihat
                                         </button>
-                                        @error('newPassword')
-                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -117,9 +119,6 @@
                                             class="toggle-password absolute inset-y-0 right-3 text-[#A0AEC0] hover:text-[#F7FAFC]">
                                             Lihat
                                         </button>
-                                        @error('confirmNewPassword')
-                                            <span class="text-sm text-[#E53E3E]">{{ $message }}</span>
-                                        @enderror
                                     </div>
                                 </div>
 

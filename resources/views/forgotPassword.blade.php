@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-[#2D3748]">
+<link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
 
 <head>
     <meta charset="UTF-8">
@@ -38,7 +39,8 @@
                         <form class="space-y-4 md:space-y-6" action="{{ route('resetPassword') }}" method="POST">
                             @csrf
                             <div>
-                                <label for="identifier" class="block mb-2 text-sm font-medium text-[#F7FAFC]">Email</label>
+                                <label for="identifier"
+                                    class="block mb-2 text-sm font-medium text-[#F7FAFC]">Email</label>
                                 <input type="text" name="email" id="email" value="{{ old('email') }}"
                                     class="bg-[#1A2634] border border-[#A0AEC0] text-[#F7FAFC] rounded-lg focus:ring-[#00B5D8] focus:border-[#00B5D8] block w-full p-2.5"
                                     placeholder="email" required="">

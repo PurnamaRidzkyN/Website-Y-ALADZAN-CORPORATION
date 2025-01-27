@@ -1,70 +1,78 @@
 <x-layouts>
     <x-slot:title>{{ $title }}</x-slot:title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            padding-top: 30px;
-        }
-        .form-control {
-            margin-bottom: 15px;
-        }
-        .image-preview {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .image-preview img {
-            max-width: 30%;
-            height: auto;
-            border-radius: 8px;
-        }
-    </style>
-
-    <div class="container">
-        <h2 class="text-center mb-4">Input Absensi</h2>
-
-        <form action="/submit-attendance" method="POST" enctype="multipart/form-data">
-
-            <!-- Ambil Gambar -->
-            <div class="mb-3">
-                <label for="cameraInput" class="form-label">Ambil Foto</label>
-                <input type="file" class="form-control" id="cameraInput" name="attendance_image" accept="image/*" capture="camera" required>
-                
-                <div class="image-preview" id="imagePreview"></div>
+    <main class="min-h-screen bg-gray-800 text-gray-100 p-6">
+        @if ($errors->has('location'))
+            <div class="alert alert-danger">
+                {{ $errors->first('location') }}
             </div>
+        @endif
 
-            <!-- Keterangan -->
-            <div class="mb-3">
-                <label for="description" class="form-label">Keterangan</label>
-                <textarea class="form-control" id="description" name="description" rows="4" required placeholder="Masukkan keterangan absensi"></textarea>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
+        @endif
 
-            <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" class="btn btn-success">Simpan Absensi</button>
-            </div>
-        </form>
+        <div class="max-w-lg mx-auto bg-gray-900 rounded-2xl shadow-lg p-8">
+            <h1 class="text-2xl font-bold text-center text-teal-400 mb-6">Absensi</h1>
+            <form action="{{ route('recordAttendance') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <!-- Input Foto -->
+                <div class="mb-4">
+                    <label for="photo" class="block text-sm font-medium text-gray-100 mb-2">Unggah Foto</label>
+                    <input type="file" id="photo" name="photo" accept="image/*"
+                        class="block w-full text-sm text-gray-100 border border-gray-700 rounded-lg cursor-pointer bg-gray-800 focus:ring-teal-400 focus:border-teal-400"
+                        required />
+                </div>
 
-        <!-- Tombol Kembali -->
-        <div class="mt-4 text-center">
-            <a href="back-page-url" class="btn btn-secondary">Kembali</a>
+                <!-- Input Keterangan -->
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-100 mb-2">Keterangan</label>
+                    <textarea id="description" name="description" rows="3"
+                        class="block w-full text-sm text-gray-100 border border-gray-700 rounded-lg bg-gray-800 focus:ring-teal-400 focus:border-teal-400"
+                        placeholder="Tulis keterangan..." required></textarea>
+                </div>
+                <div>
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+
+                </div>
+                <!-- Pilihan Masuk / Keluar -->
+                <div class="mb-4">
+                    <label for="status" class="block text-sm font-medium text-gray-100 mb-2">Status</label>
+                    <select id="status" name="status"
+                        class="block w-full text-sm text-gray-100 border border-gray-700 rounded-lg bg-gray-800 focus:ring-teal-400 focus:border-teal-400"
+                        required>
+                        <option value="">-- Pilih Status --</option>
+                        <option value="masuk">Masuk</option>
+                        <option value="keluar">Keluar</option>
+                    </select>
+                </div>
+
+                <!-- Tombol Submit -->
+                <div class="text-center">
+                    <button type="submit"
+                        class="px-6 py-2 text-sm font-medium text-white bg-teal-400 rounded-lg shadow-md hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50">
+                        Kirim Absensi
+                    </button>
+                </div>
+            </form>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    </main>
     <script>
-        // Preview image after capture
-        document.getElementById('cameraInput').addEventListener('change', function(event) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var imagePreview = document.getElementById('imagePreview');
-                imagePreview.innerHTML = '<img src="' + e.target.result + '" alt="Captured Image">';
-            };
-            reader.readAsDataURL(event.target.files[0]);
+        document.addEventListener("DOMContentLoaded", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    // Set nilai latitude dan longitude ke form
+                    document.getElementById("latitude").value = position.coords.latitude;
+                    document.getElementById("longitude").value = position.coords.longitude;
+                }, function(error) {
+                    console.error("Error mendapatkan lokasi: ", error.message);
+                });
+            } else {
+                console.error("Geolocation tidak didukung di browser ini.");
+            }
         });
     </script>
+
 </x-layouts>

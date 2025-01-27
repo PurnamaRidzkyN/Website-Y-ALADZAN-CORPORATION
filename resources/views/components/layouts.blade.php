@@ -20,13 +20,14 @@
 
     <title>{{ $title }}</title>
     <style>
-        a {
-            text-decoration: none;
+        nav a {
+            text-decoration: none !important;
+            /* Untuk memastikan semua link di navbar tidak ada underline */
         }
 
-        a:hover {
-            text-decoration: none;
-            /* Pastikan hover juga tidak ada garis bawah */
+        nav a:hover {
+            text-decoration: none !important;
+            /* Untuk memastikan tidak ada underline pada hover */
         }
 
         /* Untuk browser berbasis WebKit (Chrome, Safari, Edge) */
@@ -40,6 +41,7 @@
         input[type="number"] {
             -moz-appearance: textfield;
         }
+        
     </style>
 
 </head>
