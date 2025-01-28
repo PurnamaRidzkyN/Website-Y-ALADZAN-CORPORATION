@@ -229,7 +229,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Isi nama dan deskripsi Group baru</p>
-                    <form action="{{ route('group.store', ['group' => $group->name]) }}" method="POST">
+                    <form action="{{ route('group.store')}}" method="POST">
                         @csrf
                         <!-- Input untuk nama Group -->
                         <div class="mb-3">

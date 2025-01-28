@@ -300,41 +300,37 @@
             </div>
         </div>
         <div id="backup-data" class="section hidden">
-            <h1 class="text-xl font-bold mb-4">Backup and Restore</h1>
+            <div class="container text-center mt-1">
+                <h2 class="text-white mb-4">Backup Database</h2>
 
-            <!-- Backup Button -->
-            <form action="" method="POST" class="mb-4">
-                @csrf
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-                    Backup Data
-                </button>
-            </form>
+                <!-- Backup Button -->
+                <form action="{{ Route('backupDatabase') }}" method="get" enctype="multipart/form-data"
+                    class="text-white">
+                    <button type="submit" id="backupButton" class="btn btn-primary btn-lg">
+                        Backup Database
+                    </button>
+                </form>
+                <p id="backupMessage" class="text-white mt-3"></p>
+            </div>
 
-            <!-- Restore Button -->
-            <form action="" method="POST" enctype="multipart/form-data">
-                @csrf
-                <label for="backup_file" class="block text-gray-700 font-semibold mb-2">Upload Backup File:</label>
-                <input type="file" id="backup_file" name="backup_file" accept=".sql"
-                    class="block w-full mb-4 border rounded p-2" required>
+            <!-- Restore Section -->
+            <div class="container mt-5">
+                <h2 class="text-white mb-4">Restore Backup</h2>
+                <form action="{{ route ('restoreDatabase') }}" method="POST" enctype="multipart/form-data" class="text-white">
+                    @csrf
+                    <div class="form-group mb-4">
+                        <label for="backup_file" class="text-white font-semibold">Upload Backup File:</label>
+                        <input type="file" id="backup_file" name="backup_file" accept=".sql"
+                            class="form-control" required>
+                    </div>
 
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
-                    Restore Backup
-                </button>
-            </form>
-
-            <!-- Notification Section -->
-            @if (session('success'))
-                <div class="bg-green-100 text-green-800 p-3 rounded mt-4">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="bg-red-100 text-red-800 p-3 rounded mt-4">
-                    {{ session('error') }}
-                </div>
-            @endif
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        Restore Backup
+                    </button>
+                </form>
+            </div>
         </div>
+
 
         <!-- Modal untuk Edit Pesan -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -352,7 +348,8 @@
                             <div class="mb-4">
                                 <label for="header" class="block text-gray-300">Header Pesan</label>
                                 <input type="text" id="message_header" name="message_header"
-                                    value="{{ $message->message_header }}"
+                                    value="{{ $message->message_header ??  '' }}
+"
                                     class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
                                     placeholder="Masukkan header pesan">
                             </div>
@@ -360,7 +357,7 @@
                             <div class="mb-4">
                                 <label for="footer" class="block text-gray-300">Footer Pesan</label>
                                 <input type="text" id="message_footer" name="message_footer"
-                                    value="{{ $message->message_footer }}"
+                                    value="{{ $message->message_footer  ??  '' }}"
                                     class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
                                     placeholder="Masukkan footer pesan">
                             </div>

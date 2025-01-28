@@ -279,7 +279,7 @@ class PaymentController extends Controller
             'admin' => $admin,
             'payments' => $payments,
             'codes' => $codes,
-            'message'=>$message
+            'message' => $message
         ]);
     }
     public function updateLoan(Request $request, $group, $admin, $loan)
@@ -423,5 +423,11 @@ class PaymentController extends Controller
                 ->with('status', 'danger')
                 ->with('message', 'Pembayar tidak ditemukan!');
         }
+    }
+    public function print($id)
+    {
+        $loan = Loan::findOrFail($id); // Ambil data berdasarkan ID
+
+        return view('pembayaran/laporan', compact('loan')); // Tampilkan view khusus untuk cetak
     }
 }

@@ -53,7 +53,7 @@
 
 
         <!-- Main Content Area -->
-        <div class="flex flex-1 flex-col w-full">
+        <div class="flex flex-1 flex-col w-full bg-[#2D3748]">
             <!-- Navbar (Header) -->
             <x-navbar></x-navbar>
             <!-- Content Area -->

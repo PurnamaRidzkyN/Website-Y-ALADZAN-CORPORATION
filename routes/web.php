@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Carbon;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
-
-
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DataController;
+
+
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\AttendanceController;
 
 // auth
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -59,6 +60,7 @@ Route::put('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/update/'
 Route::delete('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/destroy', [PaymentController::class, 'destroyLoan'])->middleware('auth')->name('loan.destroy');
 Route::put('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/payment/update/', [PaymentController::class, 'updatePayment'])->middleware('auth')->name('payment.update');
 Route::delete('/transaksi-pembayaran/{group:name}/{admin:name}/{loan:name}/payment/destroy', [PaymentController::class, 'destroyPayment'])->middleware('auth')->name('payment.destroy');
+Route::get('/loans/print/{id}', [PaymentController::class, 'print'])->name('loans.print');
 
 Route::get('/pengeluaran', [ExpensesController::class, 'index'])->middleware('auth')->name('expenses.index');
 Route::post('/pengeluaran/store', [ExpensesController::class, 'store'])->middleware('auth')->name('expenses.store');
@@ -103,6 +105,11 @@ Route::put('/manajemen-data/update-message', [DataController::class, 'messageUpd
     ->middleware(['auth', CheckRole::class . ':' . 1])
     ->name('Manajemen Data.messageUpdate');
 
+Route::get('/manajemen-data/backup-database', [BackupController::class, 'backupDatabase'])->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('backupDatabase');;
+Route::post('/manajemen-data/restore-database', [BackupController::class, 'restoreDatabase'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('restoreDatabase');
 
 Route::get('/profil/{username}', [ProfilController::class, 'index'])->middleware('auth')->name('indexProfils');
 Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->middleware('auth')->name('updateUser');

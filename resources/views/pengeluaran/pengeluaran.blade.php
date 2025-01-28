@@ -191,7 +191,7 @@
                             aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="{{ route('category.store', $category->id) }}" method="POST">
+                        <form action="{{ route('category.store') }}" method="POST">
                             @csrf
                             <!-- Input untuk nama category_expenses -->
                             <div class="mb-3">
@@ -202,9 +202,9 @@
 
                             <!-- Input untuk deskripsi category_expenses -->
                             <div class="mb-3">
-                                <label for="category_expenses_role{{ $category->id }}" class="form-label"
+                                <label for="category_expenses_role" class="form-label"
                                     style="color: #fff;">Akses</label>
-                                <select class="form-control" id="category_expenses_role{{ $category->id }}"
+                                <select class="form-control" id="category_expenses_role"
                                     name="role" required>
                                     <option value="0">Semua bisa
                                         akses</option>
@@ -303,7 +303,7 @@
                         </div>
                         <input type="text" id="simple-search-exception"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search branch name..." required />
+                            placeholder="Cari..." required />
                     </div>
 
                 </form>

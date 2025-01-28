@@ -289,8 +289,12 @@
             <!-- Tombol Aksi -->
             <div class="d-flex justify-content-center mt-8 space-x-4">
                 <!-- Button Cetak Laporan -->
-                <button class="px-6 py-3 bg-[#FF6347] text-white rounded-lg hover:bg-[#FF4500] transition-all"
-                    onclick="window.print()">Cetak Laporan</button>
+                <button class="px-6 py-3 bg-[#FF6347] text-white rounded-lg hover:bg-[#FF4500] transition-all">
+                    <a href="{{ route('loans.print', ['id' => $loans->id]) }}" class="text-white">
+                        Cetak Laporan
+                    </a>
+                </button>
+
 
                 <!-- Button Kirim Pemberitahuan WA -->
                 <button class="px-6 py-3 bg-[#3182CE] text-white rounded-lg hover:bg-[#1E40AF] transition-all"
@@ -323,7 +327,8 @@ ${messages.message_footer}`;
                                 // Jika nomor telepon dimulai dengan '0', ganti dengan '62'
                                 const formattedPhoneNumber = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
                                 // Ganti dengan nomor yang diinginkan
-                                const url = `https://api.whatsapp.com/send?phone=${formattedPhoneNumber}&text=${encodeURIComponent(message)}`;
+                                const url =
+                                    `https://api.whatsapp.com/send?phone=${formattedPhoneNumber}&text=${encodeURIComponent(message)}`;
 
                                 // Buka URL untuk mengirim pesan
                                 window.open(url, '_blank');

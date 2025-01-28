@@ -45,7 +45,7 @@
                                 <span class="absolute -inset-1.5"></span>
                                 <span class="sr-only">Open user menu</span>
                                 <img class="size-8 rounded-full"
-                                    src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/Default_pfp.jpg') }}"
+                                    src="{{ $user->foto ? asset('storage/' . $user->foto) :asset('Default_pfp.jpg') }}"
                                     alt="">
                             </button>
                         </div>
@@ -108,7 +108,7 @@
             <div class="flex items-center px-5">
                 <div class="shrink-0">
                     <img class="size-10 rounded-full"
-                        src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('images/Default_pfp.jpg') }}"
+                        src="{{ $user->foto ? asset('storage/' . $user->foto) : asset('Default_pfp.jpg') }}"
                         alt="">
                 </div>
                 <div class="ml-3">
