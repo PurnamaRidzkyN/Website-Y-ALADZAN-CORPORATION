@@ -67,7 +67,7 @@
                                             @foreach ($admins as $admin)
                                                 <tr>
                                                     <td>
-                                                        <img src="{{ $admin->foto }}" alt="foto"
+                                                        <img src="{{ $admin->foto  ? asset('storage/' . $admin->foto) : asset('Default_pfp.jpg') }} " alt="foto"
                                                             class="rounded-circle" width="50" height="50">
                                                     </td>
                                                     <td class="text-white">{{ $admin->name }}</td>
@@ -239,7 +239,7 @@
                             <div class="p-6 flex items-center">
                                 <!-- Foto Profil Admin -->
                                 <div class="flex-shrink-0">
-                                    <img src="{{ $admin->foto }}" alt="Foto Profil"
+                                    <img src="{{ $admin->foto  ? asset('storage/' . $admin->foto) : asset('Default_pfp.jpg') }}" alt="Foto Profil"
                                         class="w-16 h-16 rounded-full border-2 border-[#F7FAFC]">
                                 </div>
 

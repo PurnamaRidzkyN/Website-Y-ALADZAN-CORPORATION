@@ -99,7 +99,9 @@
             <x-nav-links href="/transaksi-pembayaran">Pembayaran</x-nav-links>
             <x-nav-links href="/pengeluaran">Pengeluaran</x-nav-links>
             <x-nav-links href="/absensi">Absensi</x-nav-links>
-            <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
+            @if (Auth::check() && Auth::user()->role == 1)
+                <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
+            @endif
         </div>
 
         <div class="border-t border-gray-700 pb-3 pt-4">
@@ -118,13 +120,12 @@
 
             </div>
             <div class="mt-3 space-y-1 px-2">
-                <a href="#"
-                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your
-                    Profile</a>
-                <a href="#"
-                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
-                <a href="#"
-                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign
+                <a href="{{ route('indexProfils', ['username' => Auth::user()->username]) }}"
+                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Lihat
+                    Profil</a>
+
+                <a href="{{ route('logout') }}"
+                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Log
                     out</a>
             </div>
         </div>

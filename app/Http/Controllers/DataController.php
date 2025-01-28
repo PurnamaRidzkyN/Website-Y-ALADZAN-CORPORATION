@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Bonuses;
 use App\Models\Manager;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,10 +35,13 @@ class DataController extends Controller
         }
         $managers = $managersQuery->get();
 
+        $message = Message::first();
+
         return view('manajemenData', [
             'title' => 'Manajemen Data',
             'admins' => $admins,
             'managers' => $managers,
+            'message' => $message
         ]);
     }
     public function adminStore(Request $request)
@@ -96,7 +100,7 @@ class DataController extends Controller
     }
     public function adminDestroy(Request $request)
     {
-        
+
         try {
             // Cari pengeluaran berdasarkan ID
             $admin = Admin::findOrFail($request->admin_id);
@@ -110,7 +114,7 @@ class DataController extends Controller
             // Hapus pengeluaran dari database
             $admin->user->delete();
             $admin->delete();
-            
+
 
             // Redirect dengan pesan sukses
             return redirect()->route('Manajemen Data')->with([
@@ -135,7 +139,7 @@ class DataController extends Controller
         ]);
         $username = strtolower(str_replace(' ', '_', $validated['name']));
         // Menyimpan data ke dalam tabel 'admins'
- 
+
         $user = User::create([
             'username' => $username,
             'email' => $validated['email'],
@@ -147,7 +151,7 @@ class DataController extends Controller
             'name' => $validated['name'],
             'phone' => $validated['phone'],
             'foto' => null,
-   
+
         ]);
 
         // Redirect atau respons sesuai kebutuhan
@@ -174,7 +178,7 @@ class DataController extends Controller
     }
     public function managerDestroy(Request $request)
     {
-        
+
         try {
             // Cari pengeluaran berdasarkan ID
             $manager = Manager::findOrFail($request->admin_id);
@@ -188,7 +192,7 @@ class DataController extends Controller
             // Hapus pengeluaran dari database
             $manager->user->delete();
             $manager->delete();
-            
+
 
             // Redirect dengan pesan sukses
             return redirect()->route('Manajemen Data')->with([
@@ -202,5 +206,24 @@ class DataController extends Controller
                 'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
             ]);
         }
+    }
+    public function messageUpdate(Request $req)
+    {
+        // Validasi inputan
+        $validatedData = $req->validate([
+            'message_header' => 'required|string|max:255',
+            'message_footer' => 'nullable|string|max:255',
+        ]);
+
+        // Ambil data message dengan ID 1
+        $message = Message::findOrFail(1);
+
+        // Update data message
+        $message->update($validatedData);
+
+        // Redirect kembali dengan pesan sukses
+        return redirect()->route('Manajemen Data')
+            ->with('status', 'success')
+            ->with('message', 'Pesan berhasil diperbarui');
     }
 }

@@ -99,12 +99,16 @@ Route::delete('/manajemen-data/destroy-manager', [DataController::class, 'manage
     ->middleware(['auth', CheckRole::class . ':' . 1])
     ->name('Manajemen Data.managerDestroy');
 
+Route::put('/manajemen-data/update-message', [DataController::class, 'messageUpdate'])
+    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->name('Manajemen Data.messageUpdate');
+
+
 Route::get('/profil/{username}', [ProfilController::class, 'index'])->middleware('auth')->name('indexProfils');
 Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->middleware('auth')->name('updateUser');
 
 
 
 
-Route::get('/absensi',[AttendanceController::class,'showAttendance'])->middleware('auth')->name('attendance');
-Route::post('/absensi',[AttendanceController::class,'recordAttendance'])->middleware('auth')->name('recordAttendance');
-
+Route::get('/absensi', [AttendanceController::class, 'showAttendance'])->middleware('auth')->name('attendance');
+Route::post('/absensi', [AttendanceController::class, 'recordAttendance'])->middleware('auth')->name('recordAttendance');

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->date('loan_date');
-            $table->decimal('total_amount', 15, 2);
-            $table->decimal('total_payment', 15, 2)->default(0);
-            $table->decimal('outstanding_amount', 15, 2);
+            $table->integer('total_amount');
+            $table->integer('total_payment')->default(0);
+            $table->integer('outstanding_amount');
             $table->string('phone')->nullable();
             $table->foreignId('codes_id')->constrained('codes')->onDelete('cascade');; // Menggunakan foreignId untuk relasi ke tabel codes
             $table->timestamps(); // Menambahkan kolom timestamps
@@ -30,7 +30,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_id')->constrained('loans')->onDelete('cascade');; // Menggunakan foreignId untuk relasi ke tabel loans
-            $table->decimal('amount', 15, 2);
+            $table->integer('amount');
             $table->date('payment_date');
             $table->string('method');
             $table->text('description')->nullable();
@@ -40,10 +40,9 @@ return new class extends Migration
         // Tabel Messages
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
             $table->text('message_header');
             $table->text('message_footer');
-            $table->timestamp('time'); // Menggunakan timestamp untuk waktu yang lebih fleksibel
+            $table->timestamps(); // Menggunakan timestamp untuk waktu yang lebih fleksibel
         });
     }
 

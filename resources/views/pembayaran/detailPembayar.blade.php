@@ -295,17 +295,48 @@
                 <!-- Button Kirim Pemberitahuan WA -->
                 <button class="px-6 py-3 bg-[#3182CE] text-white rounded-lg hover:bg-[#1E40AF] transition-all"
                     onclick="sendWhatsapp()">Kirim Pemberitahuan WA</button>
-
                 <script>
                     function sendWhatsapp() {
-                        const phoneNumber = '62895351651010'; // Ganti dengan nomor tujuan dalam format internasional tanpa '+'
-                        const message = 'Halo, saya ingin memberikan pemberitahuan penting kepada Anda.'; // Pesan default
-                        const encodedMessage = encodeURIComponent(message); // Encode pesan agar URL valid
-                        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`; // Buat URL WhatsApp
+                        try {
+                            // Mendapatkan data pinjaman pertama dari array loans
+                            const loan = @json($loans); // Ambil data pinjaman pertama (index 0)
+                            const messages = @json($message);
+                            // Cek apakah loan ada (tidak null atau undefined)
+                            if (loan && loan.name) {
+                                // Menyusun pesan WhatsApp
+                                let message = `${messages.message_header} \n\n
+*Pinjaman:* \n
+- Nama\t\t\t: ${loan.name} \n
+- Deskripsi\t\t: ${loan.description} \n
+- Tanggal Pinjaman\t: ${loan.loan_date} \n
+- Total Jumlah\t\t: Rp${loan.total_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
+- Total Pembayaran\t: Rp${loan.total_payment.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
+- Jumlah Tunggakan\t: Rp${loan.outstanding_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
+- No. Telepon\t\t: ${loan.phone} \n
+- Kode ID\t\t: ${loan.codes_id} \n\n
+${messages.message_footer}`;
 
-                        window.open(whatsappUrl, '_blank'); // Buka URL di tab baru
+
+                                // Nomor WhatsApp tujuan
+                                const phoneNumber = @json($loans->phone); // Ambil nomor telepon dari server
+
+                                // Jika nomor telepon dimulai dengan '0', ganti dengan '62'
+                                const formattedPhoneNumber = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
+                                // Ganti dengan nomor yang diinginkan
+                                const url = `https://api.whatsapp.com/send?phone=${formattedPhoneNumber}&text=${encodeURIComponent(message)}`;
+
+                                // Buka URL untuk mengirim pesan
+                                window.open(url, '_blank');
+                            } else {
+                                console.error("Data pinjaman tidak ditemukan atau tidak valid.");
+                            }
+                        } catch (error) {
+                            console.error("Error in sendWhatsapp:", error); // Debug: Cek error yang terjadi
+                        }
                     }
                 </script>
+
+
 
                 <!-- Button Edit Data -->
                 <button
@@ -443,7 +474,7 @@
         </div>
     </div>
     <style>
-       
+
     </style>
 
     <!-- JavaScript for Formatting -->

@@ -49,6 +49,7 @@
                     <p class="text-sm text-gray-400 mt-1">Diperbarui pada: <span
                             class="font-medium text-white">{{ $user->updated_at }}</span></p>
                     <!-- Tombol Aksi -->
+                    @if (Auth::check() && Auth::user()->username == $users->username)
                     <div class="mt-6 flex space-x-4">
                         <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
                             data-bs-toggle="modal" data-bs-target="#editUsersModal-{{ $user->id }}">
@@ -58,6 +59,7 @@
                             data-bs-toggle="modal" data-bs-target="#changePasswordModal">Ganti Kata
                             Sandi</button>
                     </div>
+                    @endif
                 </div>
             </div>
             <!-- Modal Ganti Kata Sandi -->

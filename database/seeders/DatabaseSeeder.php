@@ -12,6 +12,7 @@ use App\Models\Code;
 use App\Models\Expense;
 use App\Models\Groups;
 use App\Models\Loan;
+use App\Models\Message;
 use App\Models\Payment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -34,6 +35,10 @@ class DatabaseSeeder extends Seeder
         Manager::factory(1)->recycle([
             $gwh,
         ])->create();
+        Message::create([
+            'message_header' => 'Jadi gini le',
+            'message_footer' => 'jadi gitu le',
+        ]);
 
         $gwh = User::create([
             'username' => 'PurnamaAdmin',

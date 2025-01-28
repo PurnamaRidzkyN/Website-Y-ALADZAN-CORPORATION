@@ -10,8 +10,7 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type',
-        'message',
-        'time',
+        'message_header',
+        'message_footer'
     ];
 }

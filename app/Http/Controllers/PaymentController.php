@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\AdminGroups;
 use Illuminate\Http\Request;
 use App\Models\AdminLoanView;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
@@ -269,7 +270,7 @@ class PaymentController extends Controller
         $loan = Loan::where('name', $loan)->firstOrFail();
         $codes = Code::all();          // Ambil semua pembayaran terkait pinjaman
         $payments = Payment::where('loan_id', $loan->id)->get();
-
+        $message = Message::first();
         // Kirim data ke view
         return view('pembayaran/detailPembayar', [
             'title' => 'Daftar Pembayaran - ' . $group->name . ' - ' . $admin->name . ' - ' . $loan->name,
@@ -277,7 +278,8 @@ class PaymentController extends Controller
             'group' => $group,
             'admin' => $admin,
             'payments' => $payments,
-            'codes' => $codes
+            'codes' => $codes,
+            'message'=>$message
         ]);
     }
     public function updateLoan(Request $request, $group, $admin, $loan)

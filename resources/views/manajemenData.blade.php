@@ -4,32 +4,34 @@
     <header>
         <div class="sticky top-0 z-10 bg-gray-800">
             <nav class="flex justify-between items-center p-4">
-                <!-- Tombol hamburger menu untuk tampilan mobile -->
-                <button class="text-gray-300 block lg:hidden" onclick="toggleMobileMenu()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-
-                <!-- Navbar untuk tampilan desktop (lg) dan mobile yang disembunyikan -->
-                <div class="flex space-x-4 lg:flex-row lg:space-x-6 lg:block hidden" id="navbar-links">
+                <!-- Navbar untuk tampilan mobile -->
+                <div class="flex space-x-4 overflow-x-auto scrollbar-hidden lg:flex-row lg:space-x-6" id="navbar-links">
                     <button onclick="toggleSection('data-admin')"
-                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Data Admin</button>
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Data Admin</button>
                     <button onclick="toggleSection('data-manajer')"
-                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Data Manajer</button>
-                    <button onclick="toggleSection('log-data')"
-                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Log Data</button>
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Data
+                        Manajer</button>
                     <button onclick="toggleSection('pengaturan-pesan')"
-                        class="text-gray-300 py-2 px-4 rounded hover:bg-gray-700">Pengaturan Pesan</button>
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
+                        Pesan</button>
+                    <button onclick="toggleSection('backup-data')"
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Backup Data</button>
+
                 </div>
             </nav>
         </div>
+
     </header>
 
 
     <main class="p-6 bg-[#2D3748] py-16 sm:py-20">
+        @if (session('status') && session('message'))
+            <div class="alert alert-{{ session('status') }} alert-dismissible fade show mt-3" role="alert">
+                {{ session('message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <!-- Data Admin Section -->
         <div id="data-admin" class="section hidden">
             <div class="flex justify-between items-center mb-6">
@@ -95,7 +97,12 @@
                             style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
 
                         <div class="text-center text-gray-300">
-                            <h2 class="text-lg font-bold">{{ $admin['name'] }}</h2>
+                            <h2 class="text-lg font-bold">
+                                <a href="{{ route('indexProfils', ['username' => $admin->user->username]) }}"
+                                    class="text-white no-underline hover:underline">
+                                    {{ $admin['name'] }}
+                                </a>
+                            </h2>
                             <p class="text-sm">{{ $admin->user->email }}</p>
                             <p class="text-sm">{{ $admin->user->username }}</p>
                         </div>
@@ -176,6 +183,10 @@
                         </svg>
                         <span class="sr-only">Search Manager</span>
                     </button>
+                    <a href="{{ route('Manajemen Data') }}"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-gray-500 rounded-lg border border-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                        Reset
+                    </a>
                 </form>
             </div>
 
@@ -203,9 +214,8 @@
                             <p><strong>Phone:</strong> {{ $manager['phone'] }}</p>
                             <p><strong>Updated At:</strong> {{ $manager['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button
-                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600" data-bs-toggle="modal"
-                                    data-bs-target="#editModalManager{{ $manager->id }}">
+                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
+                                    data-bs-toggle="modal" data-bs-target="#editModalManager{{ $manager->id }}">
                                     Edit
                                 </button>
                                 <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
@@ -226,24 +236,146 @@
 
             <!-- Card Pesan -->
             <div class="bg-gray-700 rounded-lg shadow-md p-6 mb-4">
-                <h2 class="text-xl font-semibold text-gray-300 mb-4">Pesan Pengaturan</h2>
-                <p class="text-gray-200 mb-4">
-                    a</p>
+
+
+
+                <!-- Header Pesan -->
+                <div class="text-gray-300 mb-4">
+                    <p><strong>Header Pesan:</strong></p>
+                    <p id="message-header">{{ $message->message_header ?? 'Belum ada message header' }}
+                    </p>
+                </div>
+                <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
+                <div class="text-gray-300 mb-4" id="message-header">
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Nama</strong></div>
+                        <div class="ml-2">: Rizki Radika Mahendra</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Deskripsi</strong></div>
+                        <div class="ml-2">: Quia ab autem quo. Perferendis esse ipsam culpa. Aut eius inventore autem
+                            ut. Dolores sint pariatur consequatur aut veniam assumenda.</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Kode</strong></div>
+                        <div class="ml-2">: quisquam</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Total Pembayaran</strong></div>
+                        <div class="ml-2">: Rp180.327</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Dibayar</strong></div>
+                        <div class="ml-2">: Rp9.737.798</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Sisa Pembayaran</strong></div>
+                        <div class="ml-2">: Rp-9.557.471</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>Tanggal Awal</strong></div>
+                        <div class="ml-2">: 2016-09-19</div>
+                    </div>
+                    <div class="flex mb-2">
+                        <div class="flex-shrink-0 w-40"><strong>No HP</strong></div>
+                        <div class="ml-2">: 0282 1909 910</div>
+                    </div>
+                </div>
 
                 <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
-
+                <!-- Footer Pesan -->
                 <div class="text-gray-300 mb-4">
-                    <p><strong>Dikirim otomatis pada:</strong> 10:00 AM</p>
+                    <p><strong>Footer Pesan:</strong></p>
+                    <p id="message-footer">{{ $message->message_footer ?? 'Belum ada message footer' }}
+                    </p>
                 </div>
 
                 <!-- Tombol Edit Pesan -->
                 <div class="text-center">
-                    <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                    <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+                        data-bs-toggle="modal" data-bs-target="#editModal">
                         Edit Pesan
                     </button>
                 </div>
             </div>
         </div>
+        <div id="backup-data" class="section hidden">
+            <h1 class="text-xl font-bold mb-4">Backup and Restore</h1>
+
+            <!-- Backup Button -->
+            <form action="" method="POST" class="mb-4">
+                @csrf
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                    Backup Data
+                </button>
+            </form>
+
+            <!-- Restore Button -->
+            <form action="" method="POST" enctype="multipart/form-data">
+                @csrf
+                <label for="backup_file" class="block text-gray-700 font-semibold mb-2">Upload Backup File:</label>
+                <input type="file" id="backup_file" name="backup_file" accept=".sql"
+                    class="block w-full mb-4 border rounded p-2" required>
+
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+                    Restore Backup
+                </button>
+            </form>
+
+            <!-- Notification Section -->
+            @if (session('success'))
+                <div class="bg-green-100 text-green-800 p-3 rounded mt-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="bg-red-100 text-red-800 p-3 rounded mt-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+        </div>
+
+        <!-- Modal untuk Edit Pesan -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit Pesan Pengaturan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('Manajemen Data.messageUpdate') }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-4">
+                                <label for="header" class="block text-gray-300">Header Pesan</label>
+                                <input type="text" id="message_header" name="message_header"
+                                    value="{{ $message->message_header }}"
+                                    class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
+                                    placeholder="Masukkan header pesan">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="footer" class="block text-gray-300">Footer Pesan</label>
+                                <input type="text" id="message_footer" name="message_footer"
+                                    value="{{ $message->message_footer }}"
+                                    class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
+                                    placeholder="Masukkan footer pesan">
+                            </div>
+                            <div class="text-center">
+                                <button type="submit"
+                                    class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Modal -->

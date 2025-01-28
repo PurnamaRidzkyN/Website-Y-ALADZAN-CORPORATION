@@ -22,7 +22,7 @@ class LoanFactory extends Factory
             'name' => $this->faker->name,
             'description' => $this->faker->text,
             'loan_date' => $this->faker->date,
-            'total_amount' => $this->faker->randomFloat(2, 100000, 1000000),
+            'total_amount' => $this->faker->numberBetween( 100000, 1000000),
             'total_payment' => 0,
             'outstanding_amount' => 0,
             'phone' => $this->faker->phoneNumber,
