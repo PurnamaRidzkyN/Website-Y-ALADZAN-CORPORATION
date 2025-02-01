@@ -18,6 +18,7 @@ SELECT
     a.name,
     a.phone,
     a.foto,
+    a.manager_id,
     COALESCE(SUM(l.total_payment), 0) AS total_payments,
     COALESCE(SUM(l.total_amount), 0) AS total_amount
     FROM 
@@ -27,7 +28,7 @@ JOIN
 LEFT JOIN 
     loans l ON ag.id = l.admin_group_id
 GROUP BY 
-    ag.group_id, ag.admin_id, a.name, a.phone, a.foto;
+    ag.group_id, ag.admin_id, a.name, a.phone, a.foto,a.manager_id;
  ");
     }
 

@@ -237,9 +237,16 @@
         <!-- Tabs Content -->
         <div class="tab-content" id="loanTabsContent">
             <!-- Belum Lunas -->
+            @if ($loans->isEmpty())
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Pembayar</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki Pembayar. Silakan tambahkan Pembayara.</p>
+                </div>
+            @endif
             <div class="tab-pane fade show active px-4 sm:px-6 lg:px-8" id="not-fully-paid" role="tabpanel"
                 aria-labelledby="not-fully-paid-tab">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+
                     @foreach ($loans as $loan)
                         @if ($loan->total_payment < $loan->total_amount)
                             <div

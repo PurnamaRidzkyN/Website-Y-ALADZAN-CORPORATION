@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Bonuses;
+use App\Models\Code;
 use App\Models\Manager;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class DataController extends Controller
@@ -16,6 +18,7 @@ class DataController extends Controller
     {
         // Pencarian untuk Admin
         $adminsQuery = Admin::with('user', 'bonuses');
+
         if ($request->has('search_admin') && $request->search_admin != '') {
             $adminsQuery->whereRaw('LOWER(name) like ?', ['%' . strtolower($request->search_admin) . '%'])
                 ->orWhereHas('user', function ($query) use ($request) {
@@ -23,6 +26,20 @@ class DataController extends Controller
                         ->orWhereRaw('LOWER(username) like ?', ['%' . strtolower($request->search_admin) . '%']);
                 });
         }
+
+        if (Auth::user()->role == 1) {
+            $adminsQuery->where('manager_id', '=', function ($query) {
+                $query->select('id')
+                    ->from('managers')
+                    ->where('user_id', Auth::user()->id)
+                    ->limit(1); // Pastikan hanya satu id yang dikembalikan
+            });
+        }
+
+        // Urutkan berdasarkan 'name'
+        $adminsQuery->orderBy('name', 'asc');
+
+        // Ambil data admin
         $admins = $adminsQuery->get();
 
         // Pencarian untuk Manager
@@ -36,17 +53,23 @@ class DataController extends Controller
         $managers = $managersQuery->get();
 
         $message = Message::first();
-
+        $codesQuery = Code::query(); 
+        if ($request->has('search_code') && $request->search_code != '') {
+            $codesQuery->whereRaw('LOWER(code) like ?', ['%' . strtolower($request->search_code) . '%']);
+        }
+        $codes = $codesQuery->get();
         return view('manajemenData', [
             'title' => 'Manajemen Data',
             'admins' => $admins,
             'managers' => $managers,
-            'message' => $message
+            'message' => $message,
+            'codes' => $codes
         ]);
     }
     public function adminStore(Request $request)
     {
         // Validasi input form
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',  // Sesuaikan dengan tabel yang digunakan
@@ -67,6 +90,7 @@ class DataController extends Controller
         ]);
         Admin::create([
             'user_id' => $user->id,
+            'manager_id' => Manager::where('user_id', Auth::user()->id)->first()->id,
             'name' => $validated['name'],
             'phone' => $validated['phone'],
             'salary' => $validated['salary'],
@@ -136,10 +160,14 @@ class DataController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',  // Sesuaikan dengan tabel yang digunakan
             'phone' => 'required|numeric',
+            'salary' => 'required|numeric'
         ]);
         $username = strtolower(str_replace(' ', '_', $validated['name']));
         // Menyimpan data ke dalam tabel 'admins'
-
+        $bonus = Bonuses::create([
+            'total_amount' => 0,
+            'used_amount' => 0
+        ]);
         $user = User::create([
             'username' => $username,
             'email' => $validated['email'],
@@ -150,7 +178,9 @@ class DataController extends Controller
             'user_id' => $user->id,
             'name' => $validated['name'],
             'phone' => $validated['phone'],
+            'salary' => $validated['salary'],
             'foto' => null,
+            'bonus_id' => $bonus->id
 
         ]);
 
@@ -165,13 +195,16 @@ class DataController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',  // Sesuaikan dengan tabel yang digunakan
             'phone' => 'required|numeric',
+            'salary' => 'required|numeric'
         ]);
-        $admin = Manager::find($request->id);
-        $admin->update([
+        $manager = Manager::find($request->id);
+        $manager->update([
             'name' => $validated['name'],
+            'email' => $validated['email'],
             'phone' => $validated['phone'],
+            'salary' => $validated['salary']
         ]);
-        $admin->user->update([
+        $manager->user->update([
             'email' => $validated['email']
         ]);
         return redirect()->back()->with('success', 'Data berhasil disimpan');

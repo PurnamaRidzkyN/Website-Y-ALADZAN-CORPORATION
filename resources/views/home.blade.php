@@ -2,41 +2,57 @@
     <x-slot:title>{{ $title }}</x-slot:title>
     <!-- Tambahkan Chart.js di dalam tag <head> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="container mx-auto p-6">
+        <!-- Baris pertama dengan dua grafik -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Card Grafik Pembayaran per Tanggal -->
+            <div class="bg-[#1A2634] p-4 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-white mb-4">Grafik Pembayaran per Tanggal</h3>
+                <canvas id="paymentChart" width="400" height="200"></canvas>
+            </div>
 
-    <h3>Grafik Pembayaran per Tanggal</h3>
-    <canvas id="paymentChart" width="400" height="200"></canvas>
+            <!-- Card Grafik Pembayaran Terbesar -->
+            <div class="bg-[#1A2634] p-4 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-white mb-4">Grafik Pembayaran Terbesar</h3>
+                <canvas id="highPaymentChart" width="400" height="200"></canvas>
+            </div>
+        </div>
 
-    <h3>Grafik Pembayaran Terbesar</h3>
-    <canvas id="highPaymentChart" width="400" height="200"></canvas>
+        <!-- Baris kedua dengan dua grafik -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Card Grafik User Paling Sering Datang -->
+            <div class="bg-[#1A2634] p-4 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-white mb-4">User Paling Sering Datang</h3>
+                <canvas id="frequentVisitorChart" width="400" height="200"></canvas>
+            </div>
 
-    <!-- Grafik User Paling Sering Datang -->
-    <h3>User Paling Sering Datang</h3>
-    <canvas id="frequentVisitorChart" width="400" height="200"></canvas>
-
-    <!-- Grafik User dengan Durasi Paling Lama -->
-    <h3>User dengan Durasi Paling Lama</h3>
-    <canvas id="longestDurationUserChart" width="400" height="200"></canvas>
+            <!-- Card Grafik User dengan Durasi Paling Lama -->
+            <div class="bg-[#1A2634] p-4 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-white mb-4">User dengan Durasi Paling Lama</h3>
+                <canvas id="longestDurationUserChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Data untuk grafik pembayaran
-        const paymentDates = @json($paymentDates);
-        const paymentTotals = @json($paymentTotals);
+        const paymentData = @json($paymentData);
 
-        const ctx1 = document.getElementById('paymentChart').getContext('2d');
-        const paymentChart = new Chart(ctx1, {
+        const ctx = document.getElementById('paymentChart').getContext('2d');
+
+        const datasets = Object.keys(paymentData).map(groupId => ({
+            label:  groupId,
+            data: paymentData[groupId].totals,
+            borderColor: '#' + Math.floor(Math.random() * 16777215).toString(16), // Warna random
+            fill: false
+        }));
+
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: paymentDates,
-                datasets: [{
-                    label: 'Total Pembayaran',
-                    data: paymentTotals,
-                    borderColor: 'rgb(75, 192, 192)',
-                    fill: false,
-                    tension: 0.1
-                }]
+                labels: paymentData[Object.keys(paymentData)[0]].labels, // Ambil label dari salah satu group
+                datasets: datasets
             }
         });
-
         // Data untuk grafik pembayaran terbesar
         const highPaymentDates = @json($highPaymentDates);
         const highPaymentTotals = @json($highPaymentTotals);

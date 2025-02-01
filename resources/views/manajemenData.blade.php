@@ -8,12 +8,17 @@
                 <div class="flex space-x-4 overflow-x-auto scrollbar-hidden lg:flex-row lg:space-x-6" id="navbar-links">
                     <button onclick="toggleSection('data-admin')"
                         class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Data Admin</button>
-                    <button onclick="toggleSection('data-manajer')"
-                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Data
-                        Manajer</button>
+                    @if (Auth::check() && Auth::user()->role == 0)
+                        <button onclick="toggleSection('data-manajer')"
+                            class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Data
+                            Manajer</button>
+                    @endif
                     <button onclick="toggleSection('pengaturan-pesan')"
                         class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
                         Pesan</button>
+                    <button onclick="toggleSection('pengaturan-kode')"
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
+                        Kode</button>
                     <button onclick="toggleSection('backup-data')"
                         class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Backup Data</button>
 
@@ -66,7 +71,7 @@
                         <input type="text" id="search-admin" name="search_admin"
                             value="{{ request()->search_admin }}"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search Admin..." />
+                            placeholder="Cari Admin..." />
                     </div>
                     <button type="submit"
                         class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -85,6 +90,12 @@
             </div>
 
             <!-- Card Container -->
+            @if ($admins->isEmpty() && empty(request('query')))
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Admin</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki admin. Silakan tambahkan admin.</p>
+                </div>
+            @endif
             <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 @foreach ($admins as $admin)
                     <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
@@ -107,19 +118,22 @@
                             <p class="text-sm">{{ $admin->user->username }}</p>
                         </div>
 
-                        <button onclick="toggleDetails('details-{{ $loop->index }}')"
+                        <button onclick="toggleDetails('details-{{ 'admin' }}')"
                             class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all">
                             Lihat Detail
                         </button>
 
                         <!-- Hidden Details -->
-                        <div id="details-{{ $loop->index }}" class="hidden mt-4 text-sm text-gray-300">
+                        <div id="details-{{ 'admin' }}" class="hidden mt-4 text-sm text-gray-300">
                             <p><strong>Phone:</strong> {{ $admin['phone'] }}</p>
-                            <p><strong>Gaji:</strong> {{ $admin['salary'] }}</p>
-                            <p><strong>Total Bonus:</strong> {{ $admin->bonuses->total_amount }}</p>
-                            <p><strong>Bonus Diambil:</strong> {{ $admin->bonuses->used_amount }}</p>
-                            <p><strong>Bonus Sisa:</strong> {{ $admin->bonuses->remaining_amount }}</p>
-                            <p><strong>Updated At:</strong> {{ $admin['updated_at'] }}</p>
+                            <p><strong>Gaji:</strong> {{ number_format($admin['salary'], 0, ',', '.') }}</p>
+                            <p><strong>Total Bonus:</strong>
+                                {{ number_format($admin->bonuses->total_amount, 0, ',', '.') }}</p>
+                            <p><strong>Bonus Diambil:</strong>
+                                {{ number_format($admin->bonuses->used_amount, 0, ',', '.') }}</p>
+                            <p><strong>Bonus Sisa:</strong>
+                                {{ number_format($admin->bonuses->remaining_amount, 0, ',', '.') }}</p>
+                            <p><strong>Terakhir diperbarui:</strong> {{ $admin['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
                                 <button id="editDataAdmin"
                                     class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
@@ -172,7 +186,7 @@
                         <input type="text" id="search-manager" name="search_manager"
                             value="{{ request()->search_manager }}"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search Manager..." />
+                            placeholder="Cari Manager..." />
                     </div>
                     <button type="submit"
                         class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -191,6 +205,12 @@
             </div>
 
             <!-- Card Container -->
+            @if ($managers->isEmpty() && empty(request('query')))
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Manajer</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki Manajer. Silakan tambahkan Manajer.</p>
+                </div>
+            @endif
             <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 @foreach ($managers as $manager)
                     <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
@@ -210,11 +230,24 @@
                         <hr id="separator" class="border-2 rounded mb-0"
                             style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
 
-                        <div id="details-{{ $loop->iteration }}" class=" mt-4 text-sm text-gray-300">
+                        <button onclick="toggleDetails('details-{{ 'manager' }}')"
+                            class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all">
+                            Lihat Detail
+                        </button>
+
+                        <div id="details-{{ 'manager' }}" class="hidden mt-4 text-sm text-gray-300">
                             <p><strong>Phone:</strong> {{ $manager['phone'] }}</p>
-                            <p><strong>Updated At:</strong> {{ $manager['updated_at'] }}</p>
+                            <p><strong>Gaji:</strong> {{ number_format($manager['salary'], 0, ',', '.') }}</p>
+                            <p><strong>Total Bonus:</strong>
+                                {{ number_format($manager->bonuses->total_amount, 0, ',', '.') }}</p>
+                            <p><strong>Bonus Diambil:</strong>
+                                {{ number_format($manager->bonuses->used_amount, 0, ',', '.') }}</p>
+                            <p><strong>Bonus Sisa:</strong>
+                                {{ number_format($manager->bonuses->remaining_amount, 0, ',', '.') }}</p>
+                            <p><strong>Terakhir diperbarui:</strong> {{ $manager['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
+                                <button id="editDataManager"
+                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
                                     data-bs-toggle="modal" data-bs-target="#editModalManager{{ $manager->id }}">
                                     Edit
                                 </button>
@@ -247,56 +280,122 @@
                 </div>
                 <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
                 <div class="text-gray-300 mb-4" id="message-header">
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Nama</strong></div>
-                        <div class="ml-2">: Rizki Radika Mahendra</div>
+                    <div class="ml-2">
+                        <ul id="payment-details">
+                            <li><strong>Pembayaran:</strong></li>
+                            <li>Tanggal Awal : 2025-04-01</li>
+                            <li>Total : Rp7.000.000</li>
+                            <li>Sudah Dibayar : Rp5.000.000</li>
+                            <li>Sisa : Rp2.000.000</li>
+                        </ul>
                     </div>
+
                     <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Deskripsi</strong></div>
-                        <div class="ml-2">: Quia ab autem quo. Perferendis esse ipsam culpa. Aut eius inventore autem
-                            ut. Dolores sint pariatur consequatur aut veniam assumenda.</div>
+                        <div class="ml-2">
+                            <ul id="payment-breakdown">
+                                <li><strong>Rincian Pembayaran</strong></li>
+                                <li>Tanggal Pembayaran: 2025-05-09 | Jumlah: Rp2.000.000</li>
+                                <li>Tanggal Pembayaran: 2025-06-24 | Jumlah: Rp3.000.000</li>
+                            </ul>
+                        </div>
+
                     </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Kode</strong></div>
-                        <div class="ml-2">: quisquam</div>
+
+                    <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
+                    <!-- Footer Pesan -->
+                    <div class="text-gray-300 mb-4">
+                        <p><strong>Footer Pesan:</strong></p>
+                        <p id="message-footer">{{ $message->message_footer ?? 'Belum ada message footer' }}
+                        </p>
                     </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Total Pembayaran</strong></div>
-                        <div class="ml-2">: Rp180.327</div>
-                    </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Dibayar</strong></div>
-                        <div class="ml-2">: Rp9.737.798</div>
-                    </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Sisa Pembayaran</strong></div>
-                        <div class="ml-2">: Rp-9.557.471</div>
-                    </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>Tanggal Awal</strong></div>
-                        <div class="ml-2">: 2016-09-19</div>
-                    </div>
-                    <div class="flex mb-2">
-                        <div class="flex-shrink-0 w-40"><strong>No HP</strong></div>
-                        <div class="ml-2">: 0282 1909 910</div>
+
+                    <!-- Tombol Edit Pesan -->
+                    <div class="text-center">
+                        <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+                            data-bs-toggle="modal" data-bs-target="#editModal">
+                            Edit Pesan
+                        </button>
                     </div>
                 </div>
-
-                <hr class="border-2 rounded mb-4" style="border-width: 1px; border-color: #FF6347;">
-                <!-- Footer Pesan -->
-                <div class="text-gray-300 mb-4">
-                    <p><strong>Footer Pesan:</strong></p>
-                    <p id="message-footer">{{ $message->message_footer ?? 'Belum ada message footer' }}
-                    </p>
-                </div>
-
-                <!-- Tombol Edit Pesan -->
-                <div class="text-center">
-                    <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
-                        data-bs-toggle="modal" data-bs-target="#editModal">
-                        Edit Pesan
+            </div>
+        </div>
+        <!-- Data code Section -->
+        <div id="pengaturan-kode" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-gray-300">Data Kode</h1>
+            </div>
+            <!-- Search and Add Data -->
+            <div
+                class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+                <!-- Add Data Button -->
+                <button type="button"
+                    class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                    data-bs-toggle="modal" data-bs-target="#addDataCode">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="size-6 mr-2 w-5 h-5">
+                        <path
+                            d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" />
+                    </svg>
+                    Tambah Data
+                </button>
+                <!-- Search Form -->
+                <form action="{{ route('Manajemen Data') }}" method="GET"
+                    class="flex items-center w-full md:w-auto">
+                    <label for="search-code" class="sr-only">Search Kode</label>
+                    <div class="relative w-full md:w-96">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2" />
+                            </svg>
+                        </div>
+                        <input type="text" id="search-code" name="search_code"
+                            value="{{ request()->search_code }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Cari code..." />
+                    </div>
+                    <button type="submit"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                        <span class="sr-only">Search Kode</span>
                     </button>
+                    <a href="{{ route('Manajemen Data') }}"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-gray-500 rounded-lg border border-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                        Reset
+                    </a>
+                </form>
+            </div>
+
+            <!-- Card Container -->
+            @if ($codes->isEmpty() && empty(request('query')))
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Admin</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki admin. Silakan tambahkan admin.</p>
                 </div>
+            @endif
+            <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                @foreach ($codes as $code)
+                    <div class="bg-gray-700 rounded-lg shadow-md p-4 flex flex-col justify-between">
+
+                        <div class="text-gray-300">
+                            <h2 class="text-lg font-bold">{{ $code->code }}</h2>
+                            <div class="flex text-sm"><span class="w-32">Bonus
+                                    Admin</span><span>: {{ $code->admin_bonuses }}</span></div>
+                            <div class="flex text-sm"><span class="w-32">Bonus
+                                    Manajer</span><span>: {{ $code->manager_bonuses }}</span></div>
+                            <div class="flex text-sm"><span class="w-32">Modal
+                                    Awal</span><span>: {{ $code->capital }}</span></div>
+                        </div>
+
+
+                    </div>
+                @endforeach
             </div>
         </div>
         <div id="backup-data" class="section hidden">
@@ -313,10 +412,12 @@
                 <p id="backupMessage" class="text-white mt-3"></p>
             </div>
 
+
             <!-- Restore Section -->
             <div class="container mt-5">
                 <h2 class="text-white mb-4">Restore Backup</h2>
-                <form action="{{ route ('restoreDatabase') }}" method="POST" enctype="multipart/form-data" class="text-white">
+                <form action="{{ route('restoreDatabase') }}" method="POST" enctype="multipart/form-data"
+                    class="text-white">
                     @csrf
                     <div class="form-group mb-4">
                         <label for="backup_file" class="text-white font-semibold">Upload Backup File:</label>
@@ -330,6 +431,7 @@
                 </form>
             </div>
         </div>
+
 
 
         <!-- Modal untuk Edit Pesan -->
@@ -348,7 +450,7 @@
                             <div class="mb-4">
                                 <label for="header" class="block text-gray-300">Header Pesan</label>
                                 <input type="text" id="message_header" name="message_header"
-                                    value="{{ $message->message_header ??  '' }}
+                                    value="{{ $message->message_header ?? '' }}
 "
                                     class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
                                     placeholder="Masukkan header pesan">
@@ -357,7 +459,7 @@
                             <div class="mb-4">
                                 <label for="footer" class="block text-gray-300">Footer Pesan</label>
                                 <input type="text" id="message_footer" name="message_footer"
-                                    value="{{ $message->message_footer  ??  '' }}"
+                                    value="{{ $message->message_footer ?? '' }}"
                                     class="w-full p-2 mt-1 rounded-md bg-gray-600 text-white"
                                     placeholder="Masukkan footer pesan">
                             </div>
@@ -410,10 +512,11 @@
                             <label for="salary" class="form-label">Gaji</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" id="salary" name="salary" required>
+                                <input type="text" class="form-control" id="salary" name="salary"
+                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    onfocus="addFormatting(this)">
                             </div>
                         </div>
-
 
                         <!-- Modal Footer -->
                         <div class="modal-footer" style="background-color: #1A2634;">
@@ -468,10 +571,11 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" class="form-control" id="edit_salary" name="salary"
-                                        value="{{ $admin->salary }}" required>
+                                        value="{{ number_format($admin->salary, 0, ',', '.') }}" required
+                                        oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                        onfocus="addFormatting(this)">
                                 </div>
                             </div>
-
 
                             <!-- Hidden Input for ID -->
                             <div class="mb-3">
@@ -559,7 +663,15 @@
                             <label for="phone" class="form-label">No HP</label>
                             <input type="number" class="form-control" id="phone" name="phone" required>
                         </div>
-
+                        <div class="mb-3">
+                            <label for="salary" class="form-label">Gaji</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" id="salary" name="salary"
+                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    onfocus="addFormatting(this)">
+                            </div>
+                        </div>
 
                         <!-- Modal Footer -->
                         <div class="modal-footer" style="background-color: #1A2634;">
@@ -608,7 +720,16 @@
                                 <input type="number" class="form-control" id="edit_phone" name="phone"
                                     value="{{ $manager->phone }}" required>
                             </div>
-
+                            <div class="mb-3">
+                                <label for="edit_salary" class="form-label">Gaji</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" class="form-control" id="edit_salary" name="salary"
+                                        value="{{ number_format($manager->salary, 0, ',', '.') }}" required
+                                        oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                        onfocus="addFormatting(this)">
+                                </div>
+                            </div>
                             <!-- Hidden Input for ID -->
                             <div class="mb-3">
                                 <input type="hidden" class="form-control" id="edit_id" name="id"
@@ -664,7 +785,64 @@
             </div>
         </div>
     @endforeach
+    <div class="modal fade" id="addDataCode" tabindex="-1" aria-labelledby="addDataCodeLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title" id="addDataModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
+                <!-- Modal Body -->
+                <div class="modal-body" style="background-color: #2D3748;">
+                    <!-- Form inside the modal -->
+                    <form action="" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Code</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="salary" class="form-label">Bonus Admin</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" id="salary" name="salary"
+                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    onfocus="addFormatting(this)">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="salary" class="form-label">Bonus Manajer</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" id="salary" name="salary"
+                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    onfocus="addFormatting(this)">
+                            </div>
+                        </div><div class="mb-3">
+                            <label for="salary" class="form-label">Modal Awal</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control" id="salary" name="salary"
+                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    onfocus="addFormatting(this)">
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -714,6 +892,22 @@
                 navbarLinks.classList.toggle('flex'); // Menambahkan class flex agar itemnya tampil vertikal
                 navbarLinks.classList.toggle('flex-col'); // Mengubah menu agar berjejer ke bawah
             }
+        }
+
+        function formatSalary(input) {
+            let value = input.value.replace(/[^0-9]/g, ''); // Hapus karakter selain angka
+            input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Tambah titik setiap 3 digit
+        }
+
+        // Fungsi untuk menghapus titik sebelum kirim form
+        function removeFormatting(input) {
+            input.value = input.value.replace(/\./g, ''); // Hapus titik
+        }
+
+        // Fungsi untuk menambahkan titik ketika input difokuskan
+        function addFormatting(input) {
+            let value = input.value.replace(/[^0-9]/g, ''); // Hapus karakter selain angka
+            input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Tambah titik setiap 3 digit
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

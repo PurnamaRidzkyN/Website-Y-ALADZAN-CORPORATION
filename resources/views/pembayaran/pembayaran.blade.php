@@ -16,7 +16,7 @@
         <div class="container mx-auto px-6 lg:px-8 w-full">
 
             <!-- Tombol untuk menambah group -->
-            @if (auth()->user()->role == 1)
+            @if (auth()->user()->role == 1 || auth()->user()->role == 0)
                 <button type="button"
                     class="text-right mb-8 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
                     data-bs-toggle="modal" data-bs-target="#GroupModal">
@@ -95,6 +95,12 @@
 
 
             <!-- Menampilkan Grup dalam bentuk card -->
+            @if ($groups->isEmpty() && empty(request('query')))
+                <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
+                    <h5 class="alert-heading">Belum Ada Group</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki Group.</p>
+                </div>
+            @endif
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 @foreach ($groups as $group)
@@ -115,7 +121,8 @@
                             <!-- Tanggal Dibuat -->
                             <p class="text-xs text-[#A0AEC0] mt-4">
                                 Terakhir Di Ubah pada:
-                                {{ $group->updated_at ? $group->updated_at->locale('id')->diffForHumans() : 'Tanggal tidak tersedia' }}
+
+                                {{ $group->updated_at ? \Carbon\Carbon::parse($group->updated_at)->locale('id')->diffForHumans() : 'Tanggal tidak tersedia' }}
                             </p>
                         </div>
 
@@ -123,7 +130,7 @@
 
                         <div class="p-6 bg-[#2D3748] text-right">
 
-                            @if (auth()->user()->role == 1)
+                            @if (auth()->user()->role == 1 || auth()->user()->role == 0)
                                 <a href="{{ route('List Admin', ['group' => $group->name]) }}"
                                     class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all no-underline">
                                     Lihat Group
@@ -229,7 +236,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Isi nama dan deskripsi Group baru</p>
-                    <form action="{{ route('group.store')}}" method="POST">
+                    <form action="{{ route('group.store') }}" method="POST">
                         @csrf
                         <!-- Input untuk nama Group -->
                         <div class="mb-3">

@@ -6,11 +6,13 @@ use App\Models\Code;
 use App\Models\Loan;
 use App\Models\Admin;
 use App\Models\Groups;
+use App\Models\Manager;
+use App\Models\Message;
 use App\Models\Payment;
 use App\Models\AdminGroups;
 use Illuminate\Http\Request;
 use App\Models\AdminLoanView;
-use App\Models\Message;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
@@ -18,11 +20,18 @@ class PaymentController extends Controller
     // groups
     public function showPaymentGroups()
     {
-        $groups = Groups::select('id', 'name', 'description', 'updated_at')->get();
+
         if (Auth::user()->role == 2) {
             $admin = Admin::where('user_id', Auth::user()->id)->first();
+            $groups = DB::table('admin_groups as ag')
+                ->join('groups as g', 'ag.group_id', '=', 'g.id')
+                ->join('admins as a', 'ag.admin_id', '=', 'a.id')
+                ->where('a.id', $admin->id)
+                ->select('g.id', 'g.name', 'g.description', 'g.updated_at')
+                ->get();
             return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups, 'admin' => $admin],);
         } else {
+            $groups = Groups::select('id', 'name', 'description', 'updated_at')->get();
             return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups],);
         }
     }
@@ -92,23 +101,48 @@ class PaymentController extends Controller
     {
         // Ambil kata kunci pencarian dari parameter query
         $query = $request->input('query');
+        if (Auth::user()->role == 1) {
+            // Ambil data admin berdasarkan group_id dengan filter pencarian
+            $admins = AdminLoanView::where('group_id', $group->id)
+                ->when($query, function ($q) use ($query) {
+                    $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']) // Case-insensitive untuk nama
+                        ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . strtolower($query) . '%']); // Case-insensitive untuk nomor HP
+                })->where('manager_id', '=', function ($query) {
+                    $query->select('id')
+                        ->from('managers')
+                        ->where('user_id', Auth::user()->id)
+                        ->limit(1); // Pastikan hanya satu id yang dikembalikan
+                })
+                ->get();
+            // Ambil semua admin yang belum ada di dalam $admins berdasarkan id dengan filter pencarian
+            $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
 
-        // Ambil data admin berdasarkan group_id dengan filter pencarian
-        $admins = AdminLoanView::where('group_id', $group->id)
-            ->when($query, function ($q) use ($query) {
-                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']) // Case-insensitive untuk nama
-                    ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . strtolower($query) . '%']); // Case-insensitive untuk nomor HP
-            })
-            ->get();
-        // Ambil semua admin yang belum ada di dalam $admins berdasarkan id dengan filter pencarian
-        $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
+            $adminAll = Admin::whereNotIn('id', $adminIds)
+                ->when($query, function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('name', 'like', "%{$query}%")
+                        ->orWhere('phone', 'like', "%{$query}%");
+                })
+                ->where('manager_id', '=', function ($query) {
+                    $query->select('id')
+                        ->from('managers')
+                        ->where('user_id', Auth::user()->id)
+                        ->limit(1); // Pastikan hanya satu id yang dikembalikan
+                })
+                ->get();
+        } else {
+            $admins = AdminLoanView::where('group_id', $group->id)
+                ->when($query, function ($q) use ($query) {
+                    $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']) // Case-insensitive untuk nama
+                        ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . strtolower($query) . '%']); // Case-insensitive untuk nomor HP
+                })->get();
+            $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
 
-        $adminAll = Admin::whereNotIn('id', $adminIds)
-            ->when($query, function ($queryBuilder) use ($query) {
-                $queryBuilder->where('name', 'like', "%{$query}%")
-                    ->orWhere('phone', 'like', "%{$query}%");
-            })
-            ->get();
+            $adminAll = Admin::whereNotIn('id', $adminIds)
+                ->when($query, function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('name', 'like', "%{$query}%")
+                        ->orWhere('phone', 'like', "%{$query}%");
+                })->get();
+        }
 
         // Kirim data grup, admins, dan adminAll ke view
         return view('pembayaran/listAdmin', [

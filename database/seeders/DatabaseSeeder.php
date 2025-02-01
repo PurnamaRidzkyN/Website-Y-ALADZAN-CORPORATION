@@ -27,11 +27,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $gwh = User::create([
+            'username' => 'PurnamaOwner',
+            'email' => 'purnamaO@gmail.com',
+            'password' => Hash::make('purnama'),
+            'role' => 0
+        ]);
+        $gwh = User::create([
             'username' => 'PurnamaManajer',
             'email' => 'purnamaA@gmail.com',
             'password' => Hash::make('purnama'),
             'role' => 1
         ]);
+        
         Manager::factory(1)->recycle([
             $gwh,
         ])->create();

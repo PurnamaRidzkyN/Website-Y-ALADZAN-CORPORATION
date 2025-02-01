@@ -20,7 +20,9 @@ return new class extends Migration
         Schema::create('codes', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(); // Menggunakan unique constraint untuk code
-            $table->decimal('bonus', 15, 2)->default(0);
+            $table->integer('admin_bonuses')->default(0);
+            $table->integer('manager_bonuses')->default(0);
+            $table->integer('capital')->default(0);
             $table->timestamps();
         });
     }

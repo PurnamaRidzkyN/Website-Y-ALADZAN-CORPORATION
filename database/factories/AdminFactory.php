@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Bonuses;
+use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,8 +24,10 @@ class AdminFactory extends Factory
      */
     public function definition(): array
     {
+        $manager = Manager::inRandomOrder()->first(); 
         return [
             'user_id' => User::factory(), // Relasi ke User
+            'manager_id' =>$manager->id,
             'name' => $this->faker->name,
             'foto' => 'https://randomuser.me/api/portraits/men/' . $this->faker->numberBetween(1, 100) . '.jpg',
             'salary' => $this->faker->numberBetween(5000000, 10000000),

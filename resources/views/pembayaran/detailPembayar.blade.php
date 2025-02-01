@@ -304,23 +304,25 @@
                         try {
                             // Mendapatkan data pinjaman pertama dari array loans
                             const loan = @json($loans); // Ambil data pinjaman pertama (index 0)
+                            const payments = @json($payments);
                             const messages = @json($message);
+                            console.log(payments)
                             // Cek apakah loan ada (tidak null atau undefined)
                             if (loan && loan.name) {
                                 // Menyusun pesan WhatsApp
-                                let message = `${messages.message_header} \n\n
-*Pinjaman:* \n
-- Nama\t\t\t: ${loan.name} \n
-- Deskripsi\t\t: ${loan.description} \n
-- Tanggal Pinjaman\t: ${loan.loan_date} \n
-- Total Jumlah\t\t: Rp${loan.total_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
-- Total Pembayaran\t: Rp${loan.total_payment.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
-- Jumlah Tunggakan\t: Rp${loan.outstanding_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
-- No. Telepon\t\t: ${loan.phone} \n
-- Kode ID\t\t: ${loan.codes_id} \n\n
-${messages.message_footer}`;
+                                let message = `${messages.message_header} \n
+*Pembayaran:* 
+Tanggal Awal\t\t: ${loan.loan_date} 
+Total \t\t\t: Rp${loan.total_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} 
+Sudah Dibayar\t\t: Rp${loan.total_payment.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} 
+Sisa\t\t\t: Rp${loan.outstanding_amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} \n
+*Rincian Pembayaran*`;
 
+                                let paymentDetails = payments.map(payment => {
+                                    return `Tanggal Pembayaran: ${payment.payment_date} | Jumlah: Rp${payment.amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+                                }).join("\n");
 
+                                message += `\n${paymentDetails}\n\n${messages.message_footer}`;
                                 // Nomor WhatsApp tujuan
                                 const phoneNumber = @json($loans->phone); // Ambil nomor telepon dari server
 

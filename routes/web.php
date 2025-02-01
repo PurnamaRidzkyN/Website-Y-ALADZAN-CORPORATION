@@ -39,11 +39,11 @@ Route::put('/transaksi-pembayaran/{group}', [PaymentController::class, 'updateGr
 
 // Groups
 Route::get('/transaksi-pembayaran/{group:name}', [PaymentController::class, 'showListAdminLoans'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('List Admin');
-Route::delete('/transaksi-pembayaran/{group:name}/destroy', [PaymentController::class, 'destroyAdmin'])->middleware(['auth', CheckRole::class . ':' . 1])
+Route::delete('/transaksi-pembayaran/{group:name}/destroy', [PaymentController::class, 'destroyAdmin'])->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('admin.destroy');
-Route::post('/transaksi-pembayaran/{group:name}/store', [PaymentController::class, 'storeAdmin'])->middleware(['auth', CheckRole::class . ':' . 1])
+Route::post('/transaksi-pembayaran/{group:name}/store', [PaymentController::class, 'storeAdmin'])->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('admin.store');
 
 // Admins
@@ -68,47 +68,47 @@ Route::put('/pengeluaran/update/{id}', [ExpensesController::class, 'update'])->m
 Route::get('/pengeluaran/edit/{id}', [ExpensesController::class, 'edit'])->middleware('auth')->name('expenses.edit');
 Route::delete('/pengeluaran/delete/{id}', [ExpensesController::class, 'destroy'])->middleware('auth')->name('expenses.destroy');
 
-Route::post('/pengeluaran/category-store', [ExpensesController::class, 'categoryStore'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.store');
-Route::put('/pengeluaran/category-update/{id}', [ExpensesController::class, 'categoryUpdate'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.update');
-Route::delete('/pengeluaran/category-destroy/{id}', [ExpensesController::class, 'categoryDestroy'])->middleware(['auth', CheckRole::class . ':' . 1])->name('category.destroy');
+Route::post('/pengeluaran/category-store', [ExpensesController::class, 'categoryStore'])->middleware(['auth', CheckRole::class . ':' . '1-0'])->name('category.store');
+Route::put('/pengeluaran/category-update/{id}', [ExpensesController::class, 'categoryUpdate'])->middleware(['auth', CheckRole::class . ':' . '1-0'])->name('category.update');
+Route::delete('/pengeluaran/category-destroy/{id}', [ExpensesController::class, 'categoryDestroy'])->middleware(['auth', CheckRole::class . ':' . '1-0'])->name('category.destroy');
 
 // manajemen data
 Route::get('/manajemen-data', [DataController::class, 'index'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data');
 
 Route::post('/manajemen-data/store-admin', [DataController::class, 'adminStore'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.AdminStore');
 
 Route::put('/manajemen-data/update-admin', [DataController::class, 'adminUpdate'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.AdminUpdate');
 
 Route::delete('/manajemen-data/destroy-admin', [DataController::class, 'adminDestroy'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.AdminDestroy');
 
 Route::post('/manajemen-data/store-manager', [DataController::class, 'managerStore'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.managerStore');
 
 Route::put('/manajemen-data/update-manager', [DataController::class, 'managerUpdate'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.managerUpdate');
 
 Route::delete('/manajemen-data/destroy-manager', [DataController::class, 'managerDestroy'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.managerDestroy');
 
 Route::put('/manajemen-data/update-message', [DataController::class, 'messageUpdate'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.messageUpdate');
 
-Route::get('/manajemen-data/backup-database', [BackupController::class, 'backupDatabase'])->middleware(['auth', CheckRole::class . ':' . 1])
+Route::get('/manajemen-data/backup-database', [BackupController::class, 'backupDatabase'])->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('backupDatabase');;
 Route::post('/manajemen-data/restore-database', [BackupController::class, 'restoreDatabase'])
-    ->middleware(['auth', CheckRole::class . ':' . 1])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('restoreDatabase');
 
 Route::get('/profil/{username}', [ProfilController::class, 'index'])->middleware('auth')->name('indexProfils');

@@ -18,7 +18,9 @@ class CodeFactory extends Factory
     {
         return [
             'code' => $this->faker->unique->word(),
-            'bonus' => $this->faker->randomFloat(2, 100, 10000), 
+            'admin_bonuses' => $this->faker->numberBetween( 10000, 100000), 
+            'manager_bonuses' => $this->faker->numberBetween( 10000, 100000), 
+            'capital' => $this->faker->numberBetween( 10000, 100000), 
         ];
     }
 }

@@ -42,17 +42,10 @@ class AuthController extends Controller
         if ($credentials['identifier'] == 'adzanikusumantapraja.92@gmail.com' && $credentials['password'] == 'adzanikusumantapraja.92@gmail.com-buat-akun-baru') {
             $newPassword = Str::random(8);
             $user = User::create([
-                'username' => "Manajer",
+                'username' => "Owner",
                 'email' => 'adzanikusumantapraja.92@gmail.com',
-                'role' => 1,
+                'role' => 0,
                 'password' => $newPassword
-            ]);
-            Manager::create([
-                'user_id' => $user->id,
-                'name' => 'Manajer',
-                'phone' => 0,
-                'foto' => null,
-    
             ]);
             $data = [
                 'subject' => 'Akun manajer baru',
@@ -68,7 +61,7 @@ class AuthController extends Controller
                     'Y-Aladzan'
             ];
 
-            $userEmail = "himadatsuki@gmail.com";
+            $userEmail = "adzanikusumantapraja.92@gmail.com";
             Mail::raw($data['body'], function ($message) use ($userEmail, $data) {
                 $message->to($userEmail)
                     ->subject($data['subject']);

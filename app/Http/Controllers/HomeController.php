@@ -13,13 +13,32 @@ class HomeController extends Controller
     public function showHome()
     {
         // Pembayaran
-        $payments = Payment::selectRaw('payment_date, SUM(amount) as total_payment')
-            ->groupBy('payment_date')
-            ->orderBy('payment_date')
+        $payments = Payment::selectRaw('
+        EXTRACT(MONTH FROM payments.payment_date) as month,
+        EXTRACT(YEAR FROM payments.payment_date) as year,
+        SUM(payments.amount) as total_payment,
+        groups.name as group_name
+    ')
+            ->join('loans', 'payments.loan_id', '=', 'loans.id')
+            ->join('admin_groups', 'loans.admin_group_id', '=', 'admin_groups.id')
+            ->join('groups', 'admin_groups.group_id', '=', 'groups.id') // Join ke tabel groups
+            ->groupBy('year', 'month', 'groups.name')
+            ->orderByRaw('year ASC, month ASC')
             ->get();
 
-        $highPayments = Payment::selectRaw('payment_date, SUM(amount) as total_payment')
-            ->groupBy('payment_date')
+
+        $paymentData = $payments->groupBy('group_name')->map(function ($groupPayments) {
+            return [
+                'labels' => $groupPayments->map(fn($p) => sprintf('%02d', $p->month) . '-' . $p->year), // Format: MM-YYYY
+                'totals' => $groupPayments->pluck('total_payment'),
+            ];
+        });
+
+
+
+
+        $highPayments = Payment::selectRaw('EXTRACT(MONTH FROM payment_date) as month, EXTRACT(YEAR FROM payment_date) as year, SUM(amount) as total_payment')
+            ->groupBy('year', 'month')
             ->orderByRaw('SUM(amount) DESC')
             ->take(5)
             ->get();
@@ -32,12 +51,11 @@ class HomeController extends Controller
             ->selectRaw('user_id, COUNT(*) as visit_count')
             ->groupBy('user_id')
             ->orderByDesc('visit_count')
+            ->with('user') // Relasi Eloquent
             ->get();
 
-        // Mengambil username dari tabel User untuk frequentVisitor
         $frequentVisitorWithUsernames = $frequentVisitor->map(function ($visitor) {
-            $user = User::find($visitor->user_id);
-            $visitor->username = $user ? $user->username : null; // Menambahkan username ke setiap data visitor
+            $visitor->username = $visitor->user->username ?? null;
             return $visitor;
         });
 
@@ -46,23 +64,19 @@ class HomeController extends Controller
             ->selectRaw('user_id, SUM(duration) as total_duration')
             ->groupBy('user_id')
             ->orderByDesc('total_duration')
+            ->with('user') // Relasi Eloquent
             ->get();
 
-        // Mengambil username dari tabel User untuk longestDurationUser
         $longestDurationUserWithUsernames = $longestDurationUser->map(function ($user) {
-            $userData = User::find($user->user_id);
-            $user->username = $userData ? $userData->username : null; // Menambahkan username ke setiap data user
+            $user->username = $user->user->username ?? null;
             return $user;
         });
 
-        // Menyiapkan data untuk grafik
-        $paymentDates = $payments->pluck('payment_date')->map(function ($date) {
-            return Carbon::parse($date)->format('d-m-Y');
-        });
 
         $paymentTotals = $payments->pluck('total_payment');
-        $highPaymentDates = $highPayments->pluck('payment_date')->map(function ($date) {
-            return Carbon::parse($date)->format('d-m-Y');
+
+        $highPaymentDates = $highPayments->map(function ($payment) {
+            return sprintf('%02d', $payment->month) . '-' . $payment->year; // Format Bulan-Tahun
         });
         $highPaymentTotals = $highPayments->pluck('total_payment');
 
@@ -76,7 +90,7 @@ class HomeController extends Controller
             'title' => 'Beranda',
             'payments' => $payments,
             'highPayments' => $highPayments,
-            'paymentDates' => $paymentDates,
+            'paymentData' => $paymentData,
             'paymentTotals' => $paymentTotals,
             'highPaymentDates' => $highPaymentDates,
             'highPaymentTotals' => $highPaymentTotals,

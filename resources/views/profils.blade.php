@@ -50,15 +50,15 @@
                             class="font-medium text-white">{{ $user->updated_at }}</span></p>
                     <!-- Tombol Aksi -->
                     @if (Auth::check() && Auth::user()->username == $users->username)
-                    <div class="mt-6 flex space-x-4">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                            data-bs-toggle="modal" data-bs-target="#editUsersModal-{{ $user->id }}">
-                            Edit Profil
-                        </button>
-                        <button class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded"
-                            data-bs-toggle="modal" data-bs-target="#changePasswordModal">Ganti Kata
-                            Sandi</button>
-                    </div>
+                        <div class="mt-6 flex space-x-4">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                                data-bs-toggle="modal" data-bs-target="#editUsersModal-{{ $user->id }}">
+                                Edit Profil
+                            </button>
+                            <button class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded"
+                                data-bs-toggle="modal" data-bs-target="#changePasswordModal">Ganti Kata
+                                Sandi</button>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -210,19 +210,19 @@
 
 
 
-            @if ($users->role == 2)
-                <div class="mt-8 flex flex-col lg:flex-row gap-6">
-                    <!-- Grafik Total Bonus yang Diambil -->
-                    <div class="p-6 bg-[#2D3748] mt-8 rounded-lg flex-1">
-                        <h4 class="text-lg font-semibold text-white">Grafik Bonus Diambil</h4>
-                        <!-- Batasan lebar dan tinggi untuk canvas -->
-                        <canvas id="bonusChart" class="mt-4 w-full max-h-[200px]"></canvas>
-                        <p class="text-sm text-gray-300 mt-4">Total Bonus: Rp
-                            {{ number_format($user->bonuses->total_amount, 0, ',', '.') }}</p>
-                        <p class="text-sm text-gray-300">Bonus Diambil: Rp
-                            {{ number_format($user->bonuses->used_amount, 0, ',', '.') }}</p>
-                    </div>
 
+            <div class="mt-8 flex flex-col lg:flex-row gap-6">
+                <!-- Grafik Total Bonus yang Diambil -->
+                <div class="p-6 bg-[#2D3748] mt-8 rounded-lg flex-1">
+                    <h4 class="text-lg font-semibold text-white">Grafik Bonus Diambil</h4>
+                    <!-- Batasan lebar dan tinggi untuk canvas -->
+                    <canvas id="bonusChart" class="mt-4 w-full max-h-[200px]"></canvas>
+                    <p class="text-sm text-gray-300 mt-4">Total Bonus: Rp
+                        {{ number_format($user->bonuses->total_amount, 0, ',', '.') }}</p>
+                    <p class="text-sm text-gray-300">Bonus Diambil: Rp
+                        {{ number_format($user->bonuses->used_amount, 0, ',', '.') }}</p>
+                </div>
+                @if ($users->role == 2)
                     <!-- Kontainer untuk Total Payments dan Total Amount + Progress Bar -->
                     <div class="lg:w-1/2 flex-1 flex flex-col gap-6">
                         <!-- Pembayaran Total -->
@@ -249,45 +249,50 @@
                             <canvas id="paymentChart" class="mt-4"></canvas>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
+
 
         </div>
     </div>
-    @if ($users->role == 2)
-        <!-- Tambahkan Script untuk Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            const bonusCtx = document.getElementById('bonusChart').getContext('2d');
-            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
 
-            const bonusChart = new Chart(bonusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Bonus Diambil', 'Sisa Bonus'],
-                    datasets: [{
-                        label: 'Bonus',
-                        data: [
-                            {{ $user->bonuses->used_amount }},
-                            {{ $user->bonuses->total_amount - $user->bonuses->used_amount }}
-                        ],
-                        backgroundColor: ['#FF6347', '#2D3748'],
-                        borderWidth: 1,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: '#FFFFFF'
-                            }
+    <!-- Tambahkan Script untuk Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const bonusCtx = document.getElementById('bonusChart').getContext('2d');
+
+
+        const bonusChart = new Chart(bonusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bonus Diambil', 'Sisa Bonus'],
+                datasets: [{
+                    label: 'Bonus',
+                    data: [
+                        {{ $user->bonuses->used_amount }},
+                        {{ $user->bonuses->total_amount - $user->bonuses->used_amount }}
+                    ],
+                    backgroundColor: ['#FF6347', '#2D3748'],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#FFFFFF'
                         }
                     }
                 }
-            });
+            }
+        });
+    </script>
 
+    @if ($users->role == 2)
+        <script>
+            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
             const paymentChart = new Chart(paymentCtx, {
                 type: 'bar',
                 data: {

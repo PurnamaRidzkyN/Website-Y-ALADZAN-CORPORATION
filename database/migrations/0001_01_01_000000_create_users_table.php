@@ -47,21 +47,6 @@ return new class extends Migration
             $table->timestamps(); // Tambahkan kolom timestamps jika diperlukan
         });
 
-
-
-
-        // Tabel Admins
-        Schema::create('admins', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke users
-            $table->string('name');
-            $table->string('foto')->nullable();
-            $table->integer('salary');
-            $table->foreignId('bonus_id')->constrained('bonuses')->onDelete('cascade'); // Relasi ke bonuses
-            $table->string('phone');
-            $table->timestamps();
-        });
-
         // Tabel Managers
         Schema::create('managers', function (Blueprint $table) {
             $table->id();
@@ -69,6 +54,21 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone');
             $table->string('foto')->nullable();
+            $table->integer('salary');
+            $table->foreignId('bonus_id')->constrained('bonuses')->onDelete('cascade'); // Relasi ke bonuses
+            $table->timestamps();
+        });
+        
+        // Tabel Admins
+        Schema::create('admins', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke users
+            $table->foreignId('manager_id')->constrained('managers'); // Relasi ke users
+            $table->string('name');
+            $table->string('foto')->nullable();
+            $table->integer('salary');
+            $table->foreignId('bonus_id')->constrained('bonuses')->onDelete('cascade'); // Relasi ke bonuses
+            $table->string('phone');
             $table->timestamps();
         });
 
