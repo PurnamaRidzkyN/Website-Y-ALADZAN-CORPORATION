@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\Bonuses;
 use App\Models\Expense;
+use App\Models\Manager;
 use Illuminate\Http\Request;
 use App\Models\CategoryExpense;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ExpensesController extends Controller
@@ -16,16 +18,21 @@ class ExpensesController extends Controller
         // Fetch category expenses and expenses with related users (admin, manager)
         $category_expenses = CategoryExpense::orderBy('id', 'asc')->get();
         $admins = Admin::get();
+        if (Auth::user()->role == 1) {
+            $admins = Admin::get()->where('manager_id', Auth::user()->id);
+        }
+        $managers = Manager::get();
         $expenses = Expense::with('user.admin', 'user.manager')
             ->orderBy('date', 'desc')  // 'asc' untuk urutan menaik, 'desc' untuk urutan menurun
             ->get();
-
+        // dd($expenses);
         // Convert expenses to an array to pass to JavaScript
         $expensesArray = $expenses->map(function ($expense) {
             return [
                 'id' => $expense->id,
                 'amount' => $expense->amount,
                 'description' => $expense->description,
+
                 'method' => $expense->method,
                 'date' => $expense->date,
                 'image_url' => $expense->image_url,
@@ -34,22 +41,26 @@ class ExpensesController extends Controller
                     'username' => $expense->user->username, // Ensure you have 'username' or adjust based on your user model
                 ],
                 'admin' => [
-                    'name' => $expense->admin ? $expense->admin->name : 'tidak ada admin',
-                ]
+                    'name' => $expense->admin ? $expense->admin->name : null,
+                    'role' => 'Admin'
+                ],
+                'manager' => [
+                    'name' => $expense->manager ? $expense->manager->name : 'tidak ada penerima',
+                    'role' => 'Manajer'
+                ],
             ];
         });
 
         // Pass category_expenses and expenses to the view
-        return view('pengeluaran/pengeluaran', compact('admins', 'category_expenses', 'expensesArray'), ["title" => "Pencatatan Pengeluaran"]);
+        return view('pengeluaran/pengeluaran', compact('managers', 'admins', 'category_expenses', 'expensesArray'), ["title" => "Pencatatan Pengeluaran"]);
     }
 
     public function store(Request $request)
     {
-
         if ($request->category_id == 1 || $request->category_id == 2) {
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'admin_id' => 'required|exists:admins,id',
+                'recipient' => 'required|string|max:100',
                 'tanggal' => 'required|date',
                 'nominal' => 'required|numeric|min:0',
                 'deskripsi' => 'required|string|max:500',
@@ -79,10 +90,12 @@ class ExpensesController extends Controller
                 // Simpan path gambar ke dalam validatedData
                 $validatedData['image_url'] = $imagePath;  // Ganti 'image_url' jika sesuai dengan nama kolom di database
             }
+
             // Simpan data pengeluaran ke database
             Expense::create([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => $validatedData['admin_id'],
+                'admin_id' => (Auth::user()->role == 0) ? $validatedData['recipient'] : null,
+                'manager_id' => (Auth::user()->role == 1) ? $validatedData['recipient'] : null,
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -90,8 +103,10 @@ class ExpensesController extends Controller
                 'method' => $validatedData['payment_method'],
                 'image_url' => $validatedData['image_url'] ?? null,  // Jika tidak ada gambar, set ke null
             ]);
+
+
             if ($validatedData['category_id'] == 2) {
-                $admin = Admin::find($validatedData['admin_id']);
+                $admin = Admin::find($validatedData['recipient']);
                 $bonus = Bonuses::find($admin["bonus_id"]);
                 $bonus->used_amount += $validatedData['nominal'];
                 $bonus->save();
@@ -105,17 +120,18 @@ class ExpensesController extends Controller
             // Tangani jika terjadi danger
             return redirect()->back()->withInput()->with([
                 'status' => 'danger',
-                'message' => 'Gagal menambahkan pengeluaran. Silakan coba lagi.',
+                'message' => 'Gagal menambahkan pengeluaran. Silakan coba lagi.' .$e,
             ]);
         }
     }
     public function update(Request $request, $id)
     {
+ 
         // Validasi input
         if ($request->category_id == 1 || $request->category_id == 2) {
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'edit_admin_id' => 'required|exists:admins,id',
+                'edit_recipient' => 'required|string|max:100',
                 'tanggal' => 'required|date',
                 'nominal' => 'required|numeric|min:0',
                 'deskripsi' => 'required|string|max:500',
@@ -154,7 +170,8 @@ class ExpensesController extends Controller
             // Perbarui data pengeluaran
             $expense->update([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => ($request->category_id == 1 || $request->category_id == 2) ? $validatedData['edit_admin_id'] : null,
+                'admin_id' => (($request->category_id == 1 || $request->category_id == 2) && (Auth::user()->role == 1)) ? $validatedData['edit_recipient'] : null,
+                'manager_id' => (($request->category_id == 1 || $request->category_id == 2) && (Auth::user()->role == 0)) ? $validatedData['edit_recipient'] : null,
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -201,8 +218,7 @@ class ExpensesController extends Controller
 
     public function edit($id)
     {
-        $expense = Expense::findOrFail($id); // Mengambil data berdasarkan ID
-        // Mengembalikan data dalam format JSON
+        $expense = Expense::findOrFail($id); 
         return response()->json($expense);
     }
 

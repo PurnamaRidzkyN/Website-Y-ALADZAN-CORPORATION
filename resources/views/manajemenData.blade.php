@@ -16,11 +16,14 @@
                     <button onclick="toggleSection('pengaturan-pesan')"
                         class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
                         Pesan</button>
-                    <button onclick="toggleSection('pengaturan-kode')"
-                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
-                        Kode</button>
+                    @if (Auth::check() && Auth::user()->role == 0)
+                        <button onclick="toggleSection('pengaturan-kode')"
+                            class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Pengaturan
+                            Kode</button>
+                    @endif
                     <button onclick="toggleSection('backup-data')"
-                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Backup Data</button>
+                        class="text-gray-300 py-2 px-4 rounded whitespace-nowrap hover:bg-gray-700">Backup
+                        Data</button>
 
                 </div>
             </nav>
@@ -46,6 +49,7 @@
             <div
                 class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
                 <!-- Add Data Button -->
+                @if (Auth::check() && Auth::user()->role == 1)
                 <button type="button"
                     class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
                     data-bs-toggle="modal" data-bs-target="#addDataAdmin">
@@ -56,6 +60,7 @@
                     </svg>
                     Tambah Data
                 </button>
+                @endif
                 <!-- Search Form -->
                 <form action="{{ route('Manajemen Data') }}" method="GET" class="flex items-center w-full md:w-auto">
                     <label for="search-admin" class="sr-only">Search Admin</label>
@@ -118,13 +123,13 @@
                             <p class="text-sm">{{ $admin->user->username }}</p>
                         </div>
 
-                        <button onclick="toggleDetails('details-{{ 'admin' }}')"
+                        <button onclick="toggleAdminDetails('detailsAdmin-{{ $admin->id }}')"
                             class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all">
                             Lihat Detail
                         </button>
 
                         <!-- Hidden Details -->
-                        <div id="details-{{ 'admin' }}" class="hidden mt-4 text-sm text-gray-300">
+                        <div id="detailsAdmin-{{ $admin->id }}" class="hidden mt-4 text-sm text-gray-300">
                             <p><strong>Phone:</strong> {{ $admin['phone'] }}</p>
                             <p><strong>Gaji:</strong> {{ number_format($admin['salary'], 0, ',', '.') }}</p>
                             <p><strong>Total Bonus:</strong>
@@ -135,15 +140,22 @@
                                 {{ number_format($admin->bonuses->remaining_amount, 0, ',', '.') }}</p>
                             <p><strong>Terakhir diperbarui:</strong> {{ $admin['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button id="editDataAdmin"
-                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
-                                    data-bs-toggle="modal" data-bs-target="#editModalAdmin{{ $admin->id }}">
+                                @if (Auth::check() && Auth::user()->role == 1)
+                                <button
+                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600 edit-btn-admin"
+                                    data-bs-toggle="modal" data-bs-target="#editModalAdmin"
+                                    data-id="{{ $admin->id }}" data-name="{{ $admin->name }}"
+                                    data-email="{{ $admin->user->email }}" data-phone="{{ $admin->phone }}"
+                                    data-salary="{{ number_format($admin->salary, 0, ',', '.') }}">
                                     Edit
                                 </button>
-                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
-                                    data-bs-toggle="modal" data-bs-target="#deleteModalAdmin{{ $admin->id }}">
+
+                                <button class="btn btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalAdmin" data-id="{{ $admin->id }}"
+                                    data-name="{{ $admin->name }}">
                                     Hapus
                                 </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -230,12 +242,11 @@
                         <hr id="separator" class="border-2 rounded mb-0"
                             style="border-width: 1px; border-style: solid; border-color: #FF6347 !important;">
 
-                        <button onclick="toggleDetails('details-{{ 'manager' }}')"
+                        <button onclick="toggleManagerDetails('detailsManager-{{ $manager->id }}')"
                             class="px-4 py-2 bg-[#FF6347] text-white rounded-lg hover:bg-[#D84C2E] transition-all">
                             Lihat Detail
                         </button>
-
-                        <div id="details-{{ 'manager' }}" class="hidden mt-4 text-sm text-gray-300">
+                        <div id="detailsManager-{{ $manager->id }}" class="hidden mt-4 text-sm text-gray-300">
                             <p><strong>Phone:</strong> {{ $manager['phone'] }}</p>
                             <p><strong>Gaji:</strong> {{ number_format($manager['salary'], 0, ',', '.') }}</p>
                             <p><strong>Total Bonus:</strong>
@@ -246,13 +257,18 @@
                                 {{ number_format($manager->bonuses->remaining_amount, 0, ',', '.') }}</p>
                             <p><strong>Terakhir diperbarui:</strong> {{ $manager['updated_at'] }}</p>
                             <div class="mt-4 flex justify-between">
-                                <button id="editDataManager"
-                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
-                                    data-bs-toggle="modal" data-bs-target="#editModalManager{{ $manager->id }}">
+                                <button
+                                    class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600 edit-btn-manager"
+                                    data-bs-toggle="modal" data-bs-target="#editModalManager"
+                                    data-id="{{ $manager->id }}" data-name="{{ $manager->name }}"
+                                    data-email="{{ $manager->user->email }}" data-phone="{{ $manager->phone }}"
+                                    data-salary="{{ number_format($manager->salary, 0, ',', '.') }}">
                                     Edit
                                 </button>
-                                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
-                                    data-bs-toggle="modal" data-bs-target="#deleteModalManager{{ $manager->id }}">
+
+                                <button class="btn btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModalManager" data-id="{{ $manager->id }}"
+                                    data-name="{{ $manager->name }}">
                                     Hapus
                                 </button>
                             </div>
@@ -375,8 +391,8 @@
             <!-- Card Container -->
             @if ($codes->isEmpty() && empty(request('query')))
                 <div class="alert alert-warning text-center mt-4 mx-auto" role="alert" style="max-width: 400px;">
-                    <h5 class="alert-heading">Belum Ada Admin</h5>
-                    <p class="mb-0">Anda saat ini belum memiliki admin. Silakan tambahkan admin.</p>
+                    <h5 class="alert-heading">Belum Ada Kode</h5>
+                    <p class="mb-0">Anda saat ini belum memiliki Kode. Silakan tambahkan kode.</p>
                 </div>
             @endif
             <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -393,7 +409,20 @@
                                     Awal</span><span>: {{ $code->capital }}</span></div>
                         </div>
 
-
+                        <div class="mt-4 flex justify-between">
+                            <button class="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600 edit-btn-code"
+                                data-bs-toggle="modal" data-bs-target="#editModalCode" data-id="{{ $code->id }}"
+                                data-code="{{ $code->code }}"
+                                data-admin-bonuses="{{ number_format($code->admin_bonuses, 0, ',', '.') }}"
+                                data-manager-bonuses="{{ number_format($code->manager_bonuses, 0, ',', '.') }}"
+                                data-capital="{{ number_format($code->capital, 0, ',', '.') }}">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModalCode"
+                                data-id="{{ $code->id }}" data-code="{{ $code->code }}">
+                                Hapus
+                            </button>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -491,7 +520,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body" style="background-color: #2D3748;">
                     <!-- Form inside the modal -->
-                    <form action="{{ route('Manajemen Data.AdminStore') }}" method="POST">
+                    <form action="{{ route('Manajemen Data.adminStore') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Nama</label>
@@ -513,7 +542,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="text" class="form-control" id="salary" name="salary"
-                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    oninput="formatMoney(this)" onblur="removeFormatting(this)"
                                     onfocus="addFormatting(this)">
                             </div>
                         </div>
@@ -530,108 +559,89 @@
         </div>
     </div>
     {{-- edit admin --}}
-    @foreach ($admins as $admin)
-        <div class="modal fade" id="editModalAdmin{{ $admin->id }}" tabindex="-1"
-            aria-labelledby="editDataAdminLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
-                    <!-- Modal Header -->
-                    <div class="modal-header" style="background-color: #1A2634;">
-                        <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
+    <div class="modal fade" id="editModalAdmin" tabindex="-1" aria-labelledby="editDataAdminLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                    <!-- Modal Body -->
-                    <div class="modal-body" style="background-color: #2D3748;">
-                        <!-- Form inside the modal -->
-                        <form action="{{ route('Manajemen Data.AdminUpdate') }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="mb-3">
-                                <label for="edit_name" class="form-label">Nama</label>
-                                <input type="text" class="form-control" id="edit_name" name="name"
-                                    value="{{ $admin->name }}" required>
-                            </div>
+                <!-- Modal Body -->
+                <div class="modal-body" style="background-color: #2D3748;">
+                    <!-- Form inside the modal -->
+                    <form action="{{ route('Manajemen Data.adminUpdate') }}" method="POST"
+                        onsubmit="removeFormattingBeforeSubmit()">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="edit_id" name="id">
 
-                            <div class="mb-3">
-                                <label for="edit_email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="edit_email" name="email"
-                                    value="{{ $admin->user->email }}" required>
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit_name" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="edit_phone" class="form-label">No HP</label>
-                                <input type="number" class="form-control" id="edit_phone" name="phone"
-                                    value="{{ $admin->phone }}" required>
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit_email" name="email" required>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="edit_salary" class="form-label">Gaji</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" class="form-control" id="edit_salary" name="salary"
-                                        value="{{ number_format($admin->salary, 0, ',', '.') }}" required
-                                        oninput="formatSalary(this)" onblur="removeFormatting(this)"
-                                        onfocus="addFormatting(this)">
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit_phone" class="form-label">No HP</label>
+                            <input type="number" class="form-control" id="edit_phone" name="phone" required>
+                        </div>
 
-                            <!-- Hidden Input for ID -->
-                            <div class="mb-3">
-                                <input type="hidden" class="form-control" id="edit_id" name="id"
-                                    value="{{ $admin->id }}">
+                        <div class="mb-3">
+                            <label for="edit_salary" class="form-label">Gaji</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control money-input" id="edit_salary"
+                                    name="salary" required oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
                             </div>
+                        </div>
 
-                            <!-- Modal Footer -->
-                            <div class="modal-footer" style="background-color: #1A2634;">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn"
-                                    style="background-color: #4CAF50; color: white;">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
     {{-- hapus admin --}}
     <!-- Modal Konfirmasi Hapus -->
-    @foreach ($admins as $admin)
-        <div class="modal fade" id="deleteModalAdmin{{ $admin->id }}" tabindex="-1"
-            aria-labelledby="deleteModalLabel{{ $admin->id }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel{{ $admin->id }}">Konfirmasi Hapus</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Apakah Anda yakin ingin menghapus admin "<strong>{{ $admin->name }}</strong>"?
-                    </div>
-                    <div class="modal-footer">
-                        <!-- Tombol Batal dengan Ikon -->
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle"></i> Batal
+    <div class="modal fade" id="deleteModalAdmin" tabindex="-1" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus admin "<strong id="deleteAdminName"></strong>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Batal
+                    </button>
+                    <form id="deleteForm" action="{{ route('Manajemen Data.adminDestroy') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="admin_id" id="deleteAdminId">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Hapus
                         </button>
-
-                        <!-- Form untuk menghapus admin -->
-                        <form id="deleteForm{{ $admin->id }}" action="{{ route('Manajemen Data.AdminDestroy') }}"
-                            method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" name="admin_id" value="{{ $admin->id }}">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Hapus
-                            </button>
-                        </form>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
 
     {{-- manajer modal --}}
     <div class="modal fade" id="addDataManajer" tabindex="-1" aria-labelledby="addDataManajerLabel"
@@ -668,7 +678,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="text" class="form-control" id="salary" name="salary"
-                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                    oninput="formatMoney(this)" onblur="removeFormatting(this)"
                                     onfocus="addFormatting(this)">
                             </div>
                         </div>
@@ -685,108 +695,90 @@
         </div>
     </div>
     {{-- edit manager --}}
-    @foreach ($managers as $manager)
-        <div class="modal fade" id="editModalManager{{ $manager->id }}" tabindex="-1"
-            aria-labelledby="editDataManagerLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
-                    <!-- Modal Header -->
-                    <div class="modal-header" style="background-color: #1A2634;">
-                        <h5 class="modal-title" id="editDataModalLabel">Edit Data</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
+    <div class="modal fade" id="editModalManager" tabindex="-1" aria-labelledby="editDataManagerLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title">Edit Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                    <!-- Modal Body -->
-                    <div class="modal-body" style="background-color: #2D3748;">
-                        <!-- Form inside the modal -->
-                        <form action="{{ route('Manajemen Data.managerUpdate') }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="mb-3">
-                                <label for="edit_name" class="form-label">Nama</label>
-                                <input type="text" class="form-control" id="edit_name" name="name"
-                                    value="{{ $manager->name }}" required>
-                            </div>
+                <div class="modal-body">
+                    <form action="{{ route('Manajemen Data.managerUpdate') }}" method="POST"
+                        onsubmit="removeFormattingBeforeSubmit()">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="edit_id" name="id">
 
-                            <div class="mb-3">
-                                <label for="edit_email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="edit_email" name="email"
-                                    value="{{ $manager->user->email }}" required>
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit_name" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="edit_phone" class="form-label">No HP</label>
-                                <input type="number" class="form-control" id="edit_phone" name="phone"
-                                    value="{{ $manager->phone }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit_salary" class="form-label">Gaji</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" class="form-control" id="edit_salary" name="salary"
-                                        value="{{ number_format($manager->salary, 0, ',', '.') }}" required
-                                        oninput="formatSalary(this)" onblur="removeFormatting(this)"
-                                        onfocus="addFormatting(this)">
-                                </div>
-                            </div>
-                            <!-- Hidden Input for ID -->
-                            <div class="mb-3">
-                                <input type="hidden" class="form-control" id="edit_id" name="id"
-                                    value="{{ $manager->id }}">
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="edit_email" name="email" required>
+                        </div>
 
-                            <!-- Modal Footer -->
-                            <div class="modal-footer" style="background-color: #1A2634;">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn"
-                                    style="background-color: #4CAF50; color: white;">Simpan</button>
+                        <div class="mb-3">
+                            <label for="edit_phone" class="form-label">No HP</label>
+                            <input type="number" class="form-control" id="edit_phone" name="phone" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_salary" class="form-label">Gaji</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control money-input" id="edit_salary"
+                                    name="salary" required oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
+
     {{-- hapus manager --}}
     <!-- Modal Konfirmasi Hapus -->
-    @foreach ($managers as $manager)
-        <div class="modal fade" id="deleteModalManager{{ $manager->id }}" tabindex="-1"
-            aria-labelledby="deleteModalLabel{{ $manager->id }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel{{ $manager->id }}">Konfirmasi Hapus</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Apakah Anda yakin ingin menghapus manager "<strong>{{ $manager->name }}</strong>"?
-                    </div>
-                    <div class="modal-footer">
-                        <!-- Tombol Batal dengan Ikon -->
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle"></i> Batal
+    <div class="modal fade" id="deleteModalManager" tabindex="-1" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus manager "<strong id="deleteManagerName"></strong>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Batal
+                    </button>
+                    <form id="deleteForm" action="{{ route('Manajemen Data.managerDestroy') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="manager_id" id="deleteManagerId">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Hapus
                         </button>
-
-                        <!-- Form untuk menghapus manager -->
-                        <form id="deleteForm{{ $manager->id }}"
-                            action="{{ route('Manajemen Data.managerDestroy') }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" name="manager_id" value="{{ $manager->id }}">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Hapus
-                            </button>
-                        </form>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
-    @endforeach
-    <div class="modal fade" id="addDataCode" tabindex="-1" aria-labelledby="addDataCodeLabel"
-        aria-hidden="true">
+    </div>
+
+    {{-- modal code --}}
+    <div class="modal fade" id="addDataCode" tabindex="-1" aria-labelledby="addDataCodeLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
                 <!-- Modal Header -->
@@ -798,40 +790,40 @@
                 <!-- Modal Body -->
                 <div class="modal-body" style="background-color: #2D3748;">
                     <!-- Form inside the modal -->
-                    <form action="" method="POST">
+                    <form action="{{ route('Manajemen Data.codeStore') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="name" class="form-label">Code</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="code" class="form-label">Code</label>
+                            <input type="text" class="form-control" id="code" name="code" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="salary" class="form-label">Bonus Admin</label>
+                            <label for="admin_bonuses" class="form-label">Bonus Admin</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" id="salary" name="salary"
-                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                <input type="text" class="form-control" id="admin_bonuses" name="admin_bonuses"
+                                    oninput="formatMoney(this)" onblur="removeFormatting(this)"
                                     onfocus="addFormatting(this)">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="salary" class="form-label">Bonus Manajer</label>
+                            <label for="manager_bonuses" class="form-label">Bonus Manajer</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" id="salary" name="salary"
-                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
-                                    onfocus="addFormatting(this)">
+                                <input type="text" class="form-control" id="manager_bonuses"
+                                    name="manager_bonuses" oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
                             </div>
-                        </div><div class="mb-3">
-                            <label for="salary" class="form-label">Modal Awal</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="capital" class="form-label">Modal Awal</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="text" class="form-control" id="salary" name="salary"
-                                    oninput="formatSalary(this)" onblur="removeFormatting(this)"
+                                <input type="text" class="form-control" id="capital" name="capital"
+                                    oninput="formatMoney(this)" onblur="removeFormatting(this)"
                                     onfocus="addFormatting(this)">
                             </div>
                         </div>
-
                         <!-- Modal Footer -->
                         <div class="modal-footer" style="background-color: #1A2634;">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -843,7 +835,92 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editModalCode" tabindex="-1" aria-labelledby="editDataCodeLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                <div class="modal-header" style="background-color: #1A2634;">
+                    <h5 class="modal-title">Edit Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
+                <div class="modal-body">
+                    <form action="{{ route('Manajemen Data.codeUpdate') }}" method="POST"
+                        onsubmit="removeFormattingBeforeSubmit()">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="edit_id" name="id">
+
+                        <div class="mb-3">
+                            <label for="edit_code" class="form-label">Kode</label>
+                            <input type="text" class="form-control" id="edit_code" name="code" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_admin_bonuses" class="form-label">Bonus Admin</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control money-input" id="edit_admin_bonuses"
+                                    name="admin_bonuses" required oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_manager_bonuses" class="form-label">Bonus Manager</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control money-input" id="edit_manager_bonuses"
+                                    name="manager_bonuses" required oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_capital" class="form-label">Modal Awal</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" class="form-control money-input" id="edit_capital"
+                                    name="capital" required oninput="formatMoney(this)"
+                                    onblur="removeFormatting(this)" onfocus="addFormatting(this)">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer" style="background-color: #1A2634;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn"
+                                style="background-color: #4CAF50; color: white;">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteModalCode" tabindex="-1" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus code "<strong id="deleteCode"></strong>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Batal
+                    </button>
+                    <form id="deleteForm" action="{{ route('Manajemen Data.codeDestroy') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="code_id" id="deleteCodeId">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Toggle Section
@@ -877,10 +954,16 @@
         });
 
         // Toggle Details (untuk bagian lain yang perlu di-toggle)
-        function toggleDetails(detailsId) {
-            const details = document.getElementById(detailsId);
+        function toggleAdminDetails(detailsAdminId) {
+            const details = document.getElementById(detailsAdminId);
             details.classList.toggle('hidden');
         }
+
+        function toggleManagerDetails(detailsManagerId) {
+            const details = document.getElementById(detailsManagerId);
+            details.classList.toggle('hidden');
+        }
+
 
 
         function toggleMobileMenu() {
@@ -894,7 +977,7 @@
             }
         }
 
-        function formatSalary(input) {
+        function formatMoney(input) {
             let value = input.value.replace(/[^0-9]/g, ''); // Hapus karakter selain angka
             input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Tambah titik setiap 3 digit
         }
@@ -904,11 +987,132 @@
             input.value = input.value.replace(/\./g, ''); // Hapus titik
         }
 
+        function removeFormattingBeforeSubmit() {
+            const salaryInputs = document.querySelectorAll(
+                '.money-input'); // Pilih semua elemen dengan kelas 'money-input'
+
+            salaryInputs.forEach(function(input) {
+                // Menghapus titik (pemformatan ribuan) sebelum dikirim
+                input.value = input.value.replace(/[^\d]/g, '');
+            });
+        }
+
         // Fungsi untuk menambahkan titik ketika input difokuskan
         function addFormatting(input) {
             let value = input.value.replace(/[^0-9]/g, ''); // Hapus karakter selain angka
             input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Tambah titik setiap 3 digit
         }
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Edit
+            const editButtons = document.querySelectorAll(".edit-btn-manager");
+
+            // Loop setiap tombol Edit
+            editButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil modal
+                    const modal = document.getElementById("editModalManager");
+
+                    // Masukkan data ke dalam modal
+                    modal.querySelector("#edit_id").value = this.getAttribute("data-id");
+                    modal.querySelector("#edit_name").value = this.getAttribute("data-name");
+                    modal.querySelector("#edit_email").value = this.getAttribute("data-email");
+                    modal.querySelector("#edit_phone").value = this.getAttribute("data-phone");
+                    modal.querySelector("#edit_salary").value = this.getAttribute("data-salary");
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Hapus
+            const deleteButtons = document.querySelectorAll(
+                "[data-bs-toggle='modal'][data-bs-target='#deleteModalManager']");
+
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil data dari tombol
+                    const managerId = this.getAttribute("data-id");
+                    const managerName = this.getAttribute("data-name");
+
+                    // Masukkan data ke dalam modal
+                    document.getElementById("deleteManagerName").textContent = managerName;
+                    document.getElementById("deleteManagerId").value = managerId;
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Edit
+            const editButtons = document.querySelectorAll(".edit-btn-admin");
+
+            // Loop setiap tombol Edit
+            editButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil modal
+                    const modal = document.getElementById("editModalAdmin");
+
+                    // Masukkan data ke dalam modal
+                    modal.querySelector("#edit_id").value = this.getAttribute("data-id");
+                    modal.querySelector("#edit_name").value = this.getAttribute("data-name");
+                    modal.querySelector("#edit_email").value = this.getAttribute("data-email");
+                    modal.querySelector("#edit_phone").value = this.getAttribute("data-phone");
+                    modal.querySelector("#edit_salary").value = this.getAttribute("data-salary");
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Hapus
+            const deleteButtons = document.querySelectorAll(
+                "[data-bs-toggle='modal'][data-bs-target='#deleteModalAdmin']");
+
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil data dari tombol
+                    const adminId = this.getAttribute("data-id");
+                    const adminName = this.getAttribute("data-name");
+
+                    // Masukkan data ke dalam modal
+                    document.getElementById("deleteAdminName").textContent = adminName;
+                    document.getElementById("deleteAdminId").value = adminId;
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Edit
+            const editButtons = document.querySelectorAll(".edit-btn-code");
+
+            // Loop setiap tombol Edit
+            editButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil modal
+                    const modal = document.getElementById("editModalCode");
+
+                    // Masukkan data ke dalam modal
+                    modal.querySelector("#edit_id").value = this.getAttribute("data-id");
+                    modal.querySelector("#edit_code").value = this.getAttribute("data-code");
+                    modal.querySelector("#edit_admin_bonuses").value = this.getAttribute(
+                        "data-admin-bonuses");
+                    modal.querySelector("#edit_manager_bonuses").value = this.getAttribute(
+                        "data-manager-bonuses");
+                    modal.querySelector("#edit_capital").value = this.getAttribute("data-capital");
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pilih semua tombol Hapus
+            const deleteButtons = document.querySelectorAll(
+                "[data-bs-toggle='modal'][data-bs-target='#deleteModalCode']");
+
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    // Ambil data dari tombol
+                    const codeId = this.getAttribute("data-id");
+                    const code = this.getAttribute("data-code");
+
+                    // Masukkan data ke dalam modal
+                    document.getElementById("deleteCode").textContent = code;
+                    document.getElementById("deleteCodeId").value = codeId;
+                });
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

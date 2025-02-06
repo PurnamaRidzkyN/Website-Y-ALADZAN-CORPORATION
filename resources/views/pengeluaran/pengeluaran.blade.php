@@ -14,7 +14,7 @@
         @endif
 
         <!-- Header -->
-        @if (auth()->user()->role == 1)
+        @if (auth()->user()->role == 1 || auth()->user()->role == 0)
             <button type="button"
                 class="text-right mb-8 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
                 data-bs-toggle="modal" data-bs-target="#category_expensesModal">
@@ -204,8 +204,7 @@
                             <div class="mb-3">
                                 <label for="category_expenses_role" class="form-label"
                                     style="color: #fff;">Akses</label>
-                                <select class="form-control" id="category_expenses_role"
-                                    name="role" required>
+                                <select class="form-control" id="category_expenses_role" name="role" required>
                                     <option value="0">Semua bisa
                                         akses</option>
                                     <option value="1">Hanya
@@ -319,7 +318,8 @@
                             <th class="px-4 py-2 text-xs sm:text-sm">Total</th>
                             <th class="px-4 py-2 text-xs sm:text-sm">Deskripsi</th>
                             <th class="px-4 py-2 text-xs sm:text-sm">Metode</th>
-                            <th class="px-4 py-2 text-xs sm:text-sm">Admin</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Penerima</th>
+                            <th class="px-4 py-2 text-xs sm:text-sm">Role</th>
                             <th class="px-4 py-2 text-xs sm:text-sm">Image</th>
                             <th class="px-4 py-2 text-xs sm:text-sm">Aksi</th>
                         </tr>
@@ -370,13 +370,23 @@
                                 <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
                             </div>
                             <div class="hidden" id="Select-admin">
-                                <select class="form-select" name="admin_id" id="admin_id">
-                                    @foreach ($admins as $admin)
-                                        <option value="{{ $admin->id }}"
-                                            data-profile="{{ $admin->profile_picture }}">
-                                            {{ $admin->name }}
-                                        </option>
-                                    @endforeach
+                                <select class="form-select" name="recipient" id="recipient">
+                                    @if (auth()->user()->role == 0)
+                                        @foreach ($managers as $manager)
+                                            <option value="{{ $manager->id }}"
+                                                data-profile="{{ $manager->profile_picture }}">
+                                                {{ $manager->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        @foreach ($admins as $admin)
+                                            <option value="{{ $admin->id }}"
+                                                data-profile="{{ $admin->profile_picture }}">
+                                                {{ $admin->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+
                                 </select>
                             </div>
 
@@ -457,14 +467,23 @@
                                 <label for="deskripsi" class="form-label" style="color: #fff;">Deskripsi</label>
                                 <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
                             </div>
-                            <div class="hidden" id="Select-admin-edit">
-                                <select class="form-select" name="edit_admin_id" id="edit_admin_id">
-                                    @foreach ($admins as $admin)
-                                        <option value="{{ $admin->id }}"
-                                            data-profile="{{ $admin->profile_picture }}">
-                                            {{ $admin->name }}
-                                        </option>
-                                    @endforeach
+                            <div class="hidden" id="Select-recipient-edit">
+                                <select class="form-select" name="edit_recipient" id="edit_recipient">
+                                    @if (auth()->user()->role == 0)
+                                        @foreach ($managers as $manager)
+                                            <option value="{{ $manager->id }}"
+                                                data-profile="{{ $manager->profile_picture }}">
+                                                {{ $manager->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        @foreach ($admins as $admin)
+                                            <option value="{{ $admin->id }}"
+                                                data-profile="{{ $admin->profile_picture }}">
+                                                {{ $admin->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
 
@@ -547,7 +566,6 @@
         </div>
         <!-- Tambahkan jQuery CDN -->
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
         <!-- JavaScript for Formatting -->
         <script>
             // Menambahkan CSRF Token ke setiap AJAX request
@@ -583,7 +601,6 @@
             const userRole = @json(Auth::user()->role); // Get the user's role in JavaScript
             let selectedCategoryId = null; // Variable to store selected category
             let filteredExpenses = allExpenses; // Initially, no filter is applied
-
             // Function to display expenses based on category
             function showExpenses(category) {
                 selectedCategoryId = category.id;
@@ -609,14 +626,14 @@
 
                 if (isGajiOrBonus) {
                     // Show "Add Expense" button if user has proper role or category role is 0
-                    if (userRole == category.role || category.role == 0) {
+                    if (userRole == category.role || category.role == 0 || userRole == 0) {
                         addExpenseButtonException.classList.remove('hidden');
                         addExpenseButtonException.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
                     } else {
                         addExpenseButtonException.classList.add('hidden');
                     }
                 } else {
-                    if (userRole == category.role || category.role == 0) {
+                    if (userRole == category.role || category.role == 0 || userRole == 0) {
                         addExpenseButton.classList.remove('hidden');
                         addExpenseButton.setAttribute('onclick', `addExpense(${selectedCategoryId})`);
                     } else {
@@ -627,9 +644,11 @@
 
             // Function to build table rows for expenses
             function buildExpenseRows(expenses, role, category) {
+                
+                
                 return expenses.map(expense => {
                     const adminOrManagerName = expense.user.username;
-
+                    
                     return `
         <tr class="bg-gray-800 hover:bg-gray-700">
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(adminOrManagerName)}</td>
@@ -638,17 +657,23 @@
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
             ${category === 'Gaji' || category === 'Bonus' ? `
-                                                                                                                                                                            <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.admin.name)}</td> <!-- Admin Name for Gaji/Bonus -->` : ''}
+                                                            <td class="px-4 py-2 text-xs sm:text-sm">
+            ${sanitize(expense.admin?.name || expense.manager?.name)}
+        </td>
+        <td class="px-4 py-2 text-xs sm:text-sm">
+            ${sanitize(expense.admin?.name ? expense.admin.role : (expense.manager?.role || ''))}
+        </td>
+        <!-- Admin Name for Gaji/Bonus -->` : ''}
             <td class="px-4 py-2 text-xs sm:text-sm">
                 <a href="#" onclick="openModal('{{ asset('storage/${sanitize(expense.image_url)}') }}')">
                     <img src="{{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
                 </a>
             </td>
             <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
-                ${ (userRole == role || role == 0) ? `
-                                                                                                                                                                                                                        <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-                                                                                                                                                                                                                        <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-                                                                                                                                                                                                                    ` : '<p> Hanya untuk Manajer</p>' }
+                ${ (userRole == role || role == 0 ||userRole == 0) ? `
+            <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+            <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+        ` : '<p> Hanya untuk Manajer</p>' }
             </td>
         </tr>
     `;
@@ -742,11 +767,12 @@
 
 
             function editExpense(expenseId) {
+                console.log(expenseId);
+                
                 $.ajax({
                     url: `/pengeluaran/edit/${expenseId}`, // Menyertakan ID expense dalam URL
                     method: 'GET',
                     success: function(data) {
-                        console.log(data);
 
                         // Jika data ditemukan, masukkan data ke dalam form modal
                         $('#editDataModal #tanggal').val(data.date);
@@ -755,14 +781,19 @@
                         $('#editDataModal #payment_method').val(data.method);
                         $('#editDataModal #category_id').val(data.category_id);
                         // Jika ada gambar, tampilkan gambar yang sudah ada
-                        console.log(data.admin_id)
                         if (data.image_url) {
                             $('#editDataModal img').attr('src', '/storage/' + data.image_url).show();
                         }
                         if (data.category_id == 1 || data.category_id == 2) {
                             // Tampilkan elemen Select-admin jika categoryId 1 atau 2
-                            document.getElementById('Select-admin-edit').style.display = 'block';
-                            $('#editDataModal #edit_admin_id').val(data.admin_id).trigger('change');
+                            document.getElementById('Select-recipient-edit').style.display = 'block';
+                            if (data.admin_id == null) {
+                                $('#editDataModal #edit_recipient_id').val(data.manager_id).trigger('change');
+
+                            } else {
+                                $('#editDataModal #edit_recipient_id').val(data.admin_id).trigger('change');
+
+                            }
                         } else {
                             // Sembunyikan elemen Select-admin jika categoryId bukan 1 atau 2
                             document.getElementById('Select-admin-edit').style.display = 'none';

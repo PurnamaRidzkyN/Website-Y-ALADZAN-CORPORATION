@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\reportController;
 
 // auth
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -79,15 +80,15 @@ Route::get('/manajemen-data', [DataController::class, 'index'])
 
 Route::post('/manajemen-data/store-admin', [DataController::class, 'adminStore'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
-    ->name('Manajemen Data.AdminStore');
+    ->name('Manajemen Data.adminStore');
 
 Route::put('/manajemen-data/update-admin', [DataController::class, 'adminUpdate'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
-    ->name('Manajemen Data.AdminUpdate');
+    ->name('Manajemen Data.adminUpdate');
 
 Route::delete('/manajemen-data/destroy-admin', [DataController::class, 'adminDestroy'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
-    ->name('Manajemen Data.AdminDestroy');
+    ->name('Manajemen Data.adminDestroy');
 
 Route::post('/manajemen-data/store-manager', [DataController::class, 'managerStore'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
@@ -104,8 +105,17 @@ Route::delete('/manajemen-data/destroy-manager', [DataController::class, 'manage
 Route::put('/manajemen-data/update-message', [DataController::class, 'messageUpdate'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('Manajemen Data.messageUpdate');
-
-Route::get('/manajemen-data/backup-database', [BackupController::class, 'backupDatabase'])->middleware(['auth', CheckRole::class . ':' . '1-0'])
+Route::post('/manajemen-data/store-code', [DataController::class, 'codeStore'])
+    ->middleware(['auth', CheckRole::class . ':' . '0'])
+    ->name('Manajemen Data.codeStore');
+Route::put('/manajemen-data/update-code', [DataController::class, 'codeUpdate'])
+    ->middleware(['auth', CheckRole::class . ':' . '0'])
+    ->name('Manajemen Data.codeUpdate');
+Route::delete('/manajemen-data/destroy-code', [DataController::class, 'codeDestroy'])
+    ->middleware(['auth', CheckRole::class . ':' . '0'])
+    ->name('Manajemen Data.codeDestroy');
+Route::get('/manajemen-data/backup-database', [BackupController::class, 'backupDatabase'])
+    ->middleware(['auth', CheckRole::class . ':' . '1-0'])
     ->name('backupDatabase');;
 Route::post('/manajemen-data/restore-database', [BackupController::class, 'restoreDatabase'])
     ->middleware(['auth', CheckRole::class . ':' . '1-0'])
@@ -119,3 +129,8 @@ Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->mi
 
 Route::get('/absensi', [AttendanceController::class, 'showAttendance'])->middleware('auth')->name('attendance');
 Route::post('/absensi', [AttendanceController::class, 'recordAttendance'])->middleware('auth')->name('recordAttendance');
+
+Route::get('/laporan', [reportController::class, 'showReports'])->middleware(['auth', CheckRole::class . ':' . '0'])->name('reports');
+Route::get('/laporan/bonuses', [ReportController::class, 'showBonuses'])->name('reports.bonuses');
+Route::post('/laporan/bonuses/manajer', [ReportController::class, 'checkReportBonusesManager'])->name('reports.bonuses.manager');
+Route::get('/laporan/pembayaran', [ReportController::class, 'showPayment'])->middleware(['auth', CheckRole::class . ':' . '0'])->name('reports.payment');

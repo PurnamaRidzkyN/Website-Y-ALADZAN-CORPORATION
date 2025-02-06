@@ -32,4 +32,8 @@ class Manager extends Model
     {
         return $this->hasMany(Admin::class);
     }
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
 }

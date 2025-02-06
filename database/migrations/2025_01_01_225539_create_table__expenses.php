@@ -24,8 +24,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Menggunakan foreignId untuk relasi ke admins
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('cascade'); // Menggunakan foreignId untuk relasi ke admins
+            $table->foreignId('manager_id')->nullable()->constrained('managers')->onDelete('cascade'); // Menggunakan foreignId untuk relasi ke admins
             $table->date('date');
-            $table->decimal('amount', 15, 2);
+            $table->integer('amount');
             $table->foreignId('category_id')->constrained('category_expenses')->onDelete('cascade');; // Menggunakan foreignId untuk relasi ke category_expenses
             $table->text('description')->nullable();
             $table->string('method');

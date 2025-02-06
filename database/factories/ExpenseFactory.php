@@ -19,7 +19,7 @@ class ExpenseFactory extends Factory
             'user_id' => $user->id, // Generates a random Admin ID
             'admin_id' => null, // Generates a random Admin ID
             'date' => $this->faker->date, // Generates a random date
-            'amount' => $this->faker->randomFloat(2, 10, 10000), // Generates a random amount
+            'amount' => $this->faker->numberBetween( 10000, 100000),
             'category_id' => CategoryExpense::factory(), // Generates a random CategoryExpense ID
             'description' => $this->faker->text, // Generates a random description
             'method' => $this->faker->word, // Generates a random payment method

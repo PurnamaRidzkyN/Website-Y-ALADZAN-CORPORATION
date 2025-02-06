@@ -30,6 +30,10 @@
                             <!-- Menampilkan Manajemen Data Hanya untuk Role 1 -->
                             <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
                         @endif
+                        @if (Auth::check() &&  Auth::user()->role == 0)
+                            <!-- Menampilkan Manajemen Data Hanya untuk Role 1 -->
+                            <x-nav-links href="/laporan">Laporan</x-nav-links>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -106,6 +110,9 @@
             <x-nav-links href="/absensi">Absensi</x-nav-links>
             @if (Auth::check() && (Auth::user()->role == 1 || Auth::user()->role == 0))
                 <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
+            @endif
+            @if (Auth::check() && Auth::user()->role == 0)
+                <x-nav-links href="/laporan">Laporan</x-nav-links>
             @endif
             @if (Auth::check() && Auth::user()->role == 0)
                 <x-nav-links href="{{ route('logout') }}">Log out</x-nav-links>

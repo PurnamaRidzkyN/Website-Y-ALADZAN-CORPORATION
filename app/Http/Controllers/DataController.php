@@ -53,7 +53,7 @@ class DataController extends Controller
         $managers = $managersQuery->get();
 
         $message = Message::first();
-        $codesQuery = Code::query(); 
+        $codesQuery = Code::query();
         if ($request->has('search_code') && $request->search_code != '') {
             $codesQuery->whereRaw('LOWER(code) like ?', ['%' . strtolower($request->search_code) . '%']);
         }
@@ -69,7 +69,6 @@ class DataController extends Controller
     public function adminStore(Request $request)
     {
         // Validasi input form
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',  // Sesuaikan dengan tabel yang digunakan
@@ -104,7 +103,6 @@ class DataController extends Controller
 
     public function adminUpdate(Request $request)
     {
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',  // Sesuaikan dengan tabel yang digunakan
@@ -143,13 +141,13 @@ class DataController extends Controller
             // Redirect dengan pesan sukses
             return redirect()->route('Manajemen Data')->with([
                 'status' => 'success',
-                'message' => 'Pengeluaran berhasil dihapus!',
+                'message' => 'Admin berhasil dihapus!',
             ]);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
+            // Tangani jika terjadi alert
             return redirect()->route('Manajemen Data')->with([
-                'status' => 'error',
-                'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
+                'status' => 'alert',
+                'message' => 'Gagal menghapus admin. Silakan coba lagi.',
             ]);
         }
     }
@@ -214,8 +212,7 @@ class DataController extends Controller
 
         try {
             // Cari pengeluaran berdasarkan ID
-            $manager = Manager::findOrFail($request->admin_id);
-
+            $manager = Manager::findOrFail($request->manager_id);
             // Hapus gambar dari penyimpanan jika ada
             if ($manager->image_url) {
                 // Menghapus gambar yang disimpan di folder 'public/admin'
@@ -233,9 +230,9 @@ class DataController extends Controller
                 'message' => 'Pengeluaran berhasil dihapus!',
             ]);
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
+            // Tangani jika terjadi alert
             return redirect()->route('Manajemen Data')->with([
-                'status' => 'error',
+                'status' => 'alert',
                 'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
             ]);
         }
@@ -258,5 +255,71 @@ class DataController extends Controller
         return redirect()->route('Manajemen Data')
             ->with('status', 'success')
             ->with('message', 'Pesan berhasil diperbarui');
+    }
+    public function codestore(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|unique:codes',
+            'admin_bonuses' => 'nullable|integer',
+            'manager_bonuses' => 'nullable|integer',
+            'capital' => 'nullable|integer',
+        ]);
+
+        $code = new Code();
+        $code->code = $request->code;
+        $code->admin_bonuses = $request->admin_bonuses ?? 0;
+        $code->manager_bonuses = $request->manager_bonuses ?? 0;
+        $code->capital = $request->capital ?? 0;
+        $code->save();
+        return redirect()->route('Manajemen Data')
+            ->with('status', 'success')
+            ->with('message', 'Kode berhasil ditambahkan');
+    }
+    public function codeUpdate(Request $request)
+    {
+        $code = Code::find($request->id);
+        if (!$code) {
+            return response()->json(['message' => 'Code not found'], 404);
+        }
+
+        $request->validate([
+            'code' => 'sometimes|string|unique:codes,code,' . $request->id,
+            'admin_bonuses' => 'nullable|integer',
+            'manager_bonuses' => 'nullable|integer',
+            'capital' => 'nullable|integer',
+        ]);
+
+        $code->code = $request->code ?? $code->code;
+        $code->admin_bonuses = $request->admin_bonuses ?? $code->admin_bonuses;
+        $code->manager_bonuses = $request->manager_bonuses ?? $code->manager_bonuses;
+        $code->capital = $request->capital ?? $code->capital;
+        $code->save();
+
+        return redirect()->route('Manajemen Data')
+            ->with('status', 'success')
+            ->with('message', 'Kode berhasil ditambahkan');
+    }
+    public function codeDestroy(Request $request)
+    {
+
+        try {
+            // Cari pengeluaran berdasarkan ID
+            $code = Code::findOrFail($request->code_id);
+            // Hapus pengeluaran dari database
+            $code->delete();
+
+
+            // Redirect dengan pesan sukses
+            return redirect()->route('Manajemen Data')->with([
+                'status' => 'success',
+                'message' => 'Pengeluaran berhasil dihapus!',
+            ]);
+        } catch (\Exception $e) {
+            // Tangani jika terjadi alert
+            return redirect()->route('Manajemen Data')->with([
+                'status' => 'alert',
+                'message' => 'Gagal menghapus pengeluaran. Silakan coba lagi.',
+            ]);
+        }
     }
 }
