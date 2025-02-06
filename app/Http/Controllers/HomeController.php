@@ -44,10 +44,13 @@ class HomeController extends Controller
             ->get();
 
         // User paling sering datang
-        $firstDayDecember = Carbon::create(2024, 12, 1);
-        $lastDayDecember = Carbon::create(2024, 12, 31);
 
-        $frequentVisitor = Attendance::whereBetween('attendance_date', [$firstDayDecember, $lastDayDecember])
+
+        $firstDayThisMonth = Carbon::now()->startOfMonth();
+        $lastDayThisMonth = Carbon::now()->endOfMonth();
+
+
+        $frequentVisitor = Attendance::whereBetween('attendance_date', [$firstDayThisMonth, $lastDayThisMonth])
             ->selectRaw('user_id, COUNT(*) as visit_count')
             ->groupBy('user_id')
             ->orderByDesc('visit_count')
@@ -60,7 +63,7 @@ class HomeController extends Controller
         });
 
         // User dengan durasi paling lama
-        $longestDurationUser = Attendance::whereBetween('attendance_date', [$firstDayDecember, $lastDayDecember])
+        $longestDurationUser = Attendance::whereBetween('attendance_date', [$firstDayThisMonth, $lastDayThisMonth])
             ->selectRaw('user_id, SUM(duration) as total_duration')
             ->groupBy('user_id')
             ->orderByDesc('total_duration')

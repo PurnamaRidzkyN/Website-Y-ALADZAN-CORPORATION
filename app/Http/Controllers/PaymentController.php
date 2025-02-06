@@ -28,6 +28,7 @@ class PaymentController extends Controller
                 ->join('admins as a', 'ag.admin_id', '=', 'a.id')
                 ->where('a.id', $admin->id)
                 ->select('g.id', 'g.name', 'g.description', 'g.updated_at')
+                ->orderBy('name', 'asc')
                 ->get();
             return view('pembayaran/pembayaran', ['title' => 'Transaksi Pembayaran', 'groups' => $groups, 'admin' => $admin],);
         } else {
@@ -113,6 +114,7 @@ class PaymentController extends Controller
                         ->where('user_id', Auth::user()->id)
                         ->limit(1); // Pastikan hanya satu id yang dikembalikan
                 })
+                ->orderBy('name', 'asc')
                 ->get();
             // Ambil semua admin yang belum ada di dalam $admins berdasarkan id dengan filter pencarian
             $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
@@ -128,20 +130,21 @@ class PaymentController extends Controller
                         ->where('user_id', Auth::user()->id)
                         ->limit(1); // Pastikan hanya satu id yang dikembalikan
                 })
+                ->orderBy('name', 'asc')
                 ->get();
         } else {
             $admins = AdminLoanView::where('group_id', $group->id)
                 ->when($query, function ($q) use ($query) {
                     $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']) // Case-insensitive untuk nama
                         ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . strtolower($query) . '%']); // Case-insensitive untuk nomor HP
-                })->get();
+                })->orderBy('name', 'asc')->get();
             $adminIds = $admins->pluck('admin_id')->toArray(); // Ambil semua admin_id dari $admins
 
             $adminAll = Admin::whereNotIn('id', $adminIds)
                 ->when($query, function ($queryBuilder) use ($query) {
                     $queryBuilder->where('name', 'like', "%{$query}%")
                         ->orWhere('phone', 'like', "%{$query}%");
-                })->get();
+                })->orderBy('name', 'asc')->get();
         }
 
         // Kirim data grup, admins, dan adminAll ke view
@@ -232,7 +235,7 @@ class PaymentController extends Controller
                         ->orWhere('phone', 'like', '%' . request('query') . '%');
                 });
             })
-            ->get();
+            ->orderBy('loan_date', 'desc')->get();
 
 
         $codes = Code::all();

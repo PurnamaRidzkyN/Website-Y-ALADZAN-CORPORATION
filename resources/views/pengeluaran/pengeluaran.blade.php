@@ -49,29 +49,35 @@
                             </thead>
                             <tbody style="background-color: #1A2634; color: #F7FAFC !important;">
                                 @foreach ($category_expenses as $category)
+                                    @if ($category->id == 1 || $category->id == 2)
+                                        @continue
+                                    @endif
                                     <tr id="category_expenses-row-{{ $category->id }}">
                                         <td style="color: #F7FAFC !important;">{{ $category->name }}</td>
                                         <td style="color: #F7FAFC !important;">
                                             {{ $category->role == 1 ? 'Hanya untuk manajer' : 'Semua bisa akses' }}</td>
                                         <td style="color: #F7FAFC !important;">
-                                            <!-- Tombol Edit -->
-                                            <button type="button" class="btn btn-warning btn-sm rounded-pill shadow-lg"
-                                                data-bs-toggle="modal" data-bs-target="#editModal{{ $category->id }}"
-                                                data-name="{{ $category->name }}" data-role="{{ $category->role }}">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </button>
-
-                                            <!-- Tombol Hapus -->
-                                            <form style="display: inline-block;">
+                                            <div class="flex flex-col sm:flex-row gap-2">
+                                                <!-- Tombol Edit -->
                                                 <button type="button"
-                                                    class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                    class="btn btn-warning btn-sm rounded-pill shadow-lg"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal{{ $category->id }}">
-                                                    <i class="bi bi-trash"></i> Hapus
+                                                    data-bs-target="#editModal{{ $category->id }}"
+                                                    data-name="{{ $category->name }}" data-role="{{ $category->role }}">
+                                                    <i class="bi bi-pencil"></i> Edit
                                                 </button>
-                                            </form>
+
+                                                <!-- Tombol Hapus -->
+                                                <form style="display: inline-block;">
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal{{ $category->id }}">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
-                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -644,11 +650,11 @@
 
             // Function to build table rows for expenses
             function buildExpenseRows(expenses, role, category) {
-                
-                
+
+
                 return expenses.map(expense => {
                     const adminOrManagerName = expense.user.username;
-                    
+
                     return `
         <tr class="bg-gray-800 hover:bg-gray-700">
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(adminOrManagerName)}</td>
@@ -657,13 +663,13 @@
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.description)}</td>
             <td class="px-4 py-2 text-xs sm:text-sm">${sanitize(expense.method)}</td>
             ${category === 'Gaji' || category === 'Bonus' ? `
-                                                            <td class="px-4 py-2 text-xs sm:text-sm">
-            ${sanitize(expense.admin?.name || expense.manager?.name)}
-        </td>
-        <td class="px-4 py-2 text-xs sm:text-sm">
-            ${sanitize(expense.admin?.name ? expense.admin.role : (expense.manager?.role || ''))}
-        </td>
-        <!-- Admin Name for Gaji/Bonus -->` : ''}
+                                                                            <td class="px-4 py-2 text-xs sm:text-sm">
+                            ${sanitize(expense.admin?.name || expense.manager?.name)}
+                        </td>
+                        <td class="px-4 py-2 text-xs sm:text-sm">
+                            ${sanitize(expense.admin?.name ? expense.admin.role : (expense.manager?.role || ''))}
+                        </td>
+                        <!-- Admin Name for Gaji/Bonus -->` : ''}
             <td class="px-4 py-2 text-xs sm:text-sm">
                 <a href="#" onclick="openModal('{{ asset('storage/${sanitize(expense.image_url)}') }}')">
                     <img src="{{ asset('storage/${sanitize(expense.image_url)}') }}" alt="Expense Image" class="h-16 w-16 object-cover rounded">
@@ -671,9 +677,9 @@
             </td>
             <td class="px-4 py-2 flex space-x-2 text-xs sm:text-sm">
                 ${ (userRole == role || role == 0 ||userRole == 0) ? `
-            <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
-            <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
-        ` : '<p> Hanya untuk Manajer</p>' }
+                            <button class="px-2 py-1 bg-yellow-500 rounded text-white" onclick="editExpense(${expense.id})">Edit</button>
+                            <button class="px-2 py-1 bg-red-500 rounded text-white" onclick="deleteExpense(${expense.id})">Delete</button>
+                        ` : '<p> Hanya untuk Manajer</p>' }
             </td>
         </tr>
     `;
@@ -768,7 +774,7 @@
 
             function editExpense(expenseId) {
                 console.log(expenseId);
-                
+
                 $.ajax({
                     url: `/pengeluaran/edit/${expenseId}`, // Menyertakan ID expense dalam URL
                     method: 'GET',

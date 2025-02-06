@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Groups;
+use App\Models\Manager;
 use Illuminate\Http\Request;
 use App\Models\AdminLoanView;
-use App\Models\Manager;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProfilController extends Controller
@@ -29,7 +30,12 @@ class ProfilController extends Controller
             $loans = AdminLoanView::where('admin_id', $admin->id)
                 ->selectRaw('SUM(total_payments) as total_payments, SUM(total_amount) as total_amount')
                 ->first();
-            $group = Groups::get();
+            $group = DB::table('admin_groups as ag')
+                ->join('groups as g', 'ag.group_id', '=', 'g.id')
+                ->join('admins as a', 'ag.admin_id', '=', 'a.id')
+                ->where('a.id', $admin->id)
+                ->select('g.id', 'g.name', 'g.description', 'g.updated_at')
+                ->get();
             return view('profils', ["title" => "Profils " . $user->username, "users" => $user, "user" => $admin, "loan" => $loan, "totalLoans" => $loans, "groups" => $group]);
         }
         $manager = Manager::where('user_id', $user->id)->first();
@@ -61,13 +67,13 @@ class ProfilController extends Controller
                 $imagePath = $req->file('photo')->store('fotoProfils', 'public');
                 $validatedData['photo'] = $imagePath; // Simpan path gambar baru
             }
-    
+
             // Update hanya kolom yang diperlukan di tabel 'users'
             $user->update([
                 'email' => $validatedData['email'],
                 'username' => $validatedData['username'],
             ]);
-    
+
             // Ambil data admin terkait user ini
             if ($admin) {
                 // Update hanya kolom yang diperlukan di tabel 'admin'
@@ -89,13 +95,13 @@ class ProfilController extends Controller
                 $imagePath = $req->file('photo')->store('fotoProfils', 'public');
                 $validatedData['photo'] = $imagePath; // Simpan path gambar baru
             }
-    
+
             // Update hanya kolom yang diperlukan di tabel 'users'
             $user->update([
                 'email' => $validatedData['email'],
                 'username' => $validatedData['username'],
             ]);
-    
+
             // Ambil data admin terkait user ini
             if ($manager) {
                 // Update hanya kolom yang diperlukan di tabel 'admin'

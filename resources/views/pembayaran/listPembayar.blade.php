@@ -11,10 +11,10 @@
         <div class="container mx-auto px-6 lg:px-8">
             <div class="mb-8">
                 <!-- Tombol Kembali dan Tambah Data -->
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 gap-4">
                     <!-- Tombol Kembali -->
                     <a href="{{ route('List Admin', ['group' => $group->name]) }}"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-full sm:w-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="size-6 mr-2 w-5 h-5">
                             <path fill-rule="evenodd"
@@ -24,10 +24,10 @@
                         Kembali
                     </a>
 
-
                     <!-- Tombol Tambah Data -->
+                    @if (auth()->user()->role == 2)
                     <button type="button"
-                        class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+                        class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800 w-full sm:w-auto"
                         data-bs-toggle="modal" data-bs-target="#addDataModal">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="size-6 mr-2 w-5 h-5">
@@ -36,166 +36,170 @@
                         </svg>
                         Tambah Data
                     </button>
+                    @endif
                 </div>
-                <!-- Modal -->
-                <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
-                            <!-- Modal Header -->
-                            <div class="modal-header" style="background-color: #1A2634;">
-                                <h5 class="modal-title" id="addDataModalLabel">Tambah Data</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
 
-                            <!-- Modal Body -->
-                            <div class="modal-body" style="background-color: #2D3748;">
-                                <!-- Form inside the modal -->
-                                <form
-                                    action="{{ route('loan.store', ['group' => $group->name, 'admin' => $admin->name]) }}"
-                                    method="POST">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label">Nama</label>
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            required>
-                                    </div>
+               
+                    <!-- Modal -->
+                    <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="background-color: #2D3748; color: #F7FAFC;">
+                                <!-- Modal Header -->
+                                <div class="modal-header" style="background-color: #1A2634;">
+                                    <h5 class="modal-title" id="addDataModalLabel">Tambah Data</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
 
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label">Deskripsi</label>
-                                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="total_payment" class="form-label">Total Pembayaran</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">Rp</span>
-                                            <input type="text" class="form-control" id="total_amount"
-                                                name="total_amount"required>
+                                <!-- Modal Body -->
+                                <div class="modal-body" style="background-color: #2D3748;">
+                                    <!-- Form inside the modal -->
+                                    <form
+                                        action="{{ route('loan.store', ['group' => $group->name, 'admin' => $admin->name]) }}"
+                                        method="POST">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Nama</label>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                required>
                                         </div>
-                                    </div>
 
-                                    <div class="mb-3">
-                                        <label for="end_date" class="form-label">Tanggal Akhir</label>
-                                        <input type="date" class="form-control" id="loan_date" name="loan_date"
-                                            required>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Deskripsi</label>
+                                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                        </div>
 
-                                    <div class="mb-3">
-                                        <label for="phone" class="form-label">No HP</label>
-                                        <input type="number" class="form-control" id="phone" name="phone"
-                                            required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <input type="hidden" class="form-control" id="admin_group_id"
-                                            name="admin_group_id" value="{{ $adminGroup->id }}" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="code_id" class="form-label">Pilih Kode</label>
-                                        <select class="form-select" name="code_id" id="code_id">
-                                            @foreach ($codes as $code)
-                                                <option value="{{ $code->id }}">
-                                                    {{ $code->code }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label for="total_payment" class="form-label">Total Pembayaran</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control" id="total_amount"
+                                                    name="total_amount"required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="end_date" class="form-label">Tanggal Akhir</label>
+                                            <input type="date" class="form-control" id="loan_date" name="loan_date"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="phone" class="form-label">No HP</label>
+                                            <input type="number" class="form-control" id="phone" name="phone"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="hidden" class="form-control" id="admin_group_id"
+                                                name="admin_group_id" value="{{ $adminGroup->id }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="code_id" class="form-label">Pilih Kode</label>
+                                            <select class="form-select" name="code_id" id="code_id">
+                                                @foreach ($codes as $code)
+                                                    <option value="{{ $code->id }}">
+                                                        {{ $code->code }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
 
+                                </div>
+
+                                <!-- Modal Footer -->
+                                <div class="modal-footer" style="background-color: #1A2634;">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                    <button type="submit" class="btn"
+                                        style="background-color: #4CAF50; color: white;">Kirim</button>
+                                </div>
+                                </form>
                             </div>
-
-                            <!-- Modal Footer -->
-                            <div class="modal-footer" style="background-color: #1A2634;">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn"
-                                    style="background-color: #4CAF50; color: white;">Kirim</button>
-                            </div>
-                            </form>
                         </div>
                     </div>
-                </div>
-                <script>
-                    const nominalInput = document.getElementById('total_amount');
+                    <script>
+                        const nominalInput = document.getElementById('total_amount');
 
-                    nominalInput.addEventListener('input', function(e) {
-                        // Remove non-numeric characters except comma and dot
-                        let value = this.value.replace(/[^\d]/g, '');
+                        nominalInput.addEventListener('input', function(e) {
+                            // Remove non-numeric characters except comma and dot
+                            let value = this.value.replace(/[^\d]/g, '');
 
-                        // Format to Rupiah
-                        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                            // Format to Rupiah
+                            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-                        // Set formatted value back to input
-                        this.value = value;
-                    });
+                            // Set formatted value back to input
+                            this.value = value;
+                        });
 
-                    // Add event listener for form submission
-                    const form = document.querySelector('form');
-                    form.addEventListener('submit', function(e) {
-                        // Remove the dots before sending the value to the server
-                        const valueWithoutDot = nominalInput.value.replace(/\./g, '');
-                        nominalInput.value = valueWithoutDot;
-                    });
-                </script>
+                        // Add event listener for form submission
+                        const form = document.querySelector('form');
+                        form.addEventListener('submit', function(e) {
+                            // Remove the dots before sending the value to the server
+                            const valueWithoutDot = nominalInput.value.replace(/\./g, '');
+                            nominalInput.value = valueWithoutDot;
+                        });
+                    </script>
 
 
-                <script>
-                    const totalPaymentInput = document.getElementById('total_payment');
+                    <script>
+                        const totalPaymentInput = document.getElementById('total_payment');
 
-                    // Function to format number as Rupiah
-                    function formatRupiah(value) {
-                        let number_string = value.replace(/[^,\d]/g, '').toString();
-                        let split = number_string.split(',');
-                        let rest = split[0].length % 3;
-                        let rupiah = split[0].substr(0, rest);
-                        let thousands = split[0].substr(rest).match(/\d{3}/gi);
+                        // Function to format number as Rupiah
+                        function formatRupiah(value) {
+                            let number_string = value.replace(/[^,\d]/g, '').toString();
+                            let split = number_string.split(',');
+                            let rest = split[0].length % 3;
+                            let rupiah = split[0].substr(0, rest);
+                            let thousands = split[0].substr(rest).match(/\d{3}/gi);
 
-                        if (thousands) {
-                            separator = rest ? '.' : '';
-                            rupiah += separator + thousands.join('.');
+                            if (thousands) {
+                                separator = rest ? '.' : '';
+                                rupiah += separator + thousands.join('.');
+                            }
+
+                            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                            return rupiah;
                         }
 
-                        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-                        return rupiah;
-                    }
-
-                    totalPaymentInput.addEventListener('input', function(e) {
-                        let value = e.target.value;
-                        e.target.value = formatRupiah(value);
-                    });
-                </script>
+                        totalPaymentInput.addEventListener('input', function(e) {
+                            let value = e.target.value;
+                            e.target.value = formatRupiah(value);
+                        });
+                    </script>
 
 
-                <form class="flex items-center w-full"
-                    action="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
-                    method="GET">
-                    <label for="loan-search" class="sr-only">Cari Loan</label>
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <form class="flex items-center w-full"
+                        action="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
+                        method="GET">
+                        <label for="loan-search" class="sr-only">Cari Loan</label>
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="admin-search" name="query"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Cari berdasarkan nama atau nomor HP..." value="{{ request('query') }}" />
+                        </div>
+                        <button type="submit"
+                            class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 20 20">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
-                        </div>
-                        <input type="text" id="admin-search" name="query"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Cari berdasarkan nama atau nomor HP..." value="{{ request('query') }}" />
-                    </div>
-                    <button type="submit"
-                        class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                        <span class="sr-only">Cari</span>
-                    </button>
-                    <a href="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
-                        class="p-2.5 ms-2 text-sm font-medium text-white bg-gray-500 rounded-lg border border-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
-                        Reset
-                    </a>
-                </form>
+                            <span class="sr-only">Cari</span>
+                        </button>
+                        <a href="{{ route('Daftar Pembayaran', ['group' => $group->name, 'admin' => $admin->name]) }}"
+                            class="p-2.5 ms-2 text-sm font-medium text-white bg-gray-500 rounded-lg border border-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+                            Reset
+                        </a>
+                    </form>
             </div>
         </div>
 

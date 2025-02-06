@@ -26,10 +26,9 @@ class AttendanceFactory extends Factory
 
         return [
             'user_id' => $user->id,
-            'image_url' => $this->faker->imageUrl(), // URL gambar palsu
             'description' => $this->faker->sentence(),
             'entry_time' => $entryTime->format('H:i:s'), // Waktu masuk
-            'duration' => $exitTime->diffInMinutes($entryTime), // Durasi dalam menit
+            'duration' => $entryTime->diffInMinutes($exitTime), // Durasi dalam menit
             'exit_time' => $exitTime->format('H:i:s'),  // Waktu keluar
             'attendance_date' => Carbon::now()->subMonths(rand(1, 6))->format('Y-m-d'),  // Tanggal absensi 6 bulan kebelakang
         ];

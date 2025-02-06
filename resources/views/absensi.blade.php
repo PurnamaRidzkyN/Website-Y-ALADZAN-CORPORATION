@@ -17,14 +17,6 @@
             <h1 class="text-2xl font-bold text-center text-teal-400 mb-6">Absensi</h1>
             <form action="{{ route('recordAttendance') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <!-- Input Foto -->
-                <div class="mb-4">
-                    <label for="photo" class="block text-sm font-medium text-gray-100 mb-2">Unggah Foto</label>
-                    <input type="file" id="photo" name="photo" accept="image/*"
-                        class="block w-full text-sm text-gray-100 border border-gray-700 rounded-lg cursor-pointer bg-gray-800 focus:ring-teal-400 focus:border-teal-400"
-                        required />
-                </div>
-
                 <!-- Input Keterangan -->
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-100 mb-2">Keterangan</label>

@@ -2,23 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
-use App\Models\Bonuses;
-use App\Models\Groups;
-use App\Models\Expense;
+use Carbon\Carbon;
 use App\Models\Loan;
+use App\Models\User;
+use App\Models\Admin;
+use App\Models\Groups;
+use App\Models\Bonuses;
+use App\Models\Expense;
 use App\Models\Manager;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class reportController extends Controller
 {
     public function showReports()
     {
-
         return view('reports', ['title' => 'Laporan']);
     }
+    public function showAttendances(Request $request)
+    {
+        $data = Attendance::with('user')
+            ->when($request->username, function ($query) use ($request) {
+                return $query->whereHas('user', function ($q) use ($request) {
+                    $q->whereRaw("LOWER(username) LIKE LOWER(?)", ["%{$request->username}%"]);
+                });
+            })
+            ->when($request->date, function ($query) use ($request) {
+                return $query->whereDate('attendance_date', $request->date);
+            })
+            ->orderBy('attendance_date', 'desc')
+            ->get();
+
+
+        $title = 'Laporan Absensi';
+        $usernames = User::pluck('username')->toArray();
+        return view('reportAttendance', compact('data', 'title', 'usernames'));
+    }
+
+
     public function showBonuses(Request $request)
     {
         $searchQuery = $request->input('search_manager');
@@ -55,6 +77,12 @@ class reportController extends Controller
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->first();
+        if ($expense == null) {
+            return redirect()->back()->withInput()->with([
+                'status' => 'danger',
+                'message' => 'Laporan tidak ada atau Gaji belum dibayar!',
+            ]);
+        }
         $expenseB = Expense::where('manager_id', $managerId)
             ->where('category_id', 2)
             ->whereMonth('date', $month)
@@ -71,7 +99,7 @@ class reportController extends Controller
             ->sum('c.manager_bonuses');
 
         $previousMonth = Carbon::createFromFormat('Y-m', $monthYear)->subMonth()->format('Y-m');
-        $endDate = \Carbon\Carbon::createFromFormat('Y-m', $previousMonth)->endOfMonth()->toDateString();
+        $endDate = Carbon::createFromFormat('Y-m', $previousMonth)->endOfMonth()->toDateString();
         $totalBonusPrev = DB::table('loans as l')
             ->join('admin_groups as ag', 'l.admin_group_id', '=', 'ag.id')
             ->join('codes as c', 'l.codes_id', '=', 'c.id')
@@ -79,24 +107,94 @@ class reportController extends Controller
             ->where('a.manager_id', $managerId)
             ->where('l.loan_date', '<=', $endDate) // Filter sampai tanggal tertentu
             ->sum('c.manager_bonuses');
+
         Carbon::setLocale('id');
         $monthName = Carbon::parse($monthYear)
-            ->isoFormat('MMMM');  // isoFormat dengan 'MMMM' untuk nama bulan penuh
-        // Ambil nama bulan
+            ->isoFormat('MMMM');
         $bonuses = Bonuses::find(Manager::find($managerId)->bonus_id);
 
-        if ($expense) {
-            // Jika ada laporan, arahkan ke halaman lain
-            return view('reportBonusesPrint', compact('totalBonusPrev', 'newBonus', 'bonuses', 'expense', 'monthName', 'year', 'expenseB'));
-        } else {
-            // Jika tidak ada laporan
-            return redirect()->route('reports.bonuses')->with([
+        $totalRemaining = Expense::where('date', '<=', Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth()->toDateString())
+            ->where('category_id', 2)
+            ->where('manager_id', $managerId)
+            ->sum('amount');
+
+        // Jika ada laporan, arahkan ke halaman lain
+        return view('reportBonusesPrint', compact('totalRemaining', 'totalBonusPrev', 'newBonus', 'bonuses', 'expense', 'monthName', 'year', 'expenseB'));
+    }
+    public function showBonusesAdmin($id)
+    {
+        $admins = Admin::query()
+            ->where('manager_id', $id)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $title = 'Laporan Bonus';
+        return view('reportBonusesAdmin', compact('title', 'admins', 'id')); // Tambahkan 'id' ke compact
+    }
+
+    public function checkReportBonusesAdmin(Request $request)
+    {
+
+        $monthYear = $request->input('month');
+        $adminId = $request->input('id');
+
+
+        $month = Carbon::parse($monthYear)->month;
+        $year = Carbon::parse($monthYear)->year;
+
+        // Cek apakah ada pengeluaran untuk manajer dan bulan/tahun yang dipilih
+        $expense = Expense::where('admin_id', $adminId)
+            ->where('category_id', 1)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->first();
+
+        if ($expense == null) {
+            return redirect()->back()->withInput()->with([
                 'status' => 'danger',
                 'message' => 'Laporan tidak ada atau Gaji belum dibayar!',
             ]);
         }
-    }
 
+        $expenseB = Expense::where('admin_id', $adminId)
+            ->where('category_id', 2)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->first();
+
+        $loanDate = $monthYear . '-01';
+        $newBonus = DB::table('loans as l')
+            ->join('admin_groups as ag', 'l.admin_group_id', '=', 'ag.id')
+            ->join('codes as c', 'l.codes_id', '=', 'c.id')
+            ->join('admins as a', 'ag.admin_id', '=', 'a.id')
+            ->where('a.id', $adminId)
+            ->whereRaw("DATE_TRUNC('month', l.loan_date) = ?", [$loanDate])
+            ->sum('c.admin_bonuses');
+
+        $previousMonth = Carbon::createFromFormat('Y-m', $monthYear)->subMonth()->format('Y-m');
+        $endDate = Carbon::createFromFormat('Y-m', $previousMonth)->endOfMonth()->toDateString();
+        $totalBonusPrev = DB::table('loans as l')
+            ->join('admin_groups as ag', 'l.admin_group_id', '=', 'ag.id')
+            ->join('codes as c', 'l.codes_id', '=', 'c.id')
+            ->join('admins as a', 'ag.admin_id', '=', 'a.id')
+            ->where('a.id', $adminId)
+            ->where('l.loan_date', '<=', $endDate) // Filter sampai tanggal tertentu
+            ->sum('c.admin_bonuses');
+
+        Carbon::setLocale('id');
+        $monthName = Carbon::parse($monthYear)
+            ->isoFormat('MMMM');
+
+        $bonuses = Bonuses::find(Admin::find($adminId)->bonus_id);
+
+        $totalRemaining = Expense::where('date', '<=', Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth()->toDateString())
+            ->where('category_id', 2)
+            ->where('admin_id', $adminId)
+            ->sum('amount');
+
+        // Jika ada laporan, arahkan ke halaman lain
+        return view('reportBonusesPrint', compact('totalRemaining', 'totalBonusPrev', 'newBonus', 'bonuses', 'expense', 'monthName', 'year', 'expenseB'));
+    }
 
     public function showPayment(Request $request)
     {

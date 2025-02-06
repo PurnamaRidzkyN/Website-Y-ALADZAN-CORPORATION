@@ -54,25 +54,27 @@
                                             <td style="color: #F7FAFC !important;">{{ $group->name }}</td>
                                             <td style="color: #F7FAFC !important;">{{ $group->description }}</td>
                                             <td style="color: #F7FAFC !important;">
-                                                <!-- Tombol Edit -->
-                                                <button type="button"
-                                                    class="btn btn-warning btn-sm rounded-pill shadow-lg"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editModal{{ $group->id }}"
-                                                    data-name="{{ $group->name }}"
-                                                    data-description="{{ $group->description }}">
-                                                    <i class="bi bi-pencil"></i> Edit
-                                                </button>
-
-                                                <!-- Tombol Hapus -->
-                                                <form style="display: inline-block;">
+                                                <div class="flex flex-col sm:flex-row gap-2">
+                                                    <!-- Tombol Edit -->
                                                     <button type="button"
-                                                        class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                        class="btn btn-warning btn-sm rounded-pill shadow-lg"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal{{ $group->id }}">
-                                                        <i class="bi bi-trash"></i> Hapus
+                                                        data-bs-target="#editModal{{ $group->id }}"
+                                                        data-name="{{ $group->name }}"
+                                                        data-description="{{ $group->description }}">
+                                                        <i class="bi bi-pencil"></i> Edit
                                                     </button>
-                                                </form>
+
+                                                    <!-- Tombol Hapus -->
+                                                    <form style="display: inline-block;">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm rounded-pill shadow-lg"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal{{ $group->id }}">
+                                                            <i class="bi bi-trash"></i> Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

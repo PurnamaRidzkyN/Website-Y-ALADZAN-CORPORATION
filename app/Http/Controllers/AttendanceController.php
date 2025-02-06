@@ -15,86 +15,92 @@ class AttendanceController extends Controller
     }
     public function recordAttendance(Request $request)
     {
-        $request->validate([
-            'photo' => 'required|image',
-            'description' => 'required|string',
-            'status' => 'required|in:masuk,keluar',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-        ]);
+        try {
+            $request->validate([
+                'description' => 'required|string',
+                'status' => 'required|in:masuk,keluar',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+            ]);
 
-        // Lokasi tujuan
-        $targetLatitude = -7.100906;
-        $targetLongitude = 107.4625217;
+            // Lokasi tujuan
+            $targetLatitude = -7.100906;
+            $targetLongitude = 107.4625217;
 
-        $userLatitude = $request->latitude;
-        $userLongitude = $request->longitude;
+            $userLatitude = $request->latitude;
+            $userLongitude = $request->longitude;
 
-        $distance = $this->calculateDistance($userLatitude, $userLongitude, $targetLatitude, $targetLongitude);
+            $distance = $this->calculateDistance($userLatitude, $userLongitude, $targetLatitude, $targetLongitude);
 
-        if ($distance > 0.3) {
-            return redirect()->route('attendance')->withErrors([
-                'location' => 'Lokasi Anda terlalu jauh dari tujuan. Jarak: ' . round($distance, 2) . ' km',
+            if ($distance > 0.05) {
+                return redirect()->route('attendance')->withErrors([
+                    'location' => 'Lokasi Anda terlalu jauh dari tujuan. Jarak: ' . round($distance, 2) . ' km',
+                ]);
+            }
+
+            $userId = Auth::id();
+            $attendanceDate = now()->toDateString();
+
+            if ($request->status === 'masuk') {
+                $existingAttendance = Attendance::where('user_id', $userId)
+                    ->where('attendance_date', $attendanceDate)
+                    ->first();
+
+                if ($existingAttendance) {
+                    return redirect()->route('attendance')->withErrors([
+                        'status' => 'Anda sudah melakukan absensi masuk hari ini.',
+                    ]);
+                }
+
+                $attendance = new Attendance();
+                $attendance->user_id = $userId;
+                $attendance->description = $request->description;
+                $attendance->attendance_date = $attendanceDate;
+                $attendance->entry_time = now()->toTimeString();
+                $attendance->exit_time = null;
+                $attendance->duration = null; // Kosongkan lama masuk
+                $attendance->save();
+
+                return redirect()->route('attendance')->with('success', 'Absensi masuk berhasil disimpan.');
+            } elseif ($request->status === 'keluar') {
+                $attendance = Attendance::where('user_id', $userId)
+                    ->where('attendance_date', $attendanceDate)
+                    ->first();
+
+                if (!$attendance) {
+                    return redirect()->route('attendance')->withErrors([
+                        'status' => 'Anda bahkan belum melakukan absensi masuk hari ini.',
+                    ]);
+                }
+
+                if ($attendance->exit_time) {
+                    return redirect()->route('attendance')->withErrors([
+                        'status' => 'Anda sudah melakukan absensi keluar hari ini.',
+                    ]);
+                }
+
+                $exitTime = now();
+                $entryTime = Carbon::createFromTimeString($attendance->entry_time);
+
+                // Hitung lama masuk dalam menit
+                $duration = $entryTime->diffInMinutes($exitTime);
+
+                $attendance->exit_time = $exitTime->toTimeString();
+                $attendance->image_url = $request->file('photo')->store('attendance_photos', 'public');
+                $attendance->duration = $duration;
+                $attendance->save();
+
+                return redirect()->route('attendance')->with('success', 'Absensi keluar berhasil disimpan.');
+            }
+
+            return redirect()->route('attendance')->withErrors(['status' => 'Status absensi tidak valid.']);
+        } catch (\Exception $e) {
+            // Tangani jika terjadi danger
+            return redirect()->back()->withInput()->with([
+                'status' => 'danger',
+                'message' => 'Gagal menambahkan Absensi. Silakan coba lagi.' ,
             ]);
         }
-
-        $userId = Auth::id();
-        $attendanceDate = now()->toDateString();
-
-        if ($request->status === 'masuk') {
-            $existingAttendance = Attendance::where('user_id', $userId)
-                ->where('attendance_date', $attendanceDate)
-                ->first();
-
-            if ($existingAttendance) {
-                return redirect()->route('attendance')->withErrors([
-                    'status' => 'Anda sudah melakukan absensi masuk hari ini.',
-                ]);
-            }
-
-            $attendance = new Attendance();
-            $attendance->user_id = $userId;
-            $attendance->description = $request->description;
-            $attendance->attendance_date = $attendanceDate;
-            $attendance->entry_time = now()->toTimeString();
-            $attendance->exit_time = null;
-            $attendance->image_url = $request->file('photo')->store('attendance_photos', 'public');
-            $attendance->duration = null; // Kosongkan lama masuk
-            $attendance->save();
-
-            return redirect()->route('attendance')->with('success', 'Absensi masuk berhasil disimpan.');
-        } elseif ($request->status === 'keluar') {
-            $attendance = Attendance::where('user_id', $userId)
-                ->where('attendance_date', $attendanceDate)
-                ->first();
-
-            if (!$attendance) {
-                return redirect()->route('attendance')->withErrors([
-                    'status' => 'Anda bahkan belum melakukan absensi masuk hari ini.',
-                ]);
-            }
-
-            if ($attendance->exit_time) {
-                return redirect()->route('attendance')->withErrors([
-                    'status' => 'Anda sudah melakukan absensi keluar hari ini.',
-                ]);
-            }
-
-            $exitTime = now();
-            $entryTime = Carbon::createFromTimeString($attendance->entry_time);
-
-            // Hitung lama masuk dalam menit
-            $duration = $entryTime->diffInMinutes($exitTime);
-
-            $attendance->exit_time = $exitTime->toTimeString();
-            $attendance->image_url = $request->file('photo')->store('attendance_photos', 'public');
-            $attendance->duration = $duration;
-            $attendance->save();
-
-            return redirect()->route('attendance')->with('success', 'Absensi keluar berhasil disimpan.');
-        }
-
-        return redirect()->route('attendance')->withErrors(['status' => 'Status absensi tidak valid.']);
     }
 
     // Fungsi untuk menghitung jarak menggunakan Haversine Formula

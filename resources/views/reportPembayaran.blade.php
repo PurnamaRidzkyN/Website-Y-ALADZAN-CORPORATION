@@ -2,7 +2,7 @@
     <x-slot:title>{{ $title }}</x-slot:title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="container mx-auto mt-8">
+    <div class="bg-gray-900 min-h-screen p-6 mx-auto mt-8">
         <h2 class="text-2xl font-bold text-white">Report Filter</h2>
         <form action="{{ route('reports.payment') }}" method="GET" class="space-y-4 mt-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -146,7 +146,6 @@
     <div class="overflow-x-auto">
         <!-- Table Here -->
     </div>
-@dump()
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Grafik per Group

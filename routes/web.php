@@ -130,7 +130,13 @@ Route::put('/profil/{username}/update', [ProfilController::class, 'update'])->mi
 Route::get('/absensi', [AttendanceController::class, 'showAttendance'])->middleware('auth')->name('attendance');
 Route::post('/absensi', [AttendanceController::class, 'recordAttendance'])->middleware('auth')->name('recordAttendance');
 
-Route::get('/laporan', [reportController::class, 'showReports'])->middleware(['auth', CheckRole::class . ':' . '0'])->name('reports');
-Route::get('/laporan/bonuses', [ReportController::class, 'showBonuses'])->name('reports.bonuses');
-Route::post('/laporan/bonuses/manajer', [ReportController::class, 'checkReportBonusesManager'])->name('reports.bonuses.manager');
+Route::get('/laporan', [reportController::class, 'showReports'])->middleware(['auth', CheckRole::class . ':' . '0-1'])->name('reports');
+Route::get('/laporan/bonuses', [ReportController::class, 'showBonuses'])->middleware(['auth', CheckRole::class . ':' . '0'])->name('reports.bonuses');
+Route::post('/laporan/bonuses/manajer', [ReportController::class, 'checkReportBonusesManager'])->middleware('auth')->name('reports.bonuses.manager');
+Route::get('/laporan/bonuses/manajer/{id}', [ReportController::class, 'showBonusesAdmin'])->middleware(['auth', CheckRole::class . ':' . '0-1'])->name('reports.bonuses.admins');
+Route::post('/laporan/bonuses/admin', [ReportController::class, 'checkReportBonusesAdmin'])->middleware('auth')->name('reports.bonuses.admin');
+
+Route::get('/laporan/absensi', [ReportController::class, 'showAttendances'])->middleware(['auth', CheckRole::class . ':' . '0-1'])->name('reports.attendances');
+
+
 Route::get('/laporan/pembayaran', [ReportController::class, 'showPayment'])->middleware(['auth', CheckRole::class . ':' . '0'])->name('reports.payment');

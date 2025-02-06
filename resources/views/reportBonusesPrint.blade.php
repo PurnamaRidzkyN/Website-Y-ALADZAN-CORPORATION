@@ -198,15 +198,15 @@
                 </tr>
                 <tr>
                     <th>Total Bonus Keseluruhan</th>
-                    <td>Rp {{ number_format($bonuses->total_amount, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($totalBonusPrev + $newBonus, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
                     <th>Bonus yang Sudah Diterima</th>
-                    <td>Rp {{ number_format($bonuses->used_amount, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($totalRemaining, 0, ',', '.') }}</td>
                 </tr>
                 <tr class="remaining-bonus">
                     <th>Sisa Bonus</th>
-                    <td><strong>Rp {{ number_format($bonuses->remaining_amount, 0, ',', '.') }}</strong></td>
+                    <td><strong>Rp {{ number_format(($totalBonusPrev + $newBonus)-$totalRemaining, 0, ',', '.') }}</strong></td>
                 </tr>
             </table>
         </div>

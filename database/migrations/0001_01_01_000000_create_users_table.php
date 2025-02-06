@@ -76,7 +76,6 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke tabel users
-            $table->string('image_url');  // URL gambar, opsional
             $table->string('description');
             // Menambahkan kolom waktu masuk dan waktu keluar
             $table->time('entry_time');  // Waktu masuk (tanpa tanggal)

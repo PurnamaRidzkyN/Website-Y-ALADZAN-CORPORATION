@@ -17,7 +17,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             <!-- Absensi -->
-            <a href="" style="text-decoration: none; color: inherit;"
+            <a href="{{ route('reports.attendances') }}" style="text-decoration: none; color: inherit;"
                 class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                     <path fill-rule="evenodd"
@@ -28,18 +28,28 @@
             </a>
 
             <!-- Bonus -->
-            <a href="{{ route ('reports.bonuses') }}" style="text-decoration: none; color: inherit;"
-                class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
-                <span class="material-symbols-outlined text-3xl">money_bag</span>
-                <h2 class="text-xl font-semibold">Bonus</h2>
-            </a>
-
-            <!-- Pembayaran -->
-            <a href="{{ route ('reports.payment') }}" style="text-decoration: none; color: inherit;"
-                class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
-                <span class="material-symbols-outlined text-3xl">payments</span>
-                <h2 class="text-xl font-semibold">Pembayaran</h2>
-            </a>
+            @if (Auth::user()->role == 1)
+                <a href="{{ route('reports.bonuses.admins', ['id' => App\Models\Manager::where('user_id', Auth::id())->value('id')]) }}"
+                    style="text-decoration: none; color: inherit;"
+                    class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl">money_bag</span>
+                    <h2 class="text-xl font-semibold">Bonus</h2>
+                </a>
+            @elseif (Auth::user()->role == 0)
+                <a href="{{ route('reports.bonuses') }}" style="text-decoration: none; color: inherit;"
+                    class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl">money_bag</span>
+                    <h2 class="text-xl font-semibold">Bonus</h2>
+                </a>
+            @endif
+            @if (Auth::user()->role == 0)
+                <!-- Pembayaran -->
+                <a href="{{ route('reports.payment') }}" style="text-decoration: none; color: inherit;"
+                    class="bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 cursor-pointer flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl">payments</span>
+                    <h2 class="text-xl font-semibold">Pembayaran</h2>
+                </a>
+            @endif
         </div>
     </div>
 </x-layouts>

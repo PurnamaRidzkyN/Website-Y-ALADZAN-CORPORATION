@@ -18,10 +18,12 @@ class ExpensesController extends Controller
         // Fetch category expenses and expenses with related users (admin, manager)
         $category_expenses = CategoryExpense::orderBy('id', 'asc')->get();
         $admins = Admin::get();
-        if (Auth::user()->role == 1) {
-            $admins = Admin::get()->where('manager_id', Auth::user()->id);
-        }
         $managers = Manager::get();
+        if (Auth::user()->role == 1) {
+            $managers = Manager::where('user_id', Auth::user()->id)->first();
+            $admins = Admin::where('manager_id', $managers->id)->get();
+        }
+
         $expenses = Expense::with('user.admin', 'user.manager')
             ->orderBy('date', 'desc')  // 'asc' untuk urutan menaik, 'desc' untuk urutan menurun
             ->get();
@@ -94,8 +96,8 @@ class ExpensesController extends Controller
             // Simpan data pengeluaran ke database
             Expense::create([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => (Auth::user()->role == 0) ? $validatedData['recipient'] : null,
-                'manager_id' => (Auth::user()->role == 1) ? $validatedData['recipient'] : null,
+                'admin_id' => (Auth::user()->role == 1) ? $validatedData['recipient'] : null,
+                'manager_id' => (Auth::user()->role == 0) ? $validatedData['recipient'] : null,
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -120,13 +122,13 @@ class ExpensesController extends Controller
             // Tangani jika terjadi danger
             return redirect()->back()->withInput()->with([
                 'status' => 'danger',
-                'message' => 'Gagal menambahkan pengeluaran. Silakan coba lagi.' .$e,
+                'message' => 'Gagal menambahkan pengeluaran. Silakan coba lagi.',
             ]);
         }
     }
     public function update(Request $request, $id)
     {
- 
+
         // Validasi input
         if ($request->category_id == 1 || $request->category_id == 2) {
             $validatedData = $request->validate([
@@ -151,6 +153,7 @@ class ExpensesController extends Controller
             ]);
         }
         try {
+            $role = Auth::user()->role;
             $validatedData['nominal'] =  str_replace('.', '', $validatedData['nominal']);
 
             // Cari pengeluaran berdasarkan ID
@@ -170,8 +173,8 @@ class ExpensesController extends Controller
             // Perbarui data pengeluaran
             $expense->update([
                 'user_id' => $validatedData['user_id'],
-                'admin_id' => (($request->category_id == 1 || $request->category_id == 2) && (Auth::user()->role == 1)) ? $validatedData['edit_recipient'] : null,
-                'manager_id' => (($request->category_id == 1 || $request->category_id == 2) && (Auth::user()->role == 0)) ? $validatedData['edit_recipient'] : null,
+                'admin_id' => (($request->category_id == 1 || $request->category_id == 2) && ($role == 1)) ? $validatedData['edit_recipient'] : null,
+                'manager_id' => (($request->category_id == 1 || $request->category_id == 2) && ($role == 0)) ? $validatedData['edit_recipient'] : null,
                 'date' => $validatedData['tanggal'],
                 'amount' => $validatedData['nominal'],
                 'category_id' => $validatedData['category_id'],
@@ -182,7 +185,11 @@ class ExpensesController extends Controller
 
             if ($validatedData['category_id'] == 2) {
                 // Temukan admin berdasarkan admin_id yang diubah
-                $admin = Admin::find($validatedData['edit_admin_id']);
+                if ($role == 1) {
+                    $admin = Admin::find($validatedData['edit_recipient']);
+                } else if ($role == 0) {
+                    $admin = Manager::find($validatedData['edit_recipient']);
+                };
 
                 // Temukan bonus berdasarkan bonus_id yang terkait dengan admin
                 $bonus = Bonuses::find($admin->bonus_id);
@@ -210,7 +217,7 @@ class ExpensesController extends Controller
             // Tangani jika terjadi danger
             return redirect()->back()->withInput()->with([
                 'status' => 'danger',
-                'message' => 'Gagal memperbarui pengeluaran. Silakan coba lagi.',
+                'message' => 'Gagal memperbarui pengeluaran. Silakan coba lagi.' . $e,
             ]);
         }
     }
@@ -218,7 +225,7 @@ class ExpensesController extends Controller
 
     public function edit($id)
     {
-        $expense = Expense::findOrFail($id); 
+        $expense = Expense::findOrFail($id);
         return response()->json($expense);
     }
 

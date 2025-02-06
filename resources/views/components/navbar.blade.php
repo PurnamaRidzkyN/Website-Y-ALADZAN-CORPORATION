@@ -1,12 +1,14 @@
 <!-- resources/views/components/navbar.blade.php -->
 <nav class="bg-gray-800" x-data="{ isOpen: false }">
-
-    @if (Auth::user()->role == 1)
+    @php
+        $role = Auth::user()->role;
+    @endphp
+    @if ($role == 1)
         <!-- Jika role adalah 1, cari data manajer -->
         @php
             $user = App\Models\Manager::where('user_id', Auth::user()->id)->first();
         @endphp
-    @elseif (Auth::user()->role == 2)
+    @elseif ($role == 2)
         <!-- Jika role adalah 2, cari data admin -->
         @php
             $user = App\Models\Admin::where('user_id', Auth::user()->id)->first();
@@ -26,11 +28,11 @@
                         <x-nav-links href="/pengeluaran">Pencatatan Pengeluaran</x-nav-links>
                         <x-nav-links href="/absensi">Absensi</x-nav-links>
 
-                        @if (Auth::check() && (Auth::user()->role == 1 || Auth::user()->role == 0))
+                        @if ($role == 1 || $role == 0)
                             <!-- Menampilkan Manajemen Data Hanya untuk Role 1 -->
                             <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
                         @endif
-                        @if (Auth::check() &&  Auth::user()->role == 0)
+                        @if ($role == 1 || $role == 0)
                             <!-- Menampilkan Manajemen Data Hanya untuk Role 1 -->
                             <x-nav-links href="/laporan">Laporan</x-nav-links>
                         @endif
@@ -39,7 +41,7 @@
             </div>
             <div class="hidden md:block">
                 <div class="ml-4 flex items-center md:ml-6">
-                    @if (Auth::check() && (Auth::user()->role == 1 || Auth::user()->role == 2))
+                    @if ($role == 1 || $role == 2)
                         <!-- Profile dropdown -->
                         <div class="relative ml-3">
                             <div>
@@ -108,17 +110,17 @@
             <x-nav-links href="/transaksi-pembayaran">Pembayaran</x-nav-links>
             <x-nav-links href="/pengeluaran">Pengeluaran</x-nav-links>
             <x-nav-links href="/absensi">Absensi</x-nav-links>
-            @if (Auth::check() && (Auth::user()->role == 1 || Auth::user()->role == 0))
+            @if ($role == 1 || $role == 0)
                 <x-nav-links href="/manajemen-data">Manajemen Data</x-nav-links>
             @endif
-            @if (Auth::check() && Auth::user()->role == 0)
+            @if ($role == 1 ||$role == 0)
                 <x-nav-links href="/laporan">Laporan</x-nav-links>
             @endif
-            @if (Auth::check() && Auth::user()->role == 0)
+            @if ($role == 0)
                 <x-nav-links href="{{ route('logout') }}">Log out</x-nav-links>
             @endif
         </div>
-        @if (Auth::check() && (Auth::user()->role == 1 || Auth::user()->role == 2))
+        @if ($role == 1 || $role == 2)
             <div class="border-t border-gray-700 pb-3 pt-4">
                 <div class="flex items-center px-5">
                     <div class="shrink-0">

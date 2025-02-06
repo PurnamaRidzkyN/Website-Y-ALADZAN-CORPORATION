@@ -7,7 +7,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Card Grafik Pembayaran per Tanggal -->
             <div class="bg-[#1A2634] p-4 rounded-lg shadow-lg">
-                <h3 class="text-2xl font-bold text-white mb-4">Grafik Pembayaran per Tanggal</h3>
+                <h3 class="text-2xl font-bold text-white mb-4">Grafik Pembayaran per Bulan</h3>
                 <canvas id="paymentChart" width="400" height="200"></canvas>
             </div>
 
@@ -36,11 +36,10 @@
 
     <script>
         const paymentData = @json($paymentData);
-
         const ctx = document.getElementById('paymentChart').getContext('2d');
 
         const datasets = Object.keys(paymentData).map(groupId => ({
-            label:  groupId,
+            label: groupId,
             data: paymentData[groupId].totals,
             borderColor: '#' + Math.floor(Math.random() * 16777215).toString(16), // Warna random
             fill: false
@@ -49,10 +48,32 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: paymentData[Object.keys(paymentData)[0]].labels, // Ambil label dari salah satu group
+                labels: paymentData[Object.keys(paymentData)[0]].labels,
                 datasets: datasets
+            },
+            options: {
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
             }
         });
+
         // Data untuk grafik pembayaran terbesar
         const highPaymentDates = @json($highPaymentDates);
         const highPaymentTotals = @json($highPaymentTotals);
@@ -69,6 +90,27 @@
                     borderColor: 'rgb(54, 162, 235)',
                     borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
             }
         });
 
@@ -88,6 +130,27 @@
                     borderColor: 'rgb(255, 99, 132)',
                     borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
             }
         });
 
@@ -107,6 +170,27 @@
                     borderColor: 'rgb(75, 192, 192)',
                     borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'white'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
             }
         });
     </script>
